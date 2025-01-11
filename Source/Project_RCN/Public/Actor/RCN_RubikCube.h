@@ -30,9 +30,11 @@ public:
 	void Spin(const FString& Order);
 
 protected:
-	void GrabPieces(const FSignInfo& SignInfo);
+	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
-	void UpdateTurn();
+	void UpdateTurnCore(FQuat TargetRotator);
+	void GrabPieces(const FSignInfo& SignInfo);
+	void ReleasePieces();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_RubikCubeDataAsset> RubikCubeDataAsset;
@@ -49,5 +51,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TArray<FSignInfo> SignInfos;
 
-	FQuat TargetQuat;
+	UPROPERTY(VisibleAnywhere)
+	TArray<FSignInfo> SignQueue;
+
+	UPROPERTY(VisibleAnywhere)
+	uint8 bIsTurning : 1;
 };

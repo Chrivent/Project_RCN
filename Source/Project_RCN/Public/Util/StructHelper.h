@@ -3,23 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Util/EnumHelper.h"
 #include "StructHelper.generated.h"
-
-enum class EAxisType : uint8;
 
 USTRUCT(BlueprintType)
 struct FSignInfo
 {
 	GENERATED_BODY()
 
-	/*FSignInfo() : 
-		Sign(TEXT("L")),
-		AxisType(EAxisType::AxisX),
-		Layer(-1),
-		CCW(false),
-		TurnCount(1)
+	FSignInfo(FString InSign = "L", const EAxisType InAxisType = EAxisType::AxisX, const int32 InLayer = -1, const bool InCCW = false, const int32 InTurnCount = 1)
 	{
-	}*/
+		Sign = InSign;
+		AxisType = InAxisType;
+		Layer = InLayer;
+		CCW = InCCW;
+		TurnCount = InTurnCount;
+	}
 
 	UPROPERTY(VisibleAnywhere)
 	FString Sign;
@@ -31,7 +30,7 @@ struct FSignInfo
 	int32 Layer;
 
 	UPROPERTY(VisibleAnywhere)
-	bool CCW;
+	uint8 CCW : 1;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 TurnCount;

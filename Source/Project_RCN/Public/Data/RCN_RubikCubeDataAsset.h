@@ -23,4 +23,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float PieceDistance;
+
+	UPROPERTY(EditDefaultsOnly)
+	float TurnSpeed;
 };
