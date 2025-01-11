@@ -177,9 +177,9 @@ void ARCN_RubikCube::TurnCore(const FSignInfo& SignInfo)
 
 void ARCN_RubikCube::UpdateTurnCore(FQuat TargetRotator)
 {
-	CoreComponent->SetRelativeRotation(FQuat::Slerp(CoreComponent->GetRelativeRotation().Quaternion(), TargetRotator, 0.2f));
+	CoreComponent->SetRelativeRotation(FQuat::Slerp(CoreComponent->GetRelativeRotation().Quaternion(), TargetRotator, RubikCubeDataAsset->TurnSpeed));
 
-	if (CoreComponent->GetRelativeRotation().Quaternion().Equals(TargetRotator, 0.02f))
+	if (CoreComponent->GetRelativeRotation().Quaternion().Equals(TargetRotator, RubikCubeDataAsset->TurnTolerance))
 	{
 		CoreComponent->SetRelativeRotation(TargetRotator);
 		ReleasePieces();

@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float TurnSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float TurnTolerance;
 };
