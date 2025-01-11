@@ -11,7 +11,7 @@ enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
 UCLASS()
-class PROJECT_RCN_API ARCN_RubikCube : public AActor
+class PROJECT_RCN_API ARCN_RubikCube : public APawn
 {
 	GENERATED_BODY()
 	

@@ -232,6 +232,7 @@ void ARCN_RubikCube::ReleasePieces()
 	}
 
 	CoreComponent->SetRelativeRotation(FRotator(0, 0, 0).Quaternion());
+	
 	bIsTurning = false;
 	TurnNext();
 }
