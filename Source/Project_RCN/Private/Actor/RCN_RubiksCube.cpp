@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RCN_RubiksCube.h"
+#include "Actor/RCN_RubiksCube.h"
 
 // Sets default values
 ARCN_RubiksCube::ARCN_RubiksCube()
