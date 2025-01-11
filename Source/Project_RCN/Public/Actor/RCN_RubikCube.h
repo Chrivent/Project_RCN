@@ -1,0 +1,54 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "RCN_RubikCube.generated.h"
+
+struct FSignInfo;
+enum class ETurnDirection : uint8;
+enum class EAxisType : uint8;
+class URCN_RubikCubeDataAsset;
+
+UCLASS()
+class PROJECT_RCN_API ARCN_RubikCube : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	ARCN_RubikCube();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	void Spin(const FString& Order);
+
+protected:
+	void GrabPieces(const FSignInfo& SignInfo);
+	void TurnCore(const FSignInfo& SignInfo);
+	void UpdateTurn();
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<URCN_RubikCubeDataAsset> RubikCubeDataAsset;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> DefaultComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> CoreComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<UStaticMeshComponent>> PieceMeshComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FSignInfo> SignInfos;
+
+	FQuat TargetQuat;
+};
