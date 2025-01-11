@@ -34,6 +34,9 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 	if (RubikCubeDataAssetRef.Object)
 	{
+		const float Distance = RubikCubeDataAsset->PieceDistance;
+		const float Size = RubikCubeDataAsset->PieceSize;
+		
 		int32 Index = 0;
 		for (int32 z = -1; z <= 1; z++)
 		{
@@ -45,9 +48,6 @@ ARCN_RubikCube::ARCN_RubikCube()
 					{
 						continue;
 					}
-
-					const float Distance = RubikCubeDataAsset->PieceDistance;
-					const float Size = RubikCubeDataAsset->PieceSize;
 				
 					PieceMeshComponents[Index]->SetRelativeLocation(FVector(x * Distance, y * Distance, z * Distance));
 					PieceMeshComponents[Index]->SetRelativeScale3D(FVector(Size));
@@ -57,43 +57,43 @@ ARCN_RubikCube::ARCN_RubikCube()
 				}
 			}
 		}
+	
+		SignInfos.Emplace("L", EAxisType::AxisX, -Distance, false, 1);
+		SignInfos.Emplace("L'", EAxisType::AxisX, -Distance, true, 1);
+		SignInfos.Emplace("L2", EAxisType::AxisX, -Distance, false, 2);
+	
+		SignInfos.Emplace("M", EAxisType::AxisX, 0, false, 1);
+		SignInfos.Emplace("M'", EAxisType::AxisX, 0, true, 1);
+		SignInfos.Emplace("M2", EAxisType::AxisX, 0, false, 2);
+	
+		SignInfos.Emplace("R", EAxisType::AxisX, Distance, false, 1);
+		SignInfos.Emplace("R'", EAxisType::AxisX, Distance, true, 1);
+		SignInfos.Emplace("R2", EAxisType::AxisX, Distance, false, 2);
+
+		SignInfos.Emplace("B", EAxisType::AxisY, -Distance, false, 1);
+		SignInfos.Emplace("B'", EAxisType::AxisY, -Distance, true, 1);
+		SignInfos.Emplace("B2", EAxisType::AxisY, -Distance, false, 2);
+	
+		SignInfos.Emplace("S", EAxisType::AxisY, 0, false, 1);
+		SignInfos.Emplace("S'", EAxisType::AxisY, 0, true, 1);
+		SignInfos.Emplace("S2", EAxisType::AxisY, 0, false, 2);
+	
+		SignInfos.Emplace("F", EAxisType::AxisY, Distance, false, 1);
+		SignInfos.Emplace("F'", EAxisType::AxisY, Distance, true, 1);
+		SignInfos.Emplace("F2", EAxisType::AxisY, Distance, false, 2);
+
+		SignInfos.Emplace("D", EAxisType::AxisZ, -Distance, false, 1);
+		SignInfos.Emplace("D'", EAxisType::AxisZ, -Distance, true, 1);
+		SignInfos.Emplace("D2", EAxisType::AxisZ, -Distance, false, 2);
+	
+		SignInfos.Emplace("E", EAxisType::AxisZ, 0, false, 1);
+		SignInfos.Emplace("E'", EAxisType::AxisZ, 0, true, 1);
+		SignInfos.Emplace("E2", EAxisType::AxisZ, 0, false, 2);
+	
+		SignInfos.Emplace("U", EAxisType::AxisZ, Distance, false, 1);
+		SignInfos.Emplace("U'", EAxisType::AxisZ, Distance, true, 1);
+		SignInfos.Emplace("U2", EAxisType::AxisZ, Distance, false, 2);
 	}
-	
-	SignInfos.Emplace("L", EAxisType::AxisX, -1, ETurnDirection::CW, 1);
-	SignInfos.Emplace("L'", EAxisType::AxisX, -1, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("L2", EAxisType::AxisX, -1, ETurnDirection::CW, 2);
-	
-	SignInfos.Emplace("M", EAxisType::AxisX, 0, ETurnDirection::CW, 1);
-	SignInfos.Emplace("M'", EAxisType::AxisX, 0, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("M2", EAxisType::AxisX, 0, ETurnDirection::CW, 2);
-	
-	SignInfos.Emplace("R", EAxisType::AxisX, 1, ETurnDirection::CW, 1);
-	SignInfos.Emplace("R'", EAxisType::AxisX, 1, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("R2", EAxisType::AxisX, 1, ETurnDirection::CW, 2);
-
-	SignInfos.Emplace("B", EAxisType::AxisY, -1, ETurnDirection::CW, 1);
-	SignInfos.Emplace("B'", EAxisType::AxisY, -1, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("B2", EAxisType::AxisY, -1, ETurnDirection::CW, 2);
-	
-	SignInfos.Emplace("S", EAxisType::AxisY, 0, ETurnDirection::CW, 1);
-	SignInfos.Emplace("S'", EAxisType::AxisY, 0, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("S2", EAxisType::AxisY, 0, ETurnDirection::CW, 2);
-	
-	SignInfos.Emplace("F", EAxisType::AxisY, 1, ETurnDirection::CW, 1);
-	SignInfos.Emplace("F'", EAxisType::AxisY, 1, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("F2", EAxisType::AxisY, 1, ETurnDirection::CW, 2);
-
-	SignInfos.Emplace("D", EAxisType::AxisZ, -1, ETurnDirection::CW, 1);
-	SignInfos.Emplace("D'", EAxisType::AxisZ, -1, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("D2", EAxisType::AxisZ, -1, ETurnDirection::CW, 2);
-	
-	SignInfos.Emplace("E", EAxisType::AxisZ, 0, ETurnDirection::CW, 1);
-	SignInfos.Emplace("E'", EAxisType::AxisZ, 0, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("E2", EAxisType::AxisZ, 0, ETurnDirection::CW, 2);
-	
-	SignInfos.Emplace("U", EAxisType::AxisZ, 1, ETurnDirection::CW, 1);
-	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, ETurnDirection::CCW, 1);
-	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, ETurnDirection::CW, 2);
 }
 
 // Called when the game starts or when spawned
@@ -105,7 +105,7 @@ void ARCN_RubikCube::BeginPlay()
 	GetWorldTimerManager().SetTimer(asdf, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		Spin("R");
-	}), 3.0f, false);
+	}), 1.0f, false);
 }
 
 // Called every frame
@@ -144,21 +144,21 @@ void ARCN_RubikCube::GrabPieces(const FSignInfo& SignInfo)
 		case EAxisType::AxisX:
 			if (PieceMeshComponent->GetRelativeLocation().X == SignInfo.Layer)
 			{
-				PieceMeshComponent->SetupAttachment(CoreComponent);
+				PieceMeshComponent->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			}
 			break;
 		
 		case EAxisType::AxisY:
 			if (PieceMeshComponent->GetRelativeLocation().Y == SignInfo.Layer)
 			{
-				PieceMeshComponent->SetupAttachment(CoreComponent);
+				PieceMeshComponent->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			}
 			break;
 		
 		case EAxisType::AxisZ:
 			if (PieceMeshComponent->GetRelativeLocation().Z == SignInfo.Layer)
 			{
-				PieceMeshComponent->SetupAttachment(CoreComponent);
+				PieceMeshComponent->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			}
 			break;
 		}
@@ -167,35 +167,20 @@ void ARCN_RubikCube::GrabPieces(const FSignInfo& SignInfo)
 
 void ARCN_RubikCube::TurnCore(const FSignInfo& SignInfo)
 {
-	// 축의 방향 및 회전 각도 계산
-	FVector TurnAxis;
-	float TurnAngle = 90.0f * SignInfo.TurnCount; // 기본 각도(90도) * TurnCount
-
 	switch (SignInfo.AxisType)
 	{
 	case EAxisType::AxisX:
-		TurnAxis = FVector::ForwardVector; // X축 (1, 0, 0)
+		CoreComponent->AddLocalRotation(FRotator(45 * (SignInfo.CCW ? -1 : 1) * SignInfo.TurnCount, 0, 0));
 		break;
         
 	case EAxisType::AxisY:
-		TurnAxis = FVector::RightVector; // Y축 (0, 1, 0)
+		CoreComponent->AddLocalRotation(FRotator(0, 45 * (SignInfo.CCW ? -1 : 1) * SignInfo.TurnCount, 0));
 		break;
         
 	case EAxisType::AxisZ:
-		TurnAxis = FVector::UpVector; // Z축 (0, 0, 1)
+		CoreComponent->AddLocalRotation(FRotator(0, 0, 45 * (SignInfo.CCW ? -1 : 1) * SignInfo.TurnCount));
 		break;
-        
-	default:
-		return; // 유효하지 않은 축 타입
 	}
-
-	// 시계 방향(CW)인지 반시계 방향(CCW)인지 결정
-	if (SignInfo.TurnDirection == ETurnDirection::CCW)
-	{
-		TurnAngle = -TurnAngle; // 반시계 방향은 음수 각도로 회전
-	}
-
-	//CoreComponent->AddLocalRotation()
 }
 
 void ARCN_RubikCube::UpdateTurn()

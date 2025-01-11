@@ -12,10 +12,3 @@ enum class EAxisType : uint8
 	AxisY,
 	AxisZ
 };
-
-UENUM(BlueprintType)
-enum class ETurnDirection : uint8
-{
-	CW,
-	CCW,
-};

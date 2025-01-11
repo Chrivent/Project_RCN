@@ -7,7 +7,6 @@
 #include "RCN_RubikCube.generated.h"
 
 struct FSignInfo;
-enum class ETurnDirection : uint8;
 enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 

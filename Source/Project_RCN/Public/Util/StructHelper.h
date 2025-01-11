@@ -5,13 +5,21 @@
 #include "CoreMinimal.h"
 #include "StructHelper.generated.h"
 
-enum class ETurnDirection : uint8;
 enum class EAxisType : uint8;
 
 USTRUCT(BlueprintType)
 struct FSignInfo
 {
 	GENERATED_BODY()
+
+	/*FSignInfo() : 
+		Sign(TEXT("L")),
+		AxisType(EAxisType::AxisX),
+		Layer(-1),
+		CCW(false),
+		TurnCount(1)
+	{
+	}*/
 
 	UPROPERTY(VisibleAnywhere)
 	FString Sign;
@@ -23,7 +31,7 @@ struct FSignInfo
 	int32 Layer;
 
 	UPROPERTY(VisibleAnywhere)
-	ETurnDirection TurnDirection;
+	bool CCW;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 TurnCount;
