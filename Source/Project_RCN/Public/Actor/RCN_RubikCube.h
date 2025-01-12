@@ -32,9 +32,9 @@ public:
 protected:
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
-	void UpdateTurnCore(FQuat TargetRotator);
+	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetRotator);
 	void GrabPieces(const FSignInfo& SignInfo);
-	void ReleasePieces();
+	void ReleasePieces(const FSignInfo& SignInfo);
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_RubikCubeDataAsset> RubikCubeDataAsset;
@@ -46,7 +46,7 @@ protected:
 	TObjectPtr<USceneComponent> CoreComponent;
 	
 	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<UStaticMeshComponent>> PieceMeshComponents;
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PieceMeshComponents;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FSignInfo> SignInfos;
@@ -56,4 +56,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
 };
