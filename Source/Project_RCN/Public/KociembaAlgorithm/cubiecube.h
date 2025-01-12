@@ -61,7 +61,7 @@ void setURFtoDLB(cubiecube_t* cubiecube, int idx);
 int getURtoBR(cubiecube_t* cubiecube);
 void setURtoBR(cubiecube_t* cubiecube, int idx);
 
-int verify(cubiecube_t* cubiecube);
+int Verify(cubiecube_t* cubiecube);
 
 int getURtoDF_standalone(short idx1, short idx2);
 

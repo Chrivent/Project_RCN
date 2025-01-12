@@ -103,7 +103,7 @@ cubiecube_t* toCubieCube(facecube_t* facecube)
         for (j = 0; j < CORNER_COUNT; j++) {
             if (col1 == cornerColor[j][1] && col2 == cornerColor[j][2]) {
                 // in cornerposition i we have cornercubie j
-                ccRet->cp[i] = j;
+                ccRet->cp[i] = (corner_t)j;
                 ccRet->co[i] = ori % 3;
                 break;
             }
@@ -114,13 +114,13 @@ cubiecube_t* toCubieCube(facecube_t* facecube)
         for (j = 0; j < EDGE_COUNT; j++) {
             if (facecube->f[edgeFacelet[i][0]] == edgeColor[j][0]
                     && facecube->f[edgeFacelet[i][1]] == edgeColor[j][1]) {
-                ccRet->ep[i] = j;
+                ccRet->ep[i] = (edge_t)j;
                 ccRet->eo[i] = 0;
                 break;
             }
             if (facecube->f[edgeFacelet[i][0]] == edgeColor[j][1]
                     && facecube->f[edgeFacelet[i][1]] == edgeColor[j][0]) {
-                ccRet->ep[i] = j;
+                ccRet->ep[i] = (edge_t)j;
                 ccRet->eo[i] = 1;
                 break;
             }

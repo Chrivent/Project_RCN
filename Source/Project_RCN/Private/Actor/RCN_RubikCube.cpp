@@ -248,21 +248,21 @@ void ARCN_RubikCube::BeginPlay()
 	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		Scramble();
-	}), 1.0f, false);
 
-	//Spin(TEXT("F"));
+		FTimerHandle TestTimerHandle2;
+		GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
+		{
+			FString SolveCommand = solution(
+				TCHAR_TO_ANSI(*Facelet),
+				30,
+				1000,
+				0,
+				"cache"
+			);
 
-	FTimerHandle TestTimerHandle2;
-	GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		solution(
-			TCHAR_TO_ANSI(*Facelet),
-			24,
-			1000,
-			0,
-			"cache"
-		);
-	}), 7.0f, false);
+			Spin(SolveCommand);
+		}), 6.0f, false);
+	}), 12.0f, true);
 }
 
 // Called every frame

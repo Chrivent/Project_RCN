@@ -7,27 +7,27 @@ cubiecube_t * get_moveCube()
     static int moveCube_initialized = 0;
     static const corner_t     cpU[8]  = { UBR, URF, UFL, ULB, DFR, DLF, DBL, DRB };
     static const signed char  coU[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const edge_t       epU[12] = { UB, UR, UF, UL, DR, DF, DL, DB, FR, FL, BL, BR };
+    static const edge_t       epU[12] = { UB, UR, UF_, UL, DR, DF, DL, DB, FR, FL, BL, BR };
     static const signed char  eoU[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     static const corner_t     cpR[8]  = { DFR, UFL, ULB, URF, DRB, DLF, DBL, UBR };
     static const signed char  coR[8]  = { 2, 0, 0, 1, 1, 0, 0, 2 };
-    static const edge_t       epR[12] = { FR, UF, UL, UB, BR, DF, DL, DB, DR, FL, BL, UR };
+    static const edge_t       epR[12] = { FR, UF_, UL, UB, BR, DF, DL, DB, DR, FL, BL, UR };
     static const signed char  eoR[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     static const corner_t     cpF[8]  = { UFL, DLF, ULB, UBR, URF, DFR, DBL, DRB };
     static const signed char  coF[8]  = { 1, 2, 0, 0, 2, 1, 0, 0 };
-    static const edge_t       epF[12] = { UR, FL, UL, UB, DR, FR, DL, DB, UF, DF, BL, BR };
+    static const edge_t       epF[12] = { UR, FL, UL, UB, DR, FR, DL, DB, UF_, DF, BL, BR };
     static const signed char  eoF[12] = { 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 };
     static const corner_t     cpD[8]  = { URF, UFL, ULB, UBR, DLF, DBL, DRB, DFR };
     static const signed char  coD[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const edge_t       epD[12] = { UR, UF, UL, UB, DF, DL, DB, DR, FR, FL, BL, BR };
+    static const edge_t       epD[12] = { UR, UF_, UL, UB, DF, DL, DB, DR, FR, FL, BL, BR };
     static const signed char  eoD[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     static const corner_t     cpL[8]  = { URF, ULB, DBL, UBR, DFR, UFL, DLF, DRB };
     static const signed char  coL[8]  = { 0, 1, 2, 0, 0, 2, 1, 0 };
-    static const edge_t       epL[12] = { UR, UF, BL, UB, DR, DF, FL, DB, FR, UL, DL, BR };
+    static const edge_t       epL[12] = { UR, UF_, BL, UB, DR, DF, FL, DB, FR, UL, DL, BR };
     static const signed char  eoL[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     static const corner_t     cpB[8]  = { URF, UFL, UBR, DRB, DFR, DLF, ULB, DBL };
     static const signed char  coB[8]  = { 0, 0, 1, 2, 0, 0, 2, 1 };
-    static const edge_t       epB[12] = { UR, UF, UL, BR, DR, DF, DL, BL, FR, FL, UB, DB };
+    static const edge_t       epB[12] = { UR, UF_, UL, BR, DR, DF, DL, BL, FR, FL, UB, DB };
     static const signed char  eoB[12] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1 };
 
     if (!moveCube_initialized) {
@@ -66,7 +66,7 @@ cubiecube_t* get_cubiecube()
 
     static const corner_t   cp[8]   = { URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB };
     static const signed char       co[8]   = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const edge_t     ep[12]  = { UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR };
+    static const edge_t     ep[12]  = { UR, UF_, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR };
     static const signed char       eo[12]  = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     memcpy(result->cp, cp, sizeof(cp));
@@ -158,7 +158,7 @@ void cornerMultiply(cubiecube_t* cubiecube, cubiecube_t* b)
 {
     int corn;
     signed char oriA, oriB, ori;
-    corner_t cPerm[8] = {0};
+    corner_t cPerm[8] = {(corner_t)0};
     signed char cOri[8] = {0};
     for (corn = 0; corn < CORNER_COUNT; corn++) {
         cPerm[corn] = cubiecube->cp[b->cp[corn]];
@@ -205,7 +205,7 @@ void cornerMultiply(cubiecube_t* cubiecube, cubiecube_t* b)
 void edgeMultiply(cubiecube_t* cubiecube, cubiecube_t* b)
 {
     int edge;
-    edge_t ePerm[12] = {0};
+    edge_t ePerm[12] = {(edge_t)0};
     signed char eOri[12] = {0};
 
     for(edge = 0; edge < EDGE_COUNT; edge++) {
@@ -228,11 +228,11 @@ void invCubieCube(cubiecube_t* cubiecube, cubiecube_t* c)
 {
     int edge, corn;
     for (edge = 0; edge < EDGE_COUNT; edge++)
-        c->ep[cubiecube->ep[edge]] = edge;
+        c->ep[cubiecube->ep[edge]] = (edge_t)edge;
     for (edge = 0; edge < EDGE_COUNT; edge++)
         c->eo[edge] = cubiecube->eo[c->ep[edge]];
     for (corn = 0; corn < CORNER_COUNT; corn++)
-        c->cp[cubiecube->cp[corn]] = corn;
+        c->cp[cubiecube->cp[corn]] = (corner_t)corn;
     for (corn = 0; corn < CORNER_COUNT; corn++) {
         signed char ori = cubiecube->co[c->cp[corn]];
         if (ori >= 3)// Just for completeness. We do not invert mirrored
@@ -312,7 +312,7 @@ short getFRtoBR(cubiecube_t* cubiecube)
 {
     int a = 0, x = 0, j;
     int b = 0;
-    edge_t edge4[4] = {0};
+    edge_t edge4[4] = {(edge_t)0};
     // compute the index a < (12 choose 4) and the permutation array perm.
     for (j = BR; j >= UR; j--)
         if (FR <= cubiecube->ep[j] && cubiecube->ep[j] <= BR) {
@@ -336,7 +336,7 @@ void setFRtoBR(cubiecube_t* cubiecube, short idx)
 {
     int x, j, k, e;
     edge_t sliceEdge[4] = { FR, FL, BL, BR };
-    edge_t otherEdge[8] = { UR, UF, UL, UB, DR, DF, DL, DB };
+    edge_t otherEdge[8] = { UR, UF_, UL, UB, DR, DF, DL, DB };
     int b = idx % 24; // Permutation
     int a = idx / 24; // Combination
     for (e = 0; e < EDGE_COUNT; e++)
@@ -365,7 +365,7 @@ void setFRtoBR(cubiecube_t* cubiecube, short idx)
 short getURFtoDLF(cubiecube_t* cubiecube)
 {
     int a = 0, x = 0, j, b = 0;
-    corner_t corner6[6] = {0};
+    corner_t corner6[6] = {(corner_t)0};
     // compute the index a < (8 choose 6) and the corner permutation.
     for (j = URF; j <= DRB; j++)
         if (cubiecube->cp[j] <= DLF) {
@@ -420,7 +420,7 @@ int getURtoDF(cubiecube_t* cubiecube)
 {
     int a = 0, x = 0;
     int b = 0, j;
-    edge_t edge6[6] = {0};
+    edge_t edge6[6] = {(edge_t)0};
     // compute the index a < (12 choose 6) and the edge permutation.
     for (j = UR; j <= BR; j++)
         if (cubiecube->ep[j] <= DF) {
@@ -444,7 +444,7 @@ int getURtoDF(cubiecube_t* cubiecube)
 void setURtoDF(cubiecube_t* cubiecube, int idx)
 {
     int x, e, j, k;
-    edge_t edge6[6] = { UR, UF, UL, UB, DR, DF };
+    edge_t edge6[6] = { UR, UF_, UL, UB, DR, DF };
     edge_t otherEdge[6] = { DL, DB, FR, FL, BL, BR };
     int b = idx % 720; // Permutation
     int a = idx / 720; // Combination
@@ -474,7 +474,7 @@ void setURtoDF(cubiecube_t* cubiecube, int idx)
 short getURtoUL(cubiecube_t* cubiecube)
 {
     int a = 0, b = 0, x = 0, j;
-    edge_t edge3[3] = {0};
+    edge_t edge3[3] = {(edge_t)0};
     // compute the index a < (12 choose 3) and the edge permutation.
     for (j = UR; j <= BR; j++)
         if (cubiecube->ep[j] <= UL) {
@@ -498,7 +498,7 @@ short getURtoUL(cubiecube_t* cubiecube)
 void setURtoUL(cubiecube_t* cubiecube, short idx)
 {
     int x, e, j, k;
-    edge_t edge3[3] = { UR, UF, UL };
+    edge_t edge3[3] = { UR, UF_, UL };
     int b = idx % 6; // Permutation
     int a = idx / 6; // Combination
     for(e = 0; e < EDGE_COUNT; e++) {
@@ -523,7 +523,7 @@ void setURtoUL(cubiecube_t* cubiecube, short idx)
 short getUBtoDF(cubiecube_t* cubiecube)
 {
     int a = 0, x = 0, b = 0, j;
-    edge_t edge3[3] = {0};
+    edge_t edge3[3] = {(edge_t)0};
     // compute the index a < (12 choose 3) and the edge permutation.
     for (j = UR; j <= BR; j++)
         if (UB <= cubiecube->ep[j] && cubiecube->ep[j] <= DF) {
@@ -570,7 +570,7 @@ void setUBtoDF(cubiecube_t* cubiecube, short idx)
 
 int getURFtoDLB(cubiecube_t* cubiecube)
 {
-    corner_t perm[8] = {0};
+    corner_t perm[8] = {(corner_t)0};
     int b = 0, i, j;
     for (i = 0; i < 8; i++)
         perm[i] = cubiecube->cp[i];
@@ -604,7 +604,7 @@ void setURFtoDLB(cubiecube_t* cubiecube, int idx)
 
 int getURtoBR(cubiecube_t* cubiecube)
 {
-    edge_t perm[12] = {0};
+    edge_t perm[12] = {(edge_t)0};
     int b = 0, i, j;
     for (i = 0; i < 12; i++)
         perm[i] = cubiecube->ep[i];
@@ -622,7 +622,7 @@ int getURtoBR(cubiecube_t* cubiecube)
 
 void setURtoBR(cubiecube_t* cubiecube, int idx)
 {
-    edge_t perm[12] = { UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR };
+    edge_t perm[12] = { UR, UF_, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR };
     int k, j;
     int x = 11;// set edges
     for (j = 1; j < 12; j++) {
@@ -635,7 +635,7 @@ void setURtoBR(cubiecube_t* cubiecube, int idx)
         cubiecube->ep[j] = perm[x--];
 }
 
-int verify(cubiecube_t* cubiecube)
+int Verify(cubiecube_t* cubiecube)
 {
     int sum = 0, e, i, c;
     int edgeCount[12] = {0};

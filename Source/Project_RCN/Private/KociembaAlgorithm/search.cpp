@@ -106,7 +106,7 @@ char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, con
 
     fc = get_facecube_fromstring(facelets);
     cc = toCubieCube(fc);
-    if ((s = verify(cc)) != 0) {
+    if ((s = Verify(cc)) != 0) {
         free(search);
         return NULL;
     }

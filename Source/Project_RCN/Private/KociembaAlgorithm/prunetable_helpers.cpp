@@ -8,7 +8,7 @@
 char * join_path(const char *dir, const char *filename)
 {
     size_t path_len = strnlen(dir, 500);
-    char *fpath = calloc(path_len + 32, 1);
+    char *fpath = (char*)calloc(path_len + 32, 1);
     if (path_len == 500) {
         return NULL;
     }
