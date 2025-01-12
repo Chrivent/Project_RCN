@@ -75,7 +75,10 @@ protected:
 	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
 	
 	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FString> StickerFacelets;
+	TMap<TObjectPtr<UStaticMeshComponent>, FColor> StickerColors;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FVector> CenterOrderPositions;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> FaceletOrderPositions;

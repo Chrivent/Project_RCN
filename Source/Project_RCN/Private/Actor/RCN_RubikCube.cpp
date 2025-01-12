@@ -68,7 +68,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X - 1, Y, Z));
-					StickerFacelets.Emplace(StickerMeshComponent, TEXT("L"));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Orange);
 				}
 
 				if (X == 1)
@@ -83,7 +83,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X + 1, Y, Z));
-					StickerFacelets.Emplace(StickerMeshComponent, TEXT("R"));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Red);
 				}
 
 				if (Y == -1)
@@ -98,7 +98,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y - 1, Z));
-					StickerFacelets.Emplace(StickerMeshComponent, TEXT("B"));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Green);
 				}
 
 				if (Y == 1)
@@ -113,7 +113,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y + 1, Z));
-					StickerFacelets.Emplace(StickerMeshComponent, TEXT("F"));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Blue);
 				}
 
 				if (Z == -1)
@@ -128,7 +128,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y, Z - 1));
-					StickerFacelets.Emplace(StickerMeshComponent, TEXT("D"));
+					StickerColors.Emplace(StickerMeshComponent, FColor::White);
 				}
 
 				if (Z == 1)
@@ -143,7 +143,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y, Z + 1));
-					StickerFacelets.Emplace(StickerMeshComponent, TEXT("U"));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Yellow);
 				}
 
 				PieceMeshComponents.Emplace(PieceMeshComponent);
@@ -187,6 +187,13 @@ ARCN_RubikCube::ARCN_RubikCube()
 	SignInfos.Emplace("U", EAxisType::AxisZ, 1, true, 1);
 	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, false, 1);
 	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, true, 2);
+
+	CenterOrderPositions.Emplace(FVector(0, 0, 2));
+	CenterOrderPositions.Emplace(FVector(2, 0, 0));
+	CenterOrderPositions.Emplace(FVector(0, 2, 0));
+	CenterOrderPositions.Emplace(FVector(0, 0, -2));
+	CenterOrderPositions.Emplace(FVector(-2, 0, 0));
+	CenterOrderPositions.Emplace(FVector(0, -2, 0));
 
 	for (int32 Y = -1; Y <= 1; Y++)
 	{
@@ -254,7 +261,7 @@ void ARCN_RubikCube::BeginPlay()
 		{
 			FString SolveCommand = solution(
 				TCHAR_TO_ANSI(*Facelet),
-				30,
+				24,
 				1000,
 				0,
 				"cache"
@@ -470,13 +477,49 @@ void ARCN_RubikCube::SortFacelet()
 {
 	Facelet = TEXT("");
 	
+	TArray<FColor> CenterOrderColors;
+	for (auto CenterOrderPosition : CenterOrderPositions)
+	{
+		for (auto StickerPosition : StickerPositions)
+		{
+			if (CenterOrderPosition == StickerPosition.Value)
+			{
+				CenterOrderColors.Emplace(StickerColors[StickerPosition.Key]);
+			}
+		}
+	}
+	
 	for (auto FaceletOrderPosition : FaceletOrderPositions)
 	{
 		for (auto StickerPosition : StickerPositions)
 		{
 			if (FaceletOrderPosition == StickerPosition.Value)
 			{
-				Facelet += StickerFacelets[StickerPosition.Key];
+				if (CenterOrderColors[0] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'U';
+				}
+				else if (CenterOrderColors[1] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'R';
+				}
+				else if (CenterOrderColors[2] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'F';
+				}
+				else if (CenterOrderColors[3] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'D';
+				}
+				else if (CenterOrderColors[4] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'L';
+				}
+				else if (CenterOrderColors[5] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'B';
+				}
+				
 				break;
 			}
 		}
