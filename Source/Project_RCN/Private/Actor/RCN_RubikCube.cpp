@@ -4,6 +4,7 @@
 #include "Actor/RCN_RubikCube.h"
 
 #include "Data/RCN_RubikCubeDataAsset.h"
+#include "KociembaAlgorithm/search.h"
 #include "Util/EnumHelper.h"
 
 DEFINE_LOG_CATEGORY(RubikCube);
@@ -247,9 +248,21 @@ void ARCN_RubikCube::BeginPlay()
 	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		Scramble();
-	}), 5.0f, false);
+	}), 1.0f, false);
 
 	//Spin(TEXT("F"));
+
+	FTimerHandle TestTimerHandle2;
+	GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		solution(
+			TCHAR_TO_ANSI(*Facelet),
+			24,
+			1000,
+			0,
+			"cache"
+		);
+	}), 7.0f, false);
 }
 
 // Called every frame
