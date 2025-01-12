@@ -272,8 +272,8 @@ void ARCN_RubikCube::BeginPlay()
 		GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
 		{
 			Solve();
-		}), 5.0f, false);
-	}), 10.0f, true);
+		}), 3.0f, false);
+	}), 6.0f, true);
 }
 
 // Called every frame
