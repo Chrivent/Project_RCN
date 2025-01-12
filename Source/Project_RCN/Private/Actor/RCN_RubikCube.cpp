@@ -147,7 +147,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 				}
 
 				PieceMeshComponents.Emplace(PieceMeshComponent);
-				PieceMeshPositions.Emplace(PieceMeshComponent, FVector(X, Y, Z));
+				PiecePositions.Emplace(PieceMeshComponent, FVector(X, Y, Z));
 			}
 		}
 	}
@@ -378,28 +378,28 @@ void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetRotat
 
 void ARCN_RubikCube::GrabPieces(const FSignInfo& SignInfo)
 {
-	for (const auto PieceMeshPosition : PieceMeshPositions)
+	for (const auto PiecePosition : PiecePositions)
 	{
 		switch (SignInfo.AxisType)
 		{
 		case EAxisType::AxisX:
-			if (PieceMeshPosition.Value.X == SignInfo.Layer)
+			if (PiecePosition.Value.X == SignInfo.Layer)
 			{
-				PieceMeshPosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				PiecePosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			break;
 		
 		case EAxisType::AxisY:
-			if (PieceMeshPosition.Value.Y == SignInfo.Layer)
+			if (PiecePosition.Value.Y == SignInfo.Layer)
 			{
-				PieceMeshPosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				PiecePosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			break;
 		
 		case EAxisType::AxisZ:
-			if (PieceMeshPosition.Value.Z == SignInfo.Layer)
+			if (PiecePosition.Value.Z == SignInfo.Layer)
 			{
-				PieceMeshPosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				PiecePosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			break;
 		}
@@ -415,9 +415,9 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 		{
 			PieceMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 
-			const FVector CurrentPiecePosition = PieceMeshPositions[PieceMeshComponent];
+			const FVector CurrentPiecePosition = PiecePositions[PieceMeshComponent];
 			const FVector NewPiecePosition = GetRotationMatrix(SignInfo).TransformPosition(CurrentPiecePosition);
-			PieceMeshPositions[PieceMeshComponent] = NewPiecePosition;
+			PiecePositions[PieceMeshComponent] = NewPiecePosition;
 
 			TArray<TObjectPtr<USceneComponent>> ChildStickerComponents = PieceMeshComponent->GetAttachChildren();
 			for (const auto ChildStickerComponent : ChildStickerComponents)
