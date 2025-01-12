@@ -1,9 +1,9 @@
+#include "KociembaAlgorithm/prunetable_helpers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <string.h>
-#include "KociembaAlgorithm/prunetable_helpers.h"
 
 char * join_path(const char *dir, const char *filename)
 {

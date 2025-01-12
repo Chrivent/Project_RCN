@@ -7,6 +7,8 @@
 #include "Util/StructHelper.h"
 #include "RCN_RubikCube.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
 enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
@@ -31,11 +33,12 @@ public:
 	
 	void Spin(const FString& Command);
 	void Scramble();
+	void Solve();
 
 protected:
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
-	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetRotator);
+	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat);
 	void GrabPieces(const FSignInfo& SignInfo);
 	void ReleasePieces(const FSignInfo& SignInfo);
 	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);
@@ -66,6 +69,9 @@ protected:
 	uint8 bIsTurning : 1;
 
 	UPROPERTY(VisibleAnywhere)
+	uint8 bRequestedSolving : 1;
+
+	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
 
 	UPROPERTY(VisibleAnywhere)
@@ -82,4 +88,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> FaceletOrderPositions;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCameraComponent> CameraComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 };

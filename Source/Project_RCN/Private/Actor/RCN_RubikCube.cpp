@@ -3,7 +3,9 @@
 
 #include "Actor/RCN_RubikCube.h"
 
+#include "Camera/CameraComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "KociembaAlgorithm/search.h"
 #include "Util/EnumHelper.h"
 
@@ -62,7 +64,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
 					StickerMeshComponent->SetRelativeLocation(FVector(-StickerDistance, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+					StickerMeshComponent->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
 					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Orange]);
 
@@ -77,7 +79,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
 					StickerMeshComponent->SetRelativeLocation(FVector(StickerDistance, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f).Quaternion());
+					StickerMeshComponent->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
 					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Red]);
 					
@@ -92,7 +94,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, -StickerDistance, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f).Quaternion());
+					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
 					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Green]);
 
@@ -107,7 +109,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, StickerDistance, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f).Quaternion());
+					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
 					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Blue]);
 
@@ -122,7 +124,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, -StickerDistance));
-					StickerMeshComponent->SetRelativeRotation(FRotator(180.0f, 0.0f, 0.0f).Quaternion());
+					StickerMeshComponent->SetRelativeRotation(FRotator(180.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
 					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::White]);
 					
@@ -137,7 +139,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 					
 					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, StickerDistance));
-					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
+					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
 					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Yellow]);
 
@@ -242,6 +244,16 @@ ARCN_RubikCube::ARCN_RubikCube()
 			FaceletOrderPositions.Emplace(FVector(X, -2, Z));
 		}
 	}
+
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	SpringArmComponent->SetupAttachment(RootComponent);
+	SpringArmComponent->SetRelativeRotation(FRotator(-30.0f, -120.0f, 0.0f));
+	SpringArmComponent->TargetArmLength = 800.0f;
+	SpringArmComponent->bUsePawnControlRotation = false;
+	
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
+	CameraComponent->bUsePawnControlRotation = false;
 }
 
 // Called when the game starts or when spawned
@@ -259,17 +271,9 @@ void ARCN_RubikCube::BeginPlay()
 		FTimerHandle TestTimerHandle2;
 		GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
 		{
-			FString SolveCommand = solution(
-				TCHAR_TO_ANSI(*Facelet),
-				24,
-				1000,
-				0,
-				"cache"
-			);
-
-			Spin(SolveCommand);
-		}), 6.0f, false);
-	}), 12.0f, true);
+			Solve();
+		}), 5.0f, false);
+	}), 10.0f, true);
 }
 
 // Called every frame
@@ -308,17 +312,55 @@ void ARCN_RubikCube::Scramble()
 {
 	FString Command = TEXT("");
 
+	FString LastSign = TEXT(" ");
 	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
 	{
-		Command += SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign + TEXT(" ");
+		FString CurrentSign;
+		do
+		{
+			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
+		}
+		while (LastSign[0] == CurrentSign[0]);
+		LastSign = CurrentSign;
+		
+		Command += CurrentSign + TEXT(" ");
 	}
 
 	Command.RemoveAt(Command.Len() - 1);
 	Spin(Command);
 }
 
+void ARCN_RubikCube::Solve()
+{
+	bRequestedSolving = true;
+
+	if (!bIsTurning)
+	{
+		TurnNext();
+	}
+}
+
 void ARCN_RubikCube::TurnNext()
 {
+	if (bRequestedSolving)
+	{
+		bRequestedSolving = false;
+		
+		bIsTurning = false;
+		SignQueue.Empty();
+		
+		const FString SolveCommand = solution(
+			TCHAR_TO_ANSI(*Facelet),
+			24,
+			1000,
+			0,
+			"cache"
+		);
+		
+		Spin(SolveCommand);
+		return;
+	}
+	
 	if (SignQueue.Num() == 0)
 	{
 		bIsTurning = false;
@@ -336,43 +378,43 @@ void ARCN_RubikCube::TurnCore(const FSignInfo& SignInfo)
 {
 	GrabPieces(SignInfo);
 
-	const float TargetAngle = SignInfo.TurnCount == 2 ? 180.0f : SignInfo.CCW ? 270.0f : 90.0f;
+	const float TargetAngle = SignInfo.TurnCount == 2 ? 180.0f : SignInfo.CCW ? -90.0f : 90.0f;
 	
-	FQuat TargetRotator = FQuat::Identity;
+	FQuat TargetQuat = FQuat::Identity;
 	switch (SignInfo.AxisType)
 	{
 	case EAxisType::AxisX:
-		TargetRotator = FRotator(0.0f, 0.0f, TargetAngle).Quaternion();
+		TargetQuat = FRotator(0.0f, 0.0f, TargetAngle).Quaternion();
 		break;
         
 	case EAxisType::AxisY:
-		TargetRotator = FRotator(TargetAngle, 0.0f, 0.0f).Quaternion();
+		TargetQuat = FRotator(TargetAngle, 0.0f, 0.0f).Quaternion();
 		break;
         
 	case EAxisType::AxisZ:
-		TargetRotator = FRotator(0.0f, -TargetAngle, 0.0f).Quaternion();
+		TargetQuat = FRotator(0.0f, -TargetAngle, 0.0f).Quaternion();
 		break;
 	}
 	
-	UpdateTurnCore(SignInfo, TargetRotator);
+	UpdateTurnCore(SignInfo, TargetQuat);
 }
 
-void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetRotator)
+void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat)
 {
-	const FQuat CurrentRotator = CoreComponent->GetRelativeRotation().Quaternion();
-	const FQuat NewRotator = FQuat::Slerp(CurrentRotator, TargetRotator, RubikCubeDataAsset->TurnSpeed);
-	CoreComponent->SetRelativeRotation(NewRotator);
+	const FQuat CurrentQuat = CoreComponent->GetRelativeRotation().Quaternion();
+	const FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, RubikCubeDataAsset->TurnSpeed);
+	CoreComponent->SetRelativeRotation(NewQuat);
 
-	if (NewRotator.Equals(TargetRotator, RubikCubeDataAsset->TurnTolerance))
+	if (NewQuat.Equals(TargetQuat, RubikCubeDataAsset->TurnTolerance))
 	{
-		CoreComponent->SetRelativeRotation(TargetRotator);
+		CoreComponent->SetRelativeRotation(TargetQuat);
 		ReleasePieces(SignInfo);
 		return;
 	}
 
-	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, SignInfo, TargetRotator]
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, SignInfo, TargetQuat]
 	{
-		UpdateTurnCore(SignInfo, TargetRotator);
+		UpdateTurnCore(SignInfo, TargetQuat);
 	}));
 }
 
@@ -434,7 +476,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 	
 	SortFacelet();
 
-	CoreComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f).Quaternion());
+	CoreComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	TurnNext();
 }
 

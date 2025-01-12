@@ -1,8 +1,8 @@
+#include "KociembaAlgorithm/coordcube.h"
+#include "KociembaAlgorithm/prunetable_helpers.h"
+#include "KociembaAlgorithm/cubiecube.h"
 #include <sys/types.h>
 #include <stdio.h>
-#include "KociembaAlgorithm/prunetable_helpers.h"
-#include "KociembaAlgorithm/coordcube.h"
-#include "KociembaAlgorithm/cubiecube.h"
 
 short twistMove[N_TWIST][N_MOVE];
 short flipMove[N_FLIP][N_MOVE];

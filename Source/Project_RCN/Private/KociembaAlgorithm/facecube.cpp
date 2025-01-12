@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <string.h>
 #include "KociembaAlgorithm/facecube.h"
 #include "KociembaAlgorithm/cubiecube.h"
+#include <stdlib.h>
+#include <string.h>
 
 
 facelet_t cornerFacelet[8][3] = { { U9, R1, F3 }, { U7, F1, L3 }, { U1, L1, B3 }, { U3, B1, R3 },

@@ -13,5 +13,7 @@ UCLASS()
 class PROJECT_RCN_API ARCN_GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	ARCN_GameModeBase();
 };
