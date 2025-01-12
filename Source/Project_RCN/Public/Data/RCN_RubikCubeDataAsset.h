@@ -39,4 +39,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float StickerSize;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 ScrambleTurnCount;
 };
