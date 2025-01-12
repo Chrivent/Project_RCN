@@ -160,17 +160,17 @@ ARCN_RubikCube::ARCN_RubikCube()
 	SignInfos.Emplace("F'", EAxisType::AxisY, 1, false, 1);
 	SignInfos.Emplace("F2", EAxisType::AxisY, 1, true, 2);
 
-	SignInfos.Emplace("D", EAxisType::AxisZ, -1, false, 1);
-	SignInfos.Emplace("D'", EAxisType::AxisZ, -1, true, 1);
-	SignInfos.Emplace("D2", EAxisType::AxisZ, -1, false, 2);
+	SignInfos.Emplace("D", EAxisType::AxisZ, -1, true, 1);
+	SignInfos.Emplace("D'", EAxisType::AxisZ, -1, false, 1);
+	SignInfos.Emplace("D2", EAxisType::AxisZ, -1, true, 2);
 	
-	SignInfos.Emplace("E", EAxisType::AxisZ, 0, true, 1);
-	SignInfos.Emplace("E'", EAxisType::AxisZ, 0, false, 1);
-	SignInfos.Emplace("E2", EAxisType::AxisZ, 0, true, 2);
+	SignInfos.Emplace("E", EAxisType::AxisZ, 0, false, 1);
+	SignInfos.Emplace("E'", EAxisType::AxisZ, 0, true, 1);
+	SignInfos.Emplace("E2", EAxisType::AxisZ, 0, false, 2);
 	
-	SignInfos.Emplace("U", EAxisType::AxisZ, 1, true, 1);
-	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, false, 1);
-	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, true, 2);
+	SignInfos.Emplace("U", EAxisType::AxisZ, 1, false, 1);
+	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, true, 1);
+	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, false, 2);
 }
 
 // Called when the game starts or when spawned
