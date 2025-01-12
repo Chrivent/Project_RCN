@@ -35,21 +35,3 @@ struct FSignInfo
 	UPROPERTY(VisibleAnywhere)
 	int32 TurnCount;
 };
-
-USTRUCT(BlueprintType)
-struct FFaceletPosition
-{
-	GENERATED_BODY()
-
-	FFaceletPosition(FString InFacelet = TEXT("U"), const FVector& InPosition = FVector::ZeroVector)
-	{
-		Facelet = InFacelet;
-		Position = InPosition;
-	}
-
-	UPROPERTY(VisibleAnywhere)
-	FString Facelet;
-
-	UPROPERTY(VisibleAnywhere)
-	FVector Position;
-};

@@ -72,8 +72,11 @@ protected:
 	FString Facelet;
 
 	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FFaceletPosition> FaceletPositions;
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
+	
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UStaticMeshComponent>, FString> StickerFacelets;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<FVector> FaceletOrder;
+	TArray<FVector> FaceletOrderPositions;
 };
