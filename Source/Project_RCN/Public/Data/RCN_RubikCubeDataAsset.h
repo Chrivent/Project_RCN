@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RCN_RubikCubeDataAsset.generated.h"
 
+enum class EStickerType : uint8;
 /**
  * 
  */
@@ -19,14 +20,26 @@ public:
 	TObjectPtr<UStaticMesh> PieceMesh;
 
 	UPROPERTY(EditDefaultsOnly)
-	float PieceSize;
+	float PieceDistance;
 
 	UPROPERTY(EditDefaultsOnly)
-	float PieceDistance;
+	float PieceSize;
 
 	UPROPERTY(EditDefaultsOnly)
 	float TurnSpeed;
 
 	UPROPERTY(EditDefaultsOnly)
 	float TurnTolerance;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<EStickerType, TObjectPtr<UStaticMesh>> StickerMesh;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StickerDistance;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StickerSize;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 ScrambleTurnCount;
 };
