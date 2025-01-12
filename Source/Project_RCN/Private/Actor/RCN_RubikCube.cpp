@@ -131,7 +131,8 @@ ARCN_RubikCube::ARCN_RubikCube()
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 				}
 
-				PieceMeshComponents.Emplace(PieceMeshComponent, FVector(X, Y, Z));
+				PieceMeshComponents.Emplace(PieceMeshComponent);
+				PieceMeshPositions.Emplace(PieceMeshComponent, FVector(X, Y, Z));
 			}
 		}
 	}
@@ -160,17 +161,17 @@ ARCN_RubikCube::ARCN_RubikCube()
 	SignInfos.Emplace("F'", EAxisType::AxisY, 1, false, 1);
 	SignInfos.Emplace("F2", EAxisType::AxisY, 1, true, 2);
 
-	SignInfos.Emplace("D", EAxisType::AxisZ, -1, true, 1);
-	SignInfos.Emplace("D'", EAxisType::AxisZ, -1, false, 1);
-	SignInfos.Emplace("D2", EAxisType::AxisZ, -1, true, 2);
+	SignInfos.Emplace("D", EAxisType::AxisZ, -1, false, 1);
+	SignInfos.Emplace("D'", EAxisType::AxisZ, -1, true, 1);
+	SignInfos.Emplace("D2", EAxisType::AxisZ, -1, false, 2);
 	
-	SignInfos.Emplace("E", EAxisType::AxisZ, 0, false, 1);
-	SignInfos.Emplace("E'", EAxisType::AxisZ, 0, true, 1);
-	SignInfos.Emplace("E2", EAxisType::AxisZ, 0, false, 2);
+	SignInfos.Emplace("E", EAxisType::AxisZ, 0, true, 1);
+	SignInfos.Emplace("E'", EAxisType::AxisZ, 0, false, 1);
+	SignInfos.Emplace("E2", EAxisType::AxisZ, 0, true, 2);
 	
-	SignInfos.Emplace("U", EAxisType::AxisZ, 1, false, 1);
-	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, true, 1);
-	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, false, 2);
+	SignInfos.Emplace("U", EAxisType::AxisZ, 1, true, 1);
+	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, false, 1);
+	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, true, 2);
 }
 
 // Called when the game starts or when spawned
@@ -181,8 +182,8 @@ void ARCN_RubikCube::BeginPlay()
 	FTimerHandle TestTimerHandle;
 	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
-		Spin("B D B2 R' B U2 R U' B2 F2 D F' U' L' B U' F2 U2 R2 L2 D' L R F2 L2");
-	}), 1.0f, false);
+		Spin("F R D2 R D2 F' L' B' U B D' U2 R D' B R D2 U F' D' L D B' D2 F2");
+	}), 5.0f, true);
 }
 
 // Called every frame
@@ -247,7 +248,7 @@ void ARCN_RubikCube::TurnCore(const FSignInfo& SignInfo)
 		break;
         
 	case EAxisType::AxisZ:
-		TargetRotator = FRotator(0.0f, TargetAngle, 0.0f).Quaternion();
+		TargetRotator = FRotator(0.0f, -TargetAngle, 0.0f).Quaternion();
 		break;
 	}
 	
@@ -276,28 +277,28 @@ void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetRotat
 
 void ARCN_RubikCube::GrabPieces(const FSignInfo& SignInfo)
 {
-	for (const auto PieceMeshComponent : PieceMeshComponents)
+	for (const auto PieceMeshPosition : PieceMeshPositions)
 	{
 		switch (SignInfo.AxisType)
 		{
 		case EAxisType::AxisX:
-			if (PieceMeshComponent.Value.X == SignInfo.Layer)
+			if (PieceMeshPosition.Value.X == SignInfo.Layer)
 			{
-				PieceMeshComponent.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				PieceMeshPosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			}
 			break;
 		
 		case EAxisType::AxisY:
-			if (PieceMeshComponent.Value.Y == SignInfo.Layer)
+			if (PieceMeshPosition.Value.Y == SignInfo.Layer)
 			{
-				PieceMeshComponent.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				PieceMeshPosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			}
 			break;
 		
 		case EAxisType::AxisZ:
-			if (PieceMeshComponent.Value.Z == SignInfo.Layer)
+			if (PieceMeshPosition.Value.Z == SignInfo.Layer)
 			{
-				PieceMeshComponent.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				PieceMeshPosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			}
 			break;
 		}
@@ -347,12 +348,9 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 				break;
 			}
 
-			const FVector CurrentPosition = PieceMeshComponents[PieceMeshComponent];
-			UE_LOG(LogTemp, Log, TEXT("C : %f, %f, %f"), CurrentPosition.X, CurrentPosition.Y, CurrentPosition.Z)
+			const FVector CurrentPosition = PieceMeshPositions[PieceMeshComponent];
 			const FVector NewPosition = RotationMatrix.TransformPosition(CurrentPosition);
-			UE_LOG(LogTemp, Log, TEXT("N : %f, %f, %f"), NewPosition.X, NewPosition.Y, NewPosition.Z)
-			UE_LOG(LogTemp, Log, TEXT("==========================="))
-			PieceMeshComponents[PieceMeshComponent] = NewPosition;
+			PieceMeshPositions[PieceMeshComponent] = NewPosition;
 		}
 	}
 

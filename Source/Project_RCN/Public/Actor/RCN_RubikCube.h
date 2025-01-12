@@ -46,7 +46,10 @@ protected:
 	TObjectPtr<USceneComponent> CoreComponent;
 	
 	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PieceMeshComponents;
+	TArray<TObjectPtr<UStaticMeshComponent>> PieceMeshComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PieceMeshPositions;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FSignInfo> SignInfos;
