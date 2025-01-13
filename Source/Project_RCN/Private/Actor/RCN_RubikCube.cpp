@@ -3,6 +3,8 @@
 
 #include "Actor/RCN_RubikCube.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -253,6 +255,8 @@ ARCN_RubikCube::ARCN_RubikCube()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
+
+	RotateAction = RubikCubeDataAsset->RotateAction;
 }
 
 // Called when the game starts or when spawned
@@ -264,7 +268,7 @@ void ARCN_RubikCube::BeginPlay()
 
 	SortFacelet();
 
-	FTimerHandle TestTimerHandle;
+	/*FTimerHandle TestTimerHandle;
 	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		Scramble();
@@ -274,7 +278,23 @@ void ARCN_RubikCube::BeginPlay()
 		{
 			Solve();
 		}), 3.0f, false);
-	}), 6.0f, true);
+	}), 6.0f, true);*/
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		EnableInput(PlayerController);
+	}
+
+	const APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	if (UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	{
+		EnhancedInputLocalPlayerSubsystem->ClearAllMappings();
+		const UInputMappingContext* InputMappingContext = RubikCubeDataAsset->InputMappingContext;
+		if (RubikCubeDataAsset->InputMappingContext)
+		{
+			EnhancedInputLocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
+		}
+	}
 
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
@@ -334,6 +354,15 @@ void ARCN_RubikCube::PostNetInit()
 	Super::PostNetInit();
 
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+
+	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARCN_RubikCube::Rotate);
 }
 
 // Called every frame
@@ -626,5 +655,10 @@ void ARCN_RubikCube::SortFacelet()
 			}
 		}
 	}
+}
+
+void ARCN_RubikCube::Rotate(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("a"))
 }
 

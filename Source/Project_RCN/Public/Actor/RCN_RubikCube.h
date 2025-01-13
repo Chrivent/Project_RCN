@@ -7,6 +7,8 @@
 #include "Util/StructHelper.h"
 #include "RCN_RubikCube.generated.h"
 
+struct FInputActionValue;
+class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
 enum class EAxisType : uint8;
@@ -27,6 +29,8 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_Owner() override;
 	virtual void PostNetInit() override;
+
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:	
 	// Called every frame
@@ -90,10 +94,16 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> FaceletOrderPositions;
-
+	
+	// 플레이 로직
+	void Rotate(const FInputActionValue& Value);
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInputAction> RotateAction;
 };

@@ -6,6 +6,8 @@
 #include "Engine/DataAsset.h"
 #include "RCN_RubikCubeDataAsset.generated.h"
 
+class UInputMappingContext;
+class UInputAction;
 enum class EStickerType : uint8;
 /**
  * 
@@ -42,4 +44,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 ScrambleTurnCount;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> RotateAction;
 };
