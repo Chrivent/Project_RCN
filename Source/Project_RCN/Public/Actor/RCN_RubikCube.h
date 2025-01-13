@@ -100,10 +100,14 @@ protected:
 
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
+
+	UFUNCTION()
+	void OnRep_Rotate();
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Rotate)
 	FRotator NetworkPitchRotator;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Rotate)
 	FRotator NetworkYawRotator;
 };

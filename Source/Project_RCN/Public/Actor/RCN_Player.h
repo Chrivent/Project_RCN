@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Interface/RCN_SetCubeInterface.h"
 #include "RCN_Player.generated.h"
 
 class URCN_PlayerDataAsset;
@@ -14,15 +13,13 @@ struct FInputActionValue;
 class UInputAction;
 
 UCLASS()
-class PROJECT_RCN_API ARCN_Player : public APawn, public IRCN_SetCubeInterface
+class PROJECT_RCN_API ARCN_Player : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
-
-	FORCEINLINE virtual void SetRubikCube(AActor* InRubikCube) override { RubikCube = InRubikCube; };
 
 protected:
 	// Called when the game starts or when spawned

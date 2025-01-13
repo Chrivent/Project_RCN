@@ -278,12 +278,7 @@ void ARCN_RubikCube::BeginPlay()
 void ARCN_RubikCube::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (!HasAuthority())
-	{
-		PitchComponent->SetRelativeRotation(NetworkPitchRotator);
-		YawComponent->SetRelativeRotation(NetworkYawRotator);
-	}
+	
 }
 
 void ARCN_RubikCube::Spin(const FString& Command)
@@ -592,5 +587,22 @@ void ARCN_RubikCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ARCN_RubikCube, NetworkPitchRotator)
 	DOREPLIFETIME(ARCN_RubikCube, NetworkYawRotator)
+}
+
+void ARCN_RubikCube::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	
+	Super::OnActorChannelOpen(InBunch, Connection);
+	
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::OnRep_Rotate()
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("Pitch : %s, Yaw : %s"), *NetworkPitchRotator.ToString(), *NetworkYawRotator.ToString())
+
+	PitchComponent->SetRelativeRotation(NetworkPitchRotator);
+	YawComponent->SetRelativeRotation(NetworkYawRotator);
 }
 

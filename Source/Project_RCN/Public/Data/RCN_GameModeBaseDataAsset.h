@@ -20,7 +20,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<APlayerController> PlayerControllerClass;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> RubikCubeClass;
 };

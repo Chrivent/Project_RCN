@@ -53,6 +53,13 @@ void ARCN_Player::BeginPlay()
 
 	SetControl();
 
+	if (IsLocallyControlled())
+	{
+		RubikCube = GetWorld()->SpawnActor(PlayerDataAsset->RubikCubeClass);
+		RubikCube->SetActorLocation(GetActorLocation() + GetActorForwardVector() * 400.0f);
+		RubikCube->SetActorRotation(GetActorRotation());
+	}
+
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
