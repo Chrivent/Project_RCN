@@ -24,12 +24,12 @@ void ARCN_PlayerController::PostNetInit()
 	{
 		if (IsValid(NetDriver->ServerConnection))
 		{
-			RCN_LOG(LogRCNNetwork, Log, TEXT("¼­¹ö ¿¬°áµÊ : %s"), *NetDriver->ServerConnection->GetName());
+			RCN_LOG(LogRCNNetwork, Log, TEXT("ì„œë²„ ì—°ê²°ë¨ : %s"), *NetDriver->ServerConnection->GetName());
 		}
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("NetDriver ¾øÀ½."));
+		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("NetDriver ì—†ìŒ."));
 	}
 
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));

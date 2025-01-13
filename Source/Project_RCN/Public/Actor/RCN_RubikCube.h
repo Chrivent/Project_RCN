@@ -36,7 +36,7 @@ public:
 	void Scramble();
 	void Solve();
 
-	// Å¥ºê ·ÎÁ÷
+	// íë¸Œ ë¡œì§
 protected:
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);

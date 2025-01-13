@@ -15,13 +15,13 @@ class PROJECT_RCN_API ARCN_PlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-	// °ÔÀÓ°ú ¹«°üÇÑ ¾×ÅÍ ÃÊ±âÈ­
+	// ê²Œì„ê³¼ ë¬´ê´€í•œ ì•¡í„° ì´ˆê¸°í™”
 	virtual void PostInitializeComponents() override;
-	// °ÔÀÓ°ú ¹«°üÇÏÁö¸¸ ³×Æ®¿öÅ© Àû¿ëÀ» ¹Ş´Â ÃÊ±âÈ­
+	// ê²Œì„ê³¼ ë¬´ê´€í•˜ì§€ë§Œ ë„¤íŠ¸ì›Œí¬ ì ìš©ì„ ë°›ëŠ” ì´ˆê¸°í™”
 	virtual void PostNetInit() override;
 
 	virtual void BeginPlay() override;
 	
-	// ÆùÀÌ ºùÀÇµÉ¶§ È£ÃâÇÏ´Â ÇÔ¼ö
+	// í°ì´ ë¹™ì˜ë ë•Œ í˜¸ì¶œí•˜ëŠ” í•¨ìˆ˜
 	virtual void OnPossess(APawn* InPawn) override;
 };
