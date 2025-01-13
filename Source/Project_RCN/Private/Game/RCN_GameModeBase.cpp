@@ -55,14 +55,34 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 
 	Super::PostLogin(NewPlayer);
 
+	UNetDriver* NetDriver = GetNetDriver();
+	if (IsValid(NetDriver))
+	{
+		if (NetDriver->ClientConnections.Num() == 0)
+		{
+			RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("클라이언트 연결 안됨."));
+		}
+		else
+		{
+			for (const auto& Connection : NetDriver->ClientConnections)
+			{
+				RCN_LOG(LogRCNNetwork, Log, TEXT("클라이언트 연결됨 : %s"), *Connection->GetName());
+			}
+		}
+	}
+	else
+	{
+		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("NetDriver 없음."));
+	}
+
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_GameModeBase::StartPlay()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	/*RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::StartPlay();
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));*/
 }

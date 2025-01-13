@@ -24,9 +24,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void OnRep_Owner() override;
-	virtual void PostNetInit() override;
 
 public:	
 	// Called every frame
@@ -36,7 +33,6 @@ public:
 	void Scramble();
 	void Solve();
 
-	// 큐브 로직
 protected:
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
