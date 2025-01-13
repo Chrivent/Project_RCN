@@ -329,7 +329,7 @@ void ARCN_RubikCube::OnRep_Owner()
 
 void ARCN_RubikCube::PostNetInit()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s %s"), TEXT("Begin"), *GetName());
 
 	Super::PostNetInit();
 

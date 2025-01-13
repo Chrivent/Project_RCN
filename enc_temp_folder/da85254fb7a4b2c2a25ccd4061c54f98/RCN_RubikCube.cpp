@@ -258,7 +258,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 // Called when the game starts or when spawned
 void ARCN_RubikCube::BeginPlay()
 {
-	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::BeginPlay();
 
@@ -276,7 +276,64 @@ void ARCN_RubikCube::BeginPlay()
 		}), 3.0f, false);
 	}), 6.0f, true);
 
-	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::PossessedBy(AController* NewController)
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	AActor* OwnerActor = GetOwner();
+	if (IsValid(OwnerActor))
+	{
+		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+	}
+	else
+	{
+		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+	}
+
+	Super::PossessedBy(NewController);
+
+	OwnerActor = GetOwner();
+	if (IsValid(OwnerActor))
+	{
+		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+	}
+	else
+	{
+		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+	}
+
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::OnRep_Owner()
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s %s"), *GetName(), TEXT("Begin"));
+
+	Super::OnRep_Owner();
+
+	AActor* OwnerActor = GetOwner();
+	if (IsValid(OwnerActor))
+	{
+		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+	}
+	else
+	{
+		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+	}
+
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::PostNetInit()
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	Super::PostNetInit();
+
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 // Called every frame
