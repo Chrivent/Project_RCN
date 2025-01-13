@@ -80,9 +80,9 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 
 void ARCN_GameModeBase::StartPlay()
 {
-	/*RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::StartPlay();
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));*/
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }

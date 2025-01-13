@@ -57,6 +57,9 @@ protected:
 	TObjectPtr<USceneComponent> DefaultComponent;
 
 	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> RotateComponent;
+
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> CoreComponent;
 	
 	UPROPERTY(VisibleAnywhere)
@@ -96,6 +99,7 @@ protected:
 	TArray<FVector> FaceletOrderPositions;
 	
 	// 플레이 로직
+	void SetControl() const;
 	void Rotate(const FInputActionValue& Value);
 	
 	UPROPERTY(VisibleAnywhere)

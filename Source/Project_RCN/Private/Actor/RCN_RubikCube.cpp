@@ -32,8 +32,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 	DefaultComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 	RootComponent = DefaultComponent;
 
+	RotateComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RotateComponent"));
+	RotateComponent->SetupAttachment(RootComponent);
+
 	CoreComponent = CreateDefaultSubobject<USceneComponent>(TEXT("CoreComponent"));
-	CoreComponent->SetupAttachment(RootComponent);
+	CoreComponent->SetupAttachment(RotateComponent);
 
 	const float PieceDistance = RubikCubeDataAsset->PieceDistance;
 	const float PieceSize = RubikCubeDataAsset->PieceSize;
@@ -54,7 +57,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 				UStaticMeshComponent* PieceMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("PieceComponent [%d, %d, %d]"), X, Y, Z));
 				
-				PieceMeshComponent->SetupAttachment(RootComponent);
+				PieceMeshComponent->SetupAttachment(RotateComponent);
 				PieceMeshComponent->SetRelativeLocation(FVector(X * PieceDistance, Y * PieceDistance, Z * PieceDistance));
 				PieceMeshComponent->SetRelativeScale3D(FVector(PieceSize));
 				PieceMeshComponent->SetStaticMesh(RubikCubeDataAsset->PieceMesh);
@@ -285,16 +288,7 @@ void ARCN_RubikCube::BeginPlay()
 		EnableInput(PlayerController);
 	}
 
-	const APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	if (UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	{
-		EnhancedInputLocalPlayerSubsystem->ClearAllMappings();
-		const UInputMappingContext* InputMappingContext = RubikCubeDataAsset->InputMappingContext;
-		if (RubikCubeDataAsset->InputMappingContext)
-		{
-			EnhancedInputLocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
-		}
-	}
+	SetControl();
 
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
@@ -544,7 +538,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 	{
 		if (UStaticMeshComponent* PieceMeshComponent = Cast<UStaticMeshComponent>(ChildPieceComponent))
 		{
-			PieceMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+			PieceMeshComponent->AttachToComponent(RotateComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 			const FVector CurrentPiecePosition = PiecePositions[PieceMeshComponent];
 			const FVector NewPiecePosition = GetRotationMatrix(SignInfo).TransformPosition(CurrentPiecePosition);
@@ -657,8 +651,29 @@ void ARCN_RubikCube::SortFacelet()
 	}
 }
 
+void ARCN_RubikCube::SetControl() const
+{
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
+
+	const APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	if (UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	{
+		EnhancedInputLocalPlayerSubsystem->ClearAllMappings();
+		const UInputMappingContext* InputMappingContext = RubikCubeDataAsset->InputMappingContext;
+		if (RubikCubeDataAsset->InputMappingContext)
+		{
+			EnhancedInputLocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
+		}
+	}
+}
+
 void ARCN_RubikCube::Rotate(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Log, TEXT("a"))
+	const FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	RotateComponent->SetRelativeRotation(FRotator(LookAxisVector.Y, LookAxisVector.X, 0.0f));
 }
 
