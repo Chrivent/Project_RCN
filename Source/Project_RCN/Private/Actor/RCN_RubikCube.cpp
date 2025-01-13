@@ -32,11 +32,14 @@ ARCN_RubikCube::ARCN_RubikCube()
 	DefaultComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 	RootComponent = DefaultComponent;
 
-	RotateComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RotateComponent"));
-	RotateComponent->SetupAttachment(RootComponent);
+	PitchComponent = CreateDefaultSubobject<USceneComponent>(TEXT("PitchComponent"));
+	PitchComponent->SetupAttachment(RootComponent);
+
+	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
+	YawComponent->SetupAttachment(PitchComponent);
 
 	CoreComponent = CreateDefaultSubobject<USceneComponent>(TEXT("CoreComponent"));
-	CoreComponent->SetupAttachment(RotateComponent);
+	CoreComponent->SetupAttachment(YawComponent);
 
 	const float PieceDistance = RubikCubeDataAsset->PieceDistance;
 	const float PieceSize = RubikCubeDataAsset->PieceSize;
@@ -57,7 +60,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 				UStaticMeshComponent* PieceMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("PieceComponent [%d, %d, %d]"), X, Y, Z));
 				
-				PieceMeshComponent->SetupAttachment(RotateComponent);
+				PieceMeshComponent->SetupAttachment(YawComponent);
 				PieceMeshComponent->SetRelativeLocation(FVector(X * PieceDistance, Y * PieceDistance, Z * PieceDistance));
 				PieceMeshComponent->SetRelativeScale3D(FVector(PieceSize));
 				PieceMeshComponent->SetStaticMesh(RubikCubeDataAsset->PieceMesh);
@@ -251,7 +254,6 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->SetRelativeRotation(FRotator(-30.0f, -120.0f, 0.0f));
 	SpringArmComponent->TargetArmLength = 800.0f;
 	SpringArmComponent->bUsePawnControlRotation = false;
 	
@@ -260,6 +262,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 	CameraComponent->bUsePawnControlRotation = false;
 
 	RotateAction = RubikCubeDataAsset->RotateAction;
+	HoldAction = RubikCubeDataAsset->HoldAction;
 }
 
 // Called when the game starts or when spawned
@@ -357,6 +360,8 @@ void ARCN_RubikCube::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARCN_RubikCube::Rotate);
+	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Triggered, this, &ARCN_RubikCube::HoldTriggered);
+	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Completed, this, &ARCN_RubikCube::HoldCompleted);
 }
 
 // Called every frame
@@ -538,7 +543,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 	{
 		if (UStaticMeshComponent* PieceMeshComponent = Cast<UStaticMeshComponent>(ChildPieceComponent))
 		{
-			PieceMeshComponent->AttachToComponent(RotateComponent, FAttachmentTransformRules::KeepWorldTransform);
+			PieceMeshComponent->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 			const FVector CurrentPiecePosition = PiecePositions[PieceMeshComponent];
 			const FVector NewPiecePosition = GetRotationMatrix(SignInfo).TransformPosition(CurrentPiecePosition);
@@ -670,10 +675,33 @@ void ARCN_RubikCube::SetControl() const
 	}
 }
 
+void ARCN_RubikCube::HoldTriggered(const FInputActionValue& Value)
+{
+	bIsHolding = true;
+}
+
+void ARCN_RubikCube::HoldCompleted(const FInputActionValue& Value)
+{
+	bIsHolding = false;
+}
+
 void ARCN_RubikCube::Rotate(const FInputActionValue& Value)
 {
-	const FVector2D LookAxisVector = Value.Get<FVector2D>();
+	if (!bIsHolding)
+	{
+		return;
+	}
+	
+	FVector2D RotateAxisVector = Value.Get<FVector2D>();
+	RotateAxisVector *= RubikCubeDataAsset->RotateSensitivity;
 
-	RotateComponent->SetRelativeRotation(FRotator(LookAxisVector.Y, LookAxisVector.X, 0.0f));
+	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
+	FRotator YawRotator = YawComponent->GetRelativeRotation();
+	
+	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.9f, 90.0f);
+	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+	
+	PitchComponent->SetRelativeRotation(PitchRotator);
+	YawComponent->SetRelativeRotation(YawRotator);
 }
 

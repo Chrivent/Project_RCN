@@ -57,7 +57,10 @@ protected:
 	TObjectPtr<USceneComponent> DefaultComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> RotateComponent;
+	TObjectPtr<USceneComponent> PitchComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> YawComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> CoreComponent;
@@ -100,6 +103,8 @@ protected:
 	
 	// 플레이 로직
 	void SetControl() const;
+	void HoldTriggered(const FInputActionValue& Value);
+	void HoldCompleted(const FInputActionValue& Value);
 	void Rotate(const FInputActionValue& Value);
 	
 	UPROPERTY(VisibleAnywhere)
@@ -109,5 +114,11 @@ protected:
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
 	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInputAction> HoldAction;
+
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UInputAction> RotateAction;
+
+	UPROPERTY(VisibleAnywhere)
+	uint8 bIsHolding : 1;
 };
