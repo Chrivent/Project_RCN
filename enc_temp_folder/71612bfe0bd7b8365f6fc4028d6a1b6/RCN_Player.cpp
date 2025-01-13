@@ -53,6 +53,13 @@ void ARCN_Player::BeginPlay()
 
 	SetControl();
 
+	if (IsLocallyControlled())
+	{
+		RubikCube = GetWorld()->SpawnActor(PlayerDataAsset->RubikCubeClass);
+		RubikCube->SetActorLocation(GetActorLocation() + GetActorForwardVector() * 400.0f);
+		RubikCube->SetActorRotation(GetActorRotation());
+	}
+
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
@@ -171,9 +178,9 @@ void ARCN_Player::Rotate(const FInputActionValue& Value)
 	FVector2D RotateAxisVector = Value.Get<FVector2D>();
 	RotateAxisVector *= PlayerDataAsset->RotateSensitivity;
 
-	/*if (IRCN_RotateInterface* RotateInterface = Cast<IRCN_RotateInterface>(RubikCube))
+	if (IRCN_RotateInterface* RotateInterface = Cast<IRCN_RotateInterface>(RubikCube))
 	{
 		RotateInterface->Rotate(RotateAxisVector);
-	}*/
+	}
 }
 

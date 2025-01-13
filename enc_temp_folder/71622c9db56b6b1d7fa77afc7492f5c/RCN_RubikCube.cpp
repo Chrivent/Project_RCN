@@ -3,12 +3,11 @@
 
 #include "Actor/RCN_RubikCube.h"
 
-#include "Camera/CameraComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "KociembaAlgorithm/search.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Util/EnumHelper.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ARCN_RubikCube::ARCN_RubikCube()
@@ -30,8 +29,16 @@ ARCN_RubikCube::ARCN_RubikCube()
 	DefaultComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 	RootComponent = DefaultComponent;
 
+	PitchComponent = CreateDefaultSubobject<USceneComponent>(TEXT("PitchComponent"));
+	PitchComponent->SetupAttachment(RootComponent);
+	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
+
+	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
+	YawComponent->SetupAttachment(PitchComponent);
+	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
+
 	CoreComponent = CreateDefaultSubobject<USceneComponent>(TEXT("CoreComponent"));
-	CoreComponent->SetupAttachment(RootComponent);
+	CoreComponent->SetupAttachment(YawComponent);
 
 	const float PieceDistance = RubikCubeDataAsset->PieceDistance;
 	const float PieceSize = RubikCubeDataAsset->PieceSize;
@@ -52,7 +59,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 				UStaticMeshComponent* PieceMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("PieceComponent [%d, %d, %d]"), X, Y, Z));
 				
-				PieceMeshComponent->SetupAttachment(RootComponent);
+				PieceMeshComponent->SetupAttachment(YawComponent);
 				PieceMeshComponent->SetRelativeLocation(FVector(X * PieceDistance, Y * PieceDistance, Z * PieceDistance));
 				PieceMeshComponent->SetRelativeScale3D(FVector(PieceSize));
 				PieceMeshComponent->SetStaticMesh(RubikCubeDataAsset->PieceMesh);
@@ -244,27 +251,17 @@ ARCN_RubikCube::ARCN_RubikCube()
 		}
 	}
 
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->SetRelativeRotation(FRotator(-30.0f, -120.0f, 0.0f));
-	SpringArmComponent->TargetArmLength = 800.0f;
-	SpringArmComponent->bUsePawnControlRotation = false;
-	
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
-	CameraComponent->bUsePawnControlRotation = false;
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
 void ARCN_RubikCube::BeginPlay()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
 	Super::BeginPlay();
 
 	SortFacelet();
 
-	FTimerHandle TestTimerHandle;
+	/*FTimerHandle TestTimerHandle;
 	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		Scramble();
@@ -274,73 +271,14 @@ void ARCN_RubikCube::BeginPlay()
 		{
 			Solve();
 		}), 3.0f, false);
-	}), 6.0f, true);
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::PossessedBy(AController* NewController)
-{
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
-	AActor* OwnerActor = GetOwner();
-	if (IsValid(OwnerActor))
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
-	}
-	else
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
-	}
-
-	Super::PossessedBy(NewController);
-
-	OwnerActor = GetOwner();
-	if (IsValid(OwnerActor))
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
-	}
-	else
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
-	}
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::OnRep_Owner()
-{
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s %s"), *GetName(), TEXT("Begin"));
-
-	Super::OnRep_Owner();
-
-	AActor* OwnerActor = GetOwner();
-	if (IsValid(OwnerActor))
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
-	}
-	else
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
-	}
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::PostNetInit()
-{
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
-	Super::PostNetInit();
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	}), 6.0f, true);*/
 }
 
 // Called every frame
 void ARCN_RubikCube::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 
 void ARCN_RubikCube::Spin(const FString& Command)
@@ -398,6 +336,21 @@ void ARCN_RubikCube::Solve()
 	{
 		TurnNext();
 	}
+}
+
+void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector)
+{
+	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
+	FRotator YawRotator = YawComponent->GetRelativeRotation();
+	
+	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
+	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+
+	PitchComponent->SetRelativeRotation(PitchRotator);
+	YawComponent->SetRelativeRotation(YawRotator);
+
+	NetworkPitchRotator = PitchRotator;
+	NetworkYawRotator = YawRotator;
 }
 
 void ARCN_RubikCube::TurnNext()
@@ -515,7 +468,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 	{
 		if (UStaticMeshComponent* PieceMeshComponent = Cast<UStaticMeshComponent>(ChildPieceComponent))
 		{
-			PieceMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+			PieceMeshComponent->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 			const FVector CurrentPiecePosition = PiecePositions[PieceMeshComponent];
 			const FVector NewPiecePosition = GetRotationMatrix(SignInfo).TransformPosition(CurrentPiecePosition);
@@ -626,5 +579,30 @@ void ARCN_RubikCube::SortFacelet()
 			}
 		}
 	}
+}
+
+void ARCN_RubikCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARCN_RubikCube, NetworkPitchRotator)
+	DOREPLIFETIME(ARCN_RubikCube, NetworkYawRotator)
+}
+
+void ARCN_RubikCube::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	
+	Super::OnActorChannelOpen(InBunch, Connection);
+	
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::OnRep_Rotate()
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("Pitch : %s, Yaw : %s"), *NetworkPitchRotator.ToString(), *NetworkYawRotator.ToString())
+
+	PitchComponent->SetRelativeRotation(NetworkPitchRotator);
+	YawComponent->SetRelativeRotation(NetworkYawRotator);
 }
 

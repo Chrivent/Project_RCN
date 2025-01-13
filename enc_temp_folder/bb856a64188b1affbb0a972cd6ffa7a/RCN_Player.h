@@ -51,6 +51,9 @@ protected:
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
 	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AActor> RubikCube;
+
+	UPROPERTY(VisibleAnywhere)
 	uint8 bIsHolding : 1;
 	
 	UPROPERTY(VisibleAnywhere)

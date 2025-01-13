@@ -340,17 +340,20 @@ void ARCN_RubikCube::Solve()
 
 void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector)
 {
-	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
-	FRotator YawRotator = YawComponent->GetRelativeRotation();
-	
-	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
-	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+	if (HasAuthority())
+	{
+		FRotator PitchRotator = PitchComponent->GetRelativeRotation();
+		FRotator YawRotator = YawComponent->GetRelativeRotation();
 
-	PitchComponent->SetRelativeRotation(PitchRotator);
-	YawComponent->SetRelativeRotation(YawRotator);
+		PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
+		YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
 
-	NetworkPitchRotator = PitchRotator;
-	NetworkYawRotator = YawRotator;
+		PitchComponent->SetRelativeRotation(PitchRotator);
+		YawComponent->SetRelativeRotation(YawRotator);
+
+		NetworkPitchRotator = PitchRotator;
+		NetworkYawRotator = YawRotator;
+	}
 }
 
 void ARCN_RubikCube::TurnNext()
