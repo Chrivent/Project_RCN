@@ -12,8 +12,6 @@ class USpringArmComponent;
 enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
-DECLARE_LOG_CATEGORY_EXTERN(RubikCube, Log, All);
-
 UCLASS()
 class PROJECT_RCN_API ARCN_RubikCube : public APawn
 {

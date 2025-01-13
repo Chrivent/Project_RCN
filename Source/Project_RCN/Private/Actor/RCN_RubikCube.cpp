@@ -10,8 +10,6 @@
 #include "Project_RCN/Project_RCN.h"
 #include "Util/EnumHelper.h"
 
-DEFINE_LOG_CATEGORY(RubikCube);
-
 // Sets default values
 ARCN_RubikCube::ARCN_RubikCube()
 {
@@ -25,7 +23,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 	}
 	else
 	{
-		UE_LOG(RubikCube, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(RubikCube, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 
@@ -290,7 +288,7 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 
 void ARCN_RubikCube::Spin(const FString& Command)
 {
-	UE_LOG(RubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
+	RCN_LOG(RubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
 	
 	TArray<FString> ParsedCommands;
 	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
@@ -369,7 +367,7 @@ void ARCN_RubikCube::TurnNext()
 	if (SignQueue.Num() == 0)
 	{
 		bIsTurning = false;
-		UE_LOG(RubikCube, Log, TEXT("회전 완료 및 패슬릿 : %s"), *Facelet)
+		RCN_LOG(RubikCube, Log, TEXT("회전 완료 및 패슬릿 : %s"), *Facelet)
 		return;
 	}
 
