@@ -264,8 +264,6 @@ void ARCN_RubikCube::BeginPlay()
 
 	Super::BeginPlay();
 
-	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
-
 	SortFacelet();
 
 	FTimerHandle TestTimerHandle;
@@ -279,6 +277,8 @@ void ARCN_RubikCube::BeginPlay()
 			Solve();
 		}), 3.0f, false);
 	}), 6.0f, true);
+
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
 }
 
 // Called every frame
