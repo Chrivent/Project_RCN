@@ -7,11 +7,16 @@
 
 ARCN_GameModeBase::ARCN_GameModeBase()
 {
-	static ConstructorHelpers::FClassFinder<APawn> DefultPawnClassRef(TEXT("/Script/Project_RCN.RCN_NetworkTestCharacter"));
-
-	if (DefultPawnClassRef.Class)
+	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/Project_RCN.RCN_RubikCube"));
+	if (DefaultPawnClassRef.Class)
 	{
-		DefaultPawnClass = DefultPawnClassRef.Class;
+		DefaultPawnClass = DefaultPawnClassRef.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(TEXT("/Script/Project_RCN.RCN_PlayerController"));
+	if (PlayerControllerClassRef.Class)
+	{
+		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
 
 	GameStateClass = ARCN_GameState::StaticClass();

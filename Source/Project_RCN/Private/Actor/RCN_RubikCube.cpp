@@ -7,6 +7,7 @@
 #include "Data/RCN_RubikCubeDataAsset.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "KociembaAlgorithm/search.h"
+#include "Project_RCN/Project_RCN.h"
 #include "Util/EnumHelper.h"
 
 DEFINE_LOG_CATEGORY(RubikCube);
@@ -259,7 +260,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 // Called when the game starts or when spawned
 void ARCN_RubikCube::BeginPlay()
 {
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
+
 	Super::BeginPlay();
+
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
 
 	SortFacelet();
 
