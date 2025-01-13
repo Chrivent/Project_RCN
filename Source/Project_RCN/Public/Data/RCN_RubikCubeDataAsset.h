@@ -44,16 +44,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 ScrambleTurnCount;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputMappingContext> InputMappingContext;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> HoldAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> RotateAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	float RotateSensitivity;
 };

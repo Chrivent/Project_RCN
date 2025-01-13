@@ -3,14 +3,11 @@
 
 #include "Actor/RCN_RubikCube.h"
 
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
-#include "Camera/CameraComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "KociembaAlgorithm/search.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Util/EnumHelper.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ARCN_RubikCube::ARCN_RubikCube()
@@ -31,7 +28,6 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 	DefaultComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 	RootComponent = DefaultComponent;
-	DefaultComponent->SetRelativeRotation(FRotator(-30.0f, 90.f, 0.0f));
 
 	PitchComponent = CreateDefaultSubobject<USceneComponent>(TEXT("PitchComponent"));
 	PitchComponent->SetupAttachment(RootComponent);
@@ -255,29 +251,17 @@ ARCN_RubikCube::ARCN_RubikCube()
 		}
 	}
 
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->TargetArmLength = 800.0f;
-	SpringArmComponent->bUsePawnControlRotation = false;
-	
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
-	CameraComponent->bUsePawnControlRotation = false;
-
-	RotateAction = RubikCubeDataAsset->RotateAction;
-	HoldAction = RubikCubeDataAsset->HoldAction;
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
 void ARCN_RubikCube::BeginPlay()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
 	Super::BeginPlay();
 
 	SortFacelet();
 
-	FTimerHandle TestTimerHandle;
+	/*FTimerHandle TestTimerHandle;
 	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		Scramble();
@@ -287,84 +271,7 @@ void ARCN_RubikCube::BeginPlay()
 		{
 			Solve();
 		}), 3.0f, false);
-	}), 6.0f, true);
-
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-	{
-		EnableInput(PlayerController);
-	}
-
-	SetControl();
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::PossessedBy(AController* NewController)
-{
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
-	AActor* OwnerActor = GetOwner();
-	if (IsValid(OwnerActor))
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
-	}
-	else
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
-	}
-
-	Super::PossessedBy(NewController);
-
-	OwnerActor = GetOwner();
-	if (IsValid(OwnerActor))
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
-	}
-	else
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
-	}
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::OnRep_Owner()
-{
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s %s"), *GetName(), TEXT("Begin"));
-
-	Super::OnRep_Owner();
-
-	AActor* OwnerActor = GetOwner();
-	if (IsValid(OwnerActor))
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
-	}
-	else
-	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
-	}
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::PostNetInit()
-{
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s %s"), TEXT("Begin"), *GetName());
-
-	Super::PostNetInit();
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-
-	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARCN_RubikCube::Rotate);
-	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Triggered, this, &ARCN_RubikCube::HoldTriggered);
-	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Completed, this, &ARCN_RubikCube::HoldCompleted);
+	}), 6.0f, true);*/
 }
 
 // Called every frame
@@ -372,6 +279,11 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!HasAuthority())
+	{
+		PitchComponent->SetRelativeRotation(NetworkPitchRotator);
+		YawComponent->SetRelativeRotation(NetworkYawRotator);
+	}
 }
 
 void ARCN_RubikCube::Spin(const FString& Command)
@@ -429,6 +341,21 @@ void ARCN_RubikCube::Solve()
 	{
 		TurnNext();
 	}
+}
+
+void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector)
+{
+	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
+	FRotator YawRotator = YawComponent->GetRelativeRotation();
+	
+	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
+	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+
+	PitchComponent->SetRelativeRotation(PitchRotator);
+	YawComponent->SetRelativeRotation(YawRotator);
+
+	NetworkPitchRotator = PitchRotator;
+	NetworkYawRotator = YawRotator;
 }
 
 void ARCN_RubikCube::TurnNext()
@@ -659,52 +586,11 @@ void ARCN_RubikCube::SortFacelet()
 	}
 }
 
-void ARCN_RubikCube::SetControl() const
+void ARCN_RubikCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (!IsLocallyControlled())
-	{
-		return;
-	}
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	const APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	if (UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	{
-		EnhancedInputLocalPlayerSubsystem->ClearAllMappings();
-		const UInputMappingContext* InputMappingContext = RubikCubeDataAsset->InputMappingContext;
-		if (RubikCubeDataAsset->InputMappingContext)
-		{
-			EnhancedInputLocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
-		}
-	}
-}
-
-void ARCN_RubikCube::HoldTriggered(const FInputActionValue& Value)
-{
-	bIsHolding = true;
-}
-
-void ARCN_RubikCube::HoldCompleted(const FInputActionValue& Value)
-{
-	bIsHolding = false;
-}
-
-void ARCN_RubikCube::Rotate(const FInputActionValue& Value)
-{
-	if (!bIsHolding)
-	{
-		return;
-	}
-	
-	FVector2D RotateAxisVector = Value.Get<FVector2D>();
-	RotateAxisVector *= RubikCubeDataAsset->RotateSensitivity;
-
-	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
-	FRotator YawRotator = YawComponent->GetRelativeRotation();
-	
-	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
-	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
-	
-	PitchComponent->SetRelativeRotation(PitchRotator);
-	YawComponent->SetRelativeRotation(YawRotator);
+	DOREPLIFETIME(ARCN_RubikCube, NetworkPitchRotator)
+	DOREPLIFETIME(ARCN_RubikCube, NetworkYawRotator)
 }
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/RCN_RotateInterface.h"
 #include "Util/StructHelper.h"
 #include "RCN_RubikCube.generated.h"
 
@@ -15,7 +16,7 @@ enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
 UCLASS()
-class PROJECT_RCN_API ARCN_RubikCube : public APawn
+class PROJECT_RCN_API ARCN_RubikCube : public AActor, public IRCN_RotateInterface
 {
 	GENERATED_BODY()
 	
@@ -26,11 +27,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void OnRep_Owner() override;
-	virtual void PostNetInit() override;
-
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:	
 	// Called every frame
@@ -40,8 +36,9 @@ public:
 	void Scramble();
 	void Solve();
 
-	// 큐브 로직
 protected:
+	virtual void Rotate(FVector2D RotateAxisVector) override;
+	
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
 	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat);
@@ -100,25 +97,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> FaceletOrderPositions;
-	
-	// 플레이 로직
-	void SetControl() const;
-	void HoldTriggered(const FInputActionValue& Value);
-	void HoldCompleted(const FInputActionValue& Value);
-	void Rotate(const FInputActionValue& Value);
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCameraComponent> CameraComponent;
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UInputAction> HoldAction;
+	// 네트워크 로직
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UPROPERTY(Replicated)
+	FRotator NetworkPitchRotator;
 
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UInputAction> RotateAction;
-
-	UPROPERTY(VisibleAnywhere)
-	uint8 bIsHolding : 1;
+	UPROPERTY(Replicated)
+	FRotator NetworkYawRotator;
 };
