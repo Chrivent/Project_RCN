@@ -31,12 +31,15 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 	DefaultComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 	RootComponent = DefaultComponent;
+	DefaultComponent->SetRelativeRotation(FRotator(-30.0f, 90.f, 0.0f));
 
 	PitchComponent = CreateDefaultSubobject<USceneComponent>(TEXT("PitchComponent"));
 	PitchComponent->SetupAttachment(RootComponent);
+	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
 
 	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
 	YawComponent->SetupAttachment(PitchComponent);
+	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
 	CoreComponent = CreateDefaultSubobject<USceneComponent>(TEXT("CoreComponent"));
 	CoreComponent->SetupAttachment(YawComponent);
@@ -274,7 +277,7 @@ void ARCN_RubikCube::BeginPlay()
 
 	SortFacelet();
 
-	/*FTimerHandle TestTimerHandle;
+	FTimerHandle TestTimerHandle;
 	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		Scramble();
@@ -284,7 +287,7 @@ void ARCN_RubikCube::BeginPlay()
 		{
 			Solve();
 		}), 3.0f, false);
-	}), 6.0f, true);*/
+	}), 6.0f, true);
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -698,7 +701,7 @@ void ARCN_RubikCube::Rotate(const FInputActionValue& Value)
 	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
 	FRotator YawRotator = YawComponent->GetRelativeRotation();
 	
-	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.9f, 90.0f);
+	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
 	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
 	
 	PitchComponent->SetRelativeRotation(PitchRotator);
