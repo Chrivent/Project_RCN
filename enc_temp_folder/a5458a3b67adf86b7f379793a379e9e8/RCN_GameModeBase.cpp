@@ -16,7 +16,7 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(LogRCNNetwrok, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 	
@@ -28,41 +28,39 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 
 void ARCN_GameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("========================================"));
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("========================================"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
-	//ErrorMessage = TEXT("들어오지마 씨발련아");
-
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
 }
 
 APlayerController* ARCN_GameModeBase::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
 
 	APlayerController* NewPlayerController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
 	
 	return NewPlayerController;
 }
 
 void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::PostLogin(NewPlayer);
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_GameModeBase::StartPlay()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::StartPlay();
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
 }

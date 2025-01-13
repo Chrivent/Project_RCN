@@ -258,7 +258,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 // Called when the game starts or when spawned
 void ARCN_RubikCube::BeginPlay()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::BeginPlay();
 
@@ -276,7 +276,7 @@ void ARCN_RubikCube::BeginPlay()
 		}), 3.0f, false);
 	}), 6.0f, true);
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
 }
 
 // Called every frame

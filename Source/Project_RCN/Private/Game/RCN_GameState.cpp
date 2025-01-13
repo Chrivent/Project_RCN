@@ -6,18 +6,18 @@
 
 void ARCN_GameState::HandleBeginPlay()
 {
-	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::HandleBeginPlay();
 
-	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_GameState::OnRep_ReplicatedHasBegunPlay()
 {
-	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::OnRep_ReplicatedHasBegunPlay();
 
-	RCN_LOG(LogRCNNetwrok, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
