@@ -17,16 +17,16 @@ class PROJECT_RCN_API ARCN_GameModeBase : public AGameModeBase
 public:
 	ARCN_GameModeBase();
 
-// ·Î±×ÀÎ °ü·Ã ÇÔ¼ö
-	// Å¬¶óÀÌ¾ðÆ®ÀÇ Á¢¼Ó ¿äÃ»À» Ã³¸®ÇÏ´Â ÇÔ¼ö
+// ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
+	// Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
 	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 	
-	// Á¢¼ÓÀ» Çã¿ëÇÑ Å¬¶óÀÌ¾ðÆ®¿¡ ´ëÀÀÇÏ´Â ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯¸¦ ¸¸µå´Â ÇÔ¼ö
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 	virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 
-	// ÇÃ·¹ÀÌ¾î ÀÔÀåÀ» À§ÇØ ÇÃ·¹ÀÌ¾î¿¡ ÇÊ¿äÇÑ ±âº» ¼³Á¤À» ¸ðµÎ ¸¶¹«¸®ÇÏ´Â ÇÔ¼ö
+	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¿¡ ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
-	// °ÔÀÓÀÇ ½ÃÀÛÀ» Áö½ÃÇÏ´Â ÇÔ¼ö
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
 	virtual void StartPlay() override;
 };
