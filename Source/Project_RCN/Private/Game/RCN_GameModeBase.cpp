@@ -33,7 +33,7 @@ void ARCN_GameModeBase::PreLogin(const FString& Options, const FString& Address,
 	
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
-	//ErrorMessage = TEXT("들어오지마 씨발련아");
+	//ErrorMessage = TEXT("접속 차단");
 
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
