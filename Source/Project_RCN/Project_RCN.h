@@ -4,19 +4,16 @@
 
 #include "CoreMinimal.h"
 
-// °­ÀÇ ÄÚµå¸¦ »ç¿ëÇÏ¸é ¿¡·¯°¡ ¹ß»ý
-// #define LOG_NETMODEINFO ((GetNetMode() == ENetMode::NM_Client) ? *FString::Printf(TEXT("CLIENT%d"), GPlayInEditorID) : ((GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : TEXT("SERVER")))
+// 
+#define LOG_NETMODEINFO ((GetNetMode() == ENetMode::NM_Client) ? *FString::Printf(TEXT("CLIENT%d"), UE::GetPlayInEditorID) : ((GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : TEXT("SERVER")))
 
-#define LOG_NETMODEINFO (GetWorld() && GetNetMode() == ENetMode::NM_Client) ? *FString::Printf(TEXT("CLIENT%d"), GPlayInEditorID != INDEX_NONE ? GPlayInEditorID : 0) : (GetWorld() && GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : TEXT("SERVER")
-
-
-// ·Î±×¸¦ ÄÝÇÑ ½ÃÁ¡¿¡¼­ ¾î¶² ÇÔ¼öÀÇ ¸î ¹øÂ° ÁÙÀÎÁö Á¤º¸¸¦ ¹Þ±â À§ÇÑ ¸ÅÅ©·Î
+// ë¡œê·¸ë¥¼ ì½œí•œ ì‹œì ì—ì„œ ì–´ë–¤ í•¨ìˆ˜ì˜ ëª‡ ë²ˆì§¸ ì¤„ì¸ì§€ ì •ë³´ë¥¼ ë°›ê¸° ìœ„í•œ ë§¤í¬ë¡œ
 #define LOG_CALLINFO ANSI_TO_TCHAR(__FUNCTION__)
 
-// UE_LOG ¸ÅÅ©·Î¸¦ ´ë½ÅÇÒ ·Î±× ¸ÅÅ©·Î¸¦ ÇÏ³ª ÁöÁ¤
-#define RCN_LOG(LogCat, Verbosity, Format, ...) UE_LOG(LogCat, Verbosity, TEXT("[%s] %s %s"), LOG_NETMODEINFO, LOG_CALLINFO ,*FString::Printf(Format, ##__VA_ARGS__))
+// UE_LOG ë§¤í¬ë¡œë¥¼ ëŒ€ì‹ í•  ë¡œê·¸ ë§¤í¬ë¡œë¥¼ í•˜ë‚˜ ì§€ì •
+#define RCN_LOG(LogCat, Verbosity, Format, ...) UE_LOG(LogCat, Verbosity, TEXT("[%s] %s %s"), LOG_NETMODEINFO, LOG_CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
 
-// ³×Æ®¿öÅ© ¸ÖÆ¼ ÇÃ·¹ÀÌ¾î¿¡ °ü·ÃµÈ ·Î±× ¸ÅÅ©·Î
-// ¼Ò½º ÄÚµå¸¦ Àü¹æÀ§ÀûÀ¸·Î ÀÌ ¸ÅÅ©·Î¸¦ »ç¿ëÇÒ °ÍÀÌ±â ¶§¹®¿¡
-// ¸ðµç ¼Ò½º ÆÄÀÏÀ» ½±°Ô ÂüÁ¶ÇÒ ¼ö ÀÖ´Â Project_RCN.h¿¡ ÀÛ¼ºÇßÀ½
+// ë„¤íŠ¸ì›Œí¬ ë©€í‹° í”Œë ˆì´ì–´ì— ê´€ë ¨ëœ ë¡œê·¸ ë§¤í¬ë¡œ
+// ì†ŒìŠ¤ ì½”ë“œë¥¼ ì „ë°©ìœ„ì ìœ¼ë¡œ ì´ ë§¤í¬ë¡œë¥¼ ì‚¬ìš©í•  ê²ƒì´ê¸° ë•Œë¬¸ì—
+// ëª¨ë“  ì†ŒìŠ¤ íŒŒì¼ì„ ì‰½ê²Œ ì°¸ì¡°í•  ìˆ˜ ìžˆëŠ” Project_RCN.hì— ìž‘ì„±í–ˆìŒ
 DECLARE_LOG_CATEGORY_EXTERN(LogRCNNetwrok, Log, All);

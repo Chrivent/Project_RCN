@@ -2,22 +2,26 @@
 
 
 #include "Game/RCN_GameModeBase.h"
+
+#include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Game/RCN_GameState.h"
 
 ARCN_GameModeBase::ARCN_GameModeBase()
 {
-	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/Project_RCN.RCN_RubikCube"));
-	if (DefaultPawnClassRef.Class)
+	static ConstructorHelpers::FObjectFinder<URCN_GameModeBaseDataAsset> GameModeBaseDataAssetRef(TEXT("/Script/Project_RCN.RCN_GameModeBaseDataAsset'/Game/Data/DA_GameModeBase.DA_GameModeBase'"));
+	if (GameModeBaseDataAssetRef.Object)
 	{
-		DefaultPawnClass = DefaultPawnClassRef.Class;
+		GameModeBaseDataAsset = GameModeBaseDataAssetRef.Object;
 	}
-
-	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(TEXT("/Script/Project_RCN.RCN_PlayerController"));
-	if (PlayerControllerClassRef.Class)
+	else
 	{
-		PlayerControllerClass = PlayerControllerClassRef.Class;
+		RCN_LOG(LogRCNNetwrok, Error, TEXT("데이터 에셋 로드 실패"))
+		return;
 	}
+	
+	DefaultPawnClass = GameModeBaseDataAsset->DefaultPawnClass;
+	PlayerControllerClass = GameModeBaseDataAsset->PlayerControllerClass;
 
 	GameStateClass = ARCN_GameState::StaticClass();
 }
