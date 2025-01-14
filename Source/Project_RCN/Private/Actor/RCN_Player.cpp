@@ -9,6 +9,7 @@
 #include "Data/RCN_PlayerDataAsset.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interface/RCN_RotateInterface.h"
+#include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
 
 // Sets default values
@@ -171,9 +172,41 @@ void ARCN_Player::Rotate(const FInputActionValue& Value)
 	FVector2D RotateAxisVector = Value.Get<FVector2D>();
 	RotateAxisVector *= PlayerDataAsset->RotateSensitivity;
 
-	/*if (IRCN_RotateInterface* RotateInterface = Cast<IRCN_RotateInterface>(RubikCube))
+	if (HasAuthority())
 	{
-		RotateInterface->Rotate(RotateAxisVector);
-	}*/
+		if (IRCN_RotateInterface* ControlCubeInterface = Cast<IRCN_RotateInterface>(RubikCube))
+		{
+			ControlCubeInterface->Rotate(RotateAxisVector);
+		}
+	}
+	else
+	{
+		ServerRPC_Rotate(RotateAxisVector);
+	}
+}
+
+void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARCN_Player, RubikCube);
+}
+
+void ARCN_Player::ServerRPC_Rotate_Implementation(FVector2D RotateAxisVector)
+{
+	if (IRCN_RotateInterface* ControlCubeInterface = Cast<IRCN_RotateInterface>(RubikCube))
+	{
+		ControlCubeInterface->Rotate(RotateAxisVector);
+
+		ClientRPC_Rotate(RotateAxisVector);
+	}
+}
+
+void ARCN_Player::ClientRPC_Rotate_Implementation(FVector2D RotateAxisVector)
+{
+	if (IRCN_RotateInterface* ControlCubeInterface = Cast<IRCN_RotateInterface>(RubikCube))
+	{
+		ControlCubeInterface->Rotate(RotateAxisVector);
+	}
 }
 

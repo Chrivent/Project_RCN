@@ -18,9 +18,6 @@ class PROJECT_RCN_API URCN_PlayerDataAsset : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> RubikCubeClass;
-	
-	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
 	UPROPERTY(EditDefaultsOnly)

@@ -302,6 +302,7 @@ void ARCN_RubikCube::Spin(const FString& Command)
 	if (!bIsTurning)
 	{
 		bIsTurning = true;
+
 		TurnNext();
 	}
 }
@@ -603,8 +604,6 @@ void ARCN_RubikCube::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Conne
 
 void ARCN_RubikCube::OnRep_Rotate()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("Pitch : %s, Yaw : %s"), *NetworkPitchRotator.ToString(), *NetworkYawRotator.ToString())
-
 	PitchComponent->SetRelativeRotation(NetworkPitchRotator);
 	YawComponent->SetRelativeRotation(NetworkYawRotator);
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Interface/RCN_SetCubeInterface.h"
 #include "RCN_Player.generated.h"
 
 class URCN_PlayerDataAsset;
@@ -13,13 +14,15 @@ struct FInputActionValue;
 class UInputAction;
 
 UCLASS()
-class PROJECT_RCN_API ARCN_Player : public APawn
+class PROJECT_RCN_API ARCN_Player : public APawn, public IRCN_SetCubeInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
+
+	FORCEINLINE virtual void SetRubikCube(AActor* InRubikCube) override { RubikCube = InRubikCube; };
 
 protected:
 	// Called when the game starts or when spawned
@@ -58,4 +61,16 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UInputAction> RotateAction;
+
+	// 네트워크 로직
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UFUNCTION(Server, Unreliable)
+	void ServerRPC_Rotate(FVector2D RotateAxisVector);
+
+	UFUNCTION(Client, Unreliable)
+	void ClientRPC_Rotate(FVector2D RotateAxisVector);
+
+	UPROPERTY(Replicated)
+	TObjectPtr<AActor> RubikCube;
 };
