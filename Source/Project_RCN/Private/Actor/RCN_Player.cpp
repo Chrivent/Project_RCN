@@ -218,30 +218,36 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 
 void ARCN_Player::ServerRPC_Rotate_Implementation(const FVector2D RotateAxisVector)
 {
-	MultiRPC_Rotate(RotateAxisVector);
+	RubikCube->Rotate(RotateAxisVector);
+	
+	ClientRPC_Rotate(RotateAxisVector);
 }
 
-void ARCN_Player::MultiRPC_Rotate_Implementation(const FVector2D RotateAxisVector)
+void ARCN_Player::ClientRPC_Rotate_Implementation(const FVector2D RotateAxisVector)
 {
 	RubikCube->Rotate(RotateAxisVector);
 }
 
 void ARCN_Player::ServerRPC_Scramble_Implementation()
 {
-	MultiRPC_Scramble();
+	RubikCube->Scramble();
+	
+	ClientRPC_Scramble();
 }
 
-void ARCN_Player::MultiRPC_Scramble_Implementation()
+void ARCN_Player::ClientRPC_Scramble_Implementation()
 {
 	RubikCube->Scramble();
 }
 
 void ARCN_Player::ServerRPC_Solve_Implementation()
 {
-	MultiRPC_Solve();
+	RubikCube->Solve();
+	
+	ClientRPC_Solve();
 }
 
-void ARCN_Player::MultiRPC_Solve_Implementation()
+void ARCN_Player::ClientRPC_Solve_Implementation()
 {
 	RubikCube->Solve();
 }

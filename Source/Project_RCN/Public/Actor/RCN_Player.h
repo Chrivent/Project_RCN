@@ -71,20 +71,20 @@ protected:
 	UFUNCTION(Server, Unreliable)
 	void ServerRPC_Rotate(FVector2D RotateAxisVector);
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MultiRPC_Rotate(FVector2D RotateAxisVector);
+	UFUNCTION(Client, Unreliable)
+	void ClientRPC_Rotate(FVector2D RotateAxisVector);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_Scramble();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiRPC_Scramble();
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_Scramble();
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_Solve();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiRPC_Solve();
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_Solve();
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> RubikCube;

@@ -37,7 +37,6 @@ public:
 	void Rotate(FVector2D RotateAxisVector) const;
 
 protected:
-	
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
 	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat);
