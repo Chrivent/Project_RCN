@@ -3,10 +3,11 @@
 
 #include "Game/RCN_GameModeBase.h"
 
+#include "Actor/RCN_Player.h"
+#include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Game/RCN_GameState.h"
-#include "Interface/RCN_SetCubeInterface.h"
 
 ARCN_GameModeBase::ARCN_GameModeBase()
 {
@@ -76,15 +77,17 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("NetDriver 없음."));
 	}
 
-	AActor* Cube = GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass);
-	APawn* Player = NewPlayer->GetPawn();
-	Cube->SetActorLocation(Player->GetActorLocation() + Player->GetActorForwardVector() * 400.0f);
-	Cube->SetActorRotation(Player->GetActorRotation());
-	Cube->SetReplicates(true);
-	
-	if (IRCN_SetCubeInterface* SetCubeInterface = Cast<IRCN_SetCubeInterface>(NewPlayer->GetPawn()))
+	if (ARCN_RubikCube* Cube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
-		SetCubeInterface->SetRubikCube(Cube);
+		Cube->SetReplicates(true);
+	
+		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
+		{
+			Cube->SetActorLocation(Player->GetActorLocation() + Player->GetActorForwardVector() * 400.0f);
+			Cube->SetActorRotation(Player->GetActorRotation());
+		
+			Player->SetRubikCube(Cube);
+		}
 	}
 
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));

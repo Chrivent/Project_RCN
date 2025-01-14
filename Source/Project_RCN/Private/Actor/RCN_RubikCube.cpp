@@ -281,21 +281,6 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 
 void ARCN_RubikCube::Scramble()
 {
-	Spin(GetScrambleCommand());
-}
-
-void ARCN_RubikCube::Solve()
-{
-	bRequestedSolving = true;
-
-	if (!bIsTurning)
-	{
-		TurnNext();
-	}
-}
-
-FString ARCN_RubikCube::GetScrambleCommand()
-{
 	FString Command = TEXT("");
 
 	FString LastSign = TEXT(" ");
@@ -312,28 +297,33 @@ FString ARCN_RubikCube::GetScrambleCommand()
 	}
 
 	Command.RemoveAt(Command.Len() - 1);
-
-	return Command;
+	
+	Spin(Command);
 }
 
-FString ARCN_RubikCube::GetSolveCommand()
+void ARCN_RubikCube::Solve()
 {
-	return solution(
+	FString Command = TEXT("");
+
+	Command = solution(
 		TCHAR_TO_ANSI(*Facelet),
 		24,
 		1000,
 		0,
 		"cache"
 	);
+
+	Spin(Command);
 }
 
 void ARCN_RubikCube::Spin(const FString& Command)
 {
 	RCN_LOG(RubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
 
-		TArray<FString> ParsedCommands;
+	TArray<FString> ParsedCommands;
 	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
 
+	SignQueue.Empty();
 	for (const FString& ParsedCommand : ParsedCommands)
 	{
 		for (auto SignInfo : SignInfos)
@@ -353,7 +343,7 @@ void ARCN_RubikCube::Spin(const FString& Command)
 	}
 }
 
-void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector)
+void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector) const
 {
 	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
 	FRotator YawRotator = YawComponent->GetRelativeRotation();
@@ -367,19 +357,6 @@ void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector)
 
 void ARCN_RubikCube::TurnNext()
 {
-	if (bRequestedSolving)
-	{
-		bRequestedSolving = false;
-		
-		bIsTurning = false;
-		SignQueue.Empty();
-		
-		const FString SolveCommand = GetSolveCommand();
-		Spin(SolveCommand);
-		
-		return;
-	}
-	
 	if (SignQueue.Num() == 0)
 	{
 		bIsTurning = false;

@@ -5,11 +5,10 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Actor/RCN_RubikCube.h"
 #include "Camera/CameraComponent.h"
 #include "Data/RCN_PlayerDataAsset.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Interface/RCN_RotateInterface.h"
-#include "Interface/RCN_CommandInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
 
@@ -193,18 +192,12 @@ void ARCN_Player::Rotate(const FInputActionValue& Value)
 
 void ARCN_Player::Scramble()
 {
-	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
-	{
-		ServerRPC_Scramble(CommandInterface->GetScrambleCommand());
-	}
+	ServerRPC_Scramble();
 }
 
 void ARCN_Player::Solve()
 {
-	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
-	{
-		ServerRPC_Solve(CommandInterface->GetSolveCommand());
-	}
+	ServerRPC_Solve();
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -223,42 +216,33 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::ServerRPC_Rotate_Implementation(FVector2D RotateAxisVector)
+void ARCN_Player::ServerRPC_Rotate_Implementation(const FVector2D RotateAxisVector)
 {
 	MultiRPC_Rotate(RotateAxisVector);
 }
 
-void ARCN_Player::MultiRPC_Rotate_Implementation(FVector2D RotateAxisVector)
+void ARCN_Player::MultiRPC_Rotate_Implementation(const FVector2D RotateAxisVector)
 {
-	if (IRCN_RotateInterface* ControlCubeInterface = Cast<IRCN_RotateInterface>(RubikCube))
-	{
-		ControlCubeInterface->Rotate(RotateAxisVector);
-	}
+	RubikCube->Rotate(RotateAxisVector);
 }
 
-void ARCN_Player::ServerRPC_Scramble_Implementation(const FString& Command)
+void ARCN_Player::ServerRPC_Scramble_Implementation()
 {
-	MultiRPC_Scramble(Command);
+	MultiRPC_Scramble();
 }
 
-void ARCN_Player::MultiRPC_Scramble_Implementation(const FString& Command)
+void ARCN_Player::MultiRPC_Scramble_Implementation()
 {
-	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
-	{
-		CommandInterface->Spin(Command);
-	}
+	RubikCube->Scramble();
 }
 
-void ARCN_Player::ServerRPC_Solve_Implementation(const FString& Command)
+void ARCN_Player::ServerRPC_Solve_Implementation()
 {
-	MultiRPC_Solve(Command);
+	MultiRPC_Solve();
 }
 
-void ARCN_Player::MultiRPC_Solve_Implementation(const FString& Command)
+void ARCN_Player::MultiRPC_Solve_Implementation()
 {
-	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
-	{
-		CommandInterface->Spin(Command);
-	}
+	RubikCube->Solve();
 }
 

@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Interface/RCN_SetCubeInterface.h"
 #include "RCN_Player.generated.h"
 
+class ARCN_RubikCube;
 class URCN_PlayerDataAsset;
 class USpringArmComponent;
 class UCameraComponent;
@@ -14,7 +14,7 @@ struct FInputActionValue;
 class UInputAction;
 
 UCLASS()
-class PROJECT_RCN_API ARCN_Player : public APawn, public IRCN_SetCubeInterface
+class PROJECT_RCN_API ARCN_Player : public APawn
 {
 	GENERATED_BODY()
 
@@ -22,7 +22,7 @@ public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
 
-	FORCEINLINE virtual void SetRubikCube(AActor* InRubikCube) override { RubikCube = InRubikCube; };
+	FORCEINLINE void SetRubikCube(ARCN_RubikCube* InRubikCube) { RubikCube = InRubikCube; };
 
 protected:
 	// Called when the game starts or when spawned
@@ -75,17 +75,17 @@ protected:
 	void MultiRPC_Rotate(FVector2D RotateAxisVector);
 
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_Scramble(const FString& Command);
+	void ServerRPC_Scramble();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiRPC_Scramble(const FString& Command);
+	void MultiRPC_Scramble();
 
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_Solve(const FString& Command);
+	void ServerRPC_Solve();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiRPC_Solve(const FString& Command);
+	void MultiRPC_Solve();
 
 	UPROPERTY(Replicated)
-	TObjectPtr<AActor> RubikCube;
+	TObjectPtr<ARCN_RubikCube> RubikCube;
 };

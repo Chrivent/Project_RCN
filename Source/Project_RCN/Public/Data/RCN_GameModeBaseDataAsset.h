@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RCN_GameModeBaseDataAsset.generated.h"
 
+class ARCN_RubikCube;
 /**
  * 
  */
@@ -22,5 +23,5 @@ public:
 	TSubclassOf<APlayerController> PlayerControllerClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> RubikCubeClass;
+	TSubclassOf<ARCN_RubikCube> RubikCubeClass;
 };
