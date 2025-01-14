@@ -64,12 +64,13 @@ protected:
 
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerRPC_Rotate(FVector2D RotateAxisVector);
 
-	UFUNCTION(Client, Unreliable)
-	void ClientRPC_Rotate(FVector2D RotateAxisVector);
+	UFUNCTION(NetMulticast, Unreliable)
+	void MultiRPC_Rotate(FVector2D RotateAxisVector);
 
 	UPROPERTY(Replicated)
 	TObjectPtr<AActor> RubikCube;

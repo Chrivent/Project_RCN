@@ -172,17 +172,7 @@ void ARCN_Player::Rotate(const FInputActionValue& Value)
 	FVector2D RotateAxisVector = Value.Get<FVector2D>();
 	RotateAxisVector *= PlayerDataAsset->RotateSensitivity;
 
-	if (HasAuthority())
-	{
-		if (IRCN_RotateInterface* ControlCubeInterface = Cast<IRCN_RotateInterface>(RubikCube))
-		{
-			ControlCubeInterface->Rotate(RotateAxisVector);
-		}
-	}
-	else
-	{
-		ServerRPC_Rotate(RotateAxisVector);
-	}
+	ServerRPC_Rotate(RotateAxisVector);
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -192,17 +182,21 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARCN_Player, RubikCube);
 }
 
-void ARCN_Player::ServerRPC_Rotate_Implementation(FVector2D RotateAxisVector)
+void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
 {
-	if (IRCN_RotateInterface* ControlCubeInterface = Cast<IRCN_RotateInterface>(RubikCube))
-	{
-		ControlCubeInterface->Rotate(RotateAxisVector);
-
-		ClientRPC_Rotate(RotateAxisVector);
-	}
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	
+	Super::OnActorChannelOpen(InBunch, Connection);
+	
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::ClientRPC_Rotate_Implementation(FVector2D RotateAxisVector)
+void ARCN_Player::ServerRPC_Rotate_Implementation(FVector2D RotateAxisVector)
+{
+	MultiRPC_Rotate(RotateAxisVector);
+}
+
+void ARCN_Player::MultiRPC_Rotate_Implementation(FVector2D RotateAxisVector)
 {
 	if (IRCN_RotateInterface* ControlCubeInterface = Cast<IRCN_RotateInterface>(RubikCube))
 	{

@@ -7,7 +7,6 @@
 #include "KociembaAlgorithm/search.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Util/EnumHelper.h"
-#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ARCN_RubikCube::ARCN_RubikCube()
@@ -250,8 +249,6 @@ ARCN_RubikCube::ARCN_RubikCube()
 			FaceletOrderPositions.Emplace(FVector(X, -2, Z));
 		}
 	}
-
-	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -341,20 +338,14 @@ void ARCN_RubikCube::Solve()
 
 void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector)
 {
-	if (HasAuthority())
-	{
-		FRotator PitchRotator = PitchComponent->GetRelativeRotation();
-		FRotator YawRotator = YawComponent->GetRelativeRotation();
+	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
+	FRotator YawRotator = YawComponent->GetRelativeRotation();
 
-		PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
-		YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
+	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
 
-		PitchComponent->SetRelativeRotation(PitchRotator);
-		YawComponent->SetRelativeRotation(YawRotator);
-
-		NetworkPitchRotator = PitchRotator;
-		NetworkYawRotator = YawRotator;
-	}
+	PitchComponent->SetRelativeRotation(PitchRotator);
+	YawComponent->SetRelativeRotation(YawRotator);
 }
 
 void ARCN_RubikCube::TurnNext()
@@ -583,28 +574,5 @@ void ARCN_RubikCube::SortFacelet()
 			}
 		}
 	}
-}
-
-void ARCN_RubikCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ARCN_RubikCube, NetworkPitchRotator)
-	DOREPLIFETIME(ARCN_RubikCube, NetworkYawRotator)
-}
-
-void ARCN_RubikCube::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
-{
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
-	
-	Super::OnActorChannelOpen(InBunch, Connection);
-	
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_RubikCube::OnRep_Rotate()
-{
-	PitchComponent->SetRelativeRotation(NetworkPitchRotator);
-	YawComponent->SetRelativeRotation(NetworkYawRotator);
 }
 

@@ -80,7 +80,8 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 	APawn* Player = NewPlayer->GetPawn();
 	Cube->SetActorLocation(Player->GetActorLocation() + Player->GetActorForwardVector() * 400.0f);
 	Cube->SetActorRotation(Player->GetActorRotation());
-
+	Cube->SetReplicates(true);
+	
 	if (IRCN_SetCubeInterface* SetCubeInterface = Cast<IRCN_SetCubeInterface>(NewPlayer->GetPawn()))
 	{
 		SetCubeInterface->SetRubikCube(Cube);
