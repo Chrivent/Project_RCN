@@ -74,17 +74,17 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MultiRPC_Rotate(FVector2D RotateAxisVector);
 
-	UFUNCTION(Server, Unreliable)
-	void ServerRPC_Scramble(FString Command);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Scramble(const FString& Command);
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MultiRPC_Scramble(FString Command);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPC_Scramble(const FString& Command);
 
-	UFUNCTION(Server, Unreliable)
-	void ServerRPC_Solve(FString Command);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Solve(const FString& Command);
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MultiRPC_Solve(FString Command);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPC_Solve(const FString& Command);
 
 	UPROPERTY(Replicated)
 	TObjectPtr<AActor> RubikCube;
