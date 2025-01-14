@@ -9,6 +9,7 @@
 #include "Data/RCN_PlayerDataAsset.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interface/RCN_RotateInterface.h"
+#include "Interface/RCN_CommandInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
 
@@ -175,6 +176,22 @@ void ARCN_Player::Rotate(const FInputActionValue& Value)
 	ServerRPC_Rotate(RotateAxisVector);
 }
 
+void ARCN_Player::Scramble()
+{
+	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
+	{
+		ServerRPC_Scramble(CommandInterface->GetScrambleCommand());
+	}
+}
+
+void ARCN_Player::Solve()
+{
+	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
+	{
+		ServerRPC_Solve(CommandInterface->GetSolveCommand());
+	}
+}
+
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -189,6 +206,32 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	Super::OnActorChannelOpen(InBunch, Connection);
 	
 	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_Scramble_Implementation(FString Command)
+{
+	MultiRPC_Scramble(Command);
+}
+
+void ARCN_Player::MultiRPC_Scramble_Implementation(FString Command)
+{
+	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
+	{
+		CommandInterface->Spin(Command);
+	}
+}
+
+void ARCN_Player::ServerRPC_Solve_Implementation(FString Command)
+{
+	MultiRPC_Solve(Command);
+}
+
+void ARCN_Player::MultiRPC_Solve_Implementation(FString Command)
+{
+	if (IRCN_CommandInterface* CommandInterface = Cast<IRCN_CommandInterface>(RubikCube))
+	{
+		CommandInterface->Spin(Command);
+	}
 }
 
 void ARCN_Player::ServerRPC_Rotate_Implementation(FVector2D RotateAxisVector)

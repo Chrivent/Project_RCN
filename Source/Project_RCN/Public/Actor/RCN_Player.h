@@ -37,12 +37,14 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 protected:
 	void SetControl() const;
 	void HoldTriggered(const FInputActionValue& Value);
 	void HoldCompleted(const FInputActionValue& Value);
 	void Rotate(const FInputActionValue& Value);
+	void Scramble();
+	void Solve();
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
@@ -71,6 +73,18 @@ protected:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MultiRPC_Rotate(FVector2D RotateAxisVector);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerRPC_Scramble(FString Command);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MultiRPC_Scramble(FString Command);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerRPC_Solve(FString Command);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MultiRPC_Solve(FString Command);
 
 	UPROPERTY(Replicated)
 	TObjectPtr<AActor> RubikCube;

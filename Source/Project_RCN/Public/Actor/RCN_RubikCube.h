@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interface/RCN_RotateInterface.h"
+#include "Interface/RCN_CommandInterface.h"
 #include "Util/StructHelper.h"
 #include "RCN_RubikCube.generated.h"
 
@@ -16,7 +17,7 @@ enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
 UCLASS()
-class PROJECT_RCN_API ARCN_RubikCube : public AActor, public IRCN_RotateInterface
+class PROJECT_RCN_API ARCN_RubikCube : public AActor, public IRCN_RotateInterface, public IRCN_CommandInterface
 {
 	GENERATED_BODY()
 	
@@ -32,7 +33,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	void Spin(const FString& Command);
+ 	virtual FString GetScrambleCommand() override;
+	virtual FString GetSolveCommand() override;
+	virtual void Spin(const FString& Command) override;
+
 	void Scramble();
 	void Solve();
 

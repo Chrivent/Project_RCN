@@ -278,11 +278,60 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 	
 }
 
+
+void ARCN_RubikCube::Scramble()
+{
+	Spin(GetScrambleCommand());
+}
+
+void ARCN_RubikCube::Solve()
+{
+	bRequestedSolving = true;
+
+	if (!bIsTurning)
+	{
+		TurnNext();
+	}
+}
+
+FString ARCN_RubikCube::GetScrambleCommand()
+{
+	FString Command = TEXT("");
+
+	FString LastSign = TEXT(" ");
+	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
+	{
+		FString CurrentSign;
+		do
+		{
+			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
+		} while (LastSign[0] == CurrentSign[0]);
+		LastSign = CurrentSign;
+
+		Command += CurrentSign + TEXT(" ");
+	}
+
+	Command.RemoveAt(Command.Len() - 1);
+
+	return Command;
+}
+
+FString ARCN_RubikCube::GetSolveCommand()
+{
+	return solution(
+		TCHAR_TO_ANSI(*Facelet),
+		24,
+		1000,
+		0,
+		"cache"
+	);
+}
+
 void ARCN_RubikCube::Spin(const FString& Command)
 {
 	RCN_LOG(RubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
-	
-	TArray<FString> ParsedCommands;
+
+		TArray<FString> ParsedCommands;
 	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
 
 	for (const FString& ParsedCommand : ParsedCommands)
@@ -300,38 +349,6 @@ void ARCN_RubikCube::Spin(const FString& Command)
 	{
 		bIsTurning = true;
 
-		TurnNext();
-	}
-}
-
-void ARCN_RubikCube::Scramble()
-{
-	FString Command = TEXT("");
-
-	FString LastSign = TEXT(" ");
-	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
-	{
-		FString CurrentSign;
-		do
-		{
-			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
-		}
-		while (LastSign[0] == CurrentSign[0]);
-		LastSign = CurrentSign;
-		
-		Command += CurrentSign + TEXT(" ");
-	}
-
-	Command.RemoveAt(Command.Len() - 1);
-	Spin(Command);
-}
-
-void ARCN_RubikCube::Solve()
-{
-	bRequestedSolving = true;
-
-	if (!bIsTurning)
-	{
 		TurnNext();
 	}
 }
@@ -357,15 +374,9 @@ void ARCN_RubikCube::TurnNext()
 		bIsTurning = false;
 		SignQueue.Empty();
 		
-		const FString SolveCommand = solution(
-			TCHAR_TO_ANSI(*Facelet),
-			24,
-			1000,
-			0,
-			"cache"
-		);
-		
+		const FString SolveCommand = GetSolveCommand();
 		Spin(SolveCommand);
+		
 		return;
 	}
 	
