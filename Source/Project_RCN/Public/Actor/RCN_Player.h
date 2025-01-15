@@ -42,10 +42,9 @@ protected:
 	void SetControl() const;
 	void HoldTriggered(const FInputActionValue& Value);
 	void HoldCompleted(const FInputActionValue& Value);
-	
 	void RotateCube(const FInputActionValue& Value);
-	void ScrambleCube();
-	void SolveCube();
+	void ScrambleCube(const FInputActionValue& Value);
+	void SolveCube(const FInputActionValue& Value);
 
 	UFUNCTION()
 	void CubeSpinEvent(FString Command);
@@ -77,6 +76,12 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UInputAction> RotateAction;
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInputAction> ScrambleAction;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInputAction> SolveAction;
+
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
@@ -98,6 +103,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_ScrambleCube();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SolveCube();
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> NetworkRubikCube;

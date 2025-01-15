@@ -45,8 +45,10 @@ ARCN_Player::ARCN_Player()
 	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
 	YawComponent->SetupAttachment(PitchComponent);
 
-	RotateAction = PlayerDataAsset->RotateAction;
 	HoldAction = PlayerDataAsset->HoldAction;
+	RotateAction = PlayerDataAsset->RotateAction;
+	ScrambleAction = PlayerDataAsset->ScrambleAction;
+	SolveAction = PlayerDataAsset->SolveAction;
 }
 
 // Called when the game starts or when spawned
@@ -62,21 +64,6 @@ void ARCN_Player::BeginPlay()
 	}
 
 	SetControl();
-
-	if (HasAuthority())
-	{
-		FTimerHandle TestTimerHandle;
-		GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-		{
-			ScrambleCube();
-
-			FTimerHandle TestTimerHandle2;
-			GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
-			{
-				SolveCube();
-			}), 4.0f, false);
-		}), 8.0f, true);
-	}
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
@@ -152,9 +139,11 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARCN_Player::RotateCube);
 	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Triggered, this, &ARCN_Player::HoldTriggered);
 	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Completed, this, &ARCN_Player::HoldCompleted);
+	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARCN_Player::RotateCube);
+	EnhancedInputComponent->BindAction(ScrambleAction, ETriggerEvent::Triggered, this, &ARCN_Player::ScrambleCube);
+	EnhancedInputComponent->BindAction(SolveAction, ETriggerEvent::Triggered, this, &ARCN_Player::SolveCube);
 }
 
 void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
@@ -225,14 +214,14 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 	ServerRPC_SetCubeRotation(Rotator);
 }
 
-void ARCN_Player::ScrambleCube()
+void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
 {
 	ServerRPC_ScrambleCube();
 }
 
-void ARCN_Player::SolveCube()
+void ARCN_Player::SolveCube(const FInputActionValue& Value)
 {
-	
+	ServerRPC_SolveCube();
 }
 
 void ARCN_Player::CubeSpinEvent(FString Command)
@@ -309,6 +298,15 @@ void ARCN_Player::ServerRPC_ScrambleCube_Implementation()
 
 	NetworkRubikCube->Scramble();
 	
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_SolveCube_Implementation()
+{
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	
+	NetworkRubikCube->Solve();
+
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
