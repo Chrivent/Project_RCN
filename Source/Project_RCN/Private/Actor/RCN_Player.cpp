@@ -206,7 +206,7 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 	FRotator Rotator = FRotator::ZeroRotator;
 	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
-
+	
 	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
 
