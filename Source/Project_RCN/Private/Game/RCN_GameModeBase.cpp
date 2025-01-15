@@ -93,7 +93,7 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 			{
 				if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
 				{
-					MultiPlayer->RubikCubeInit();
+					MultiPlayer->RenewalRubikCubeLocationAndRotation();
 				}
 			}
 		}), 1.0f, false);

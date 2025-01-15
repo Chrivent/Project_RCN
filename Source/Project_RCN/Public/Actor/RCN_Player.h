@@ -36,7 +36,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void RubikCubeInit();
+	void SetRubikCube(ARCN_RubikCube* InRubikCube);
+	void RenewalRubikCubeLocationAndRotation();
 	
 protected:
 	void SetControl() const;

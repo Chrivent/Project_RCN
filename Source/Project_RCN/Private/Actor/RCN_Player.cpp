@@ -146,16 +146,30 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(SolveAction, ETriggerEvent::Triggered, this, &ARCN_Player::SolveCube);
 }
 
-void ARCN_Player::RubikCubeInit()
+void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 {
+	NetworkRubikCube = InRubikCube;
+
 	NetworkRubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
 	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
 
-	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::CubeSpinEvent);
+	PitchComponent->SetRelativeLocation(FVector::ForwardVector * 400.0f);
+	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
+	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
-	ServerRPC_SetCubeLocation(FVector::ForwardVector * 400.0f);
-	ServerRPC_SetCubeRotation(FRotator(30.0f, 120.0f, 0.0f));
+	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::CubeSpinEvent);
+}
+
+void ARCN_Player::RenewalRubikCubeLocationAndRotation()
+{
+	ServerRPC_SetCubeLocation(PitchComponent->GetRelativeLocation());
+
+	FRotator Rotator = FRotator::ZeroRotator;
+	Rotator.Pitch = PitchComponent->GetRelativeRotation().Pitch;
+	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw;
+	
+	ServerRPC_SetCubeRotation(Rotator);
 }
 
 void ARCN_Player::SetControl() const
@@ -197,15 +211,14 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 	FVector2D RotateAxisVector = Value.Get<FVector2D>();
 	RotateAxisVector *= PlayerDataAsset->RotateSensitivity;
 
-	FRotator Rotator = FRotator::ZeroRotator;
+	FRotator Rotator;
 	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
 
 	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
 
-	ServerRPC_SetCubeLocation(PitchComponent->GetRelativeLocation());
-	ServerRPC_SetCubeRotation(Rotator);
+	RenewalRubikCubeLocationAndRotation();
 }
 
 void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
