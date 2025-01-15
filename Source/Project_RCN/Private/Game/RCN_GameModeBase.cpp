@@ -80,11 +80,23 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		RubikCube->SetReplicates(true);
-	
-		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
+		
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 		{
-			Player->SetRubikCube(RubikCube);
-		}
+			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
+			{
+				Player->SetRubikCube(RubikCube);
+			}
+			
+			for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+			{
+				if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
+				{
+					MultiPlayer->RubikCubeInit();
+				}
+			}
+		}), 1.0f, false);
 	}
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));

@@ -146,22 +146,16 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(SolveAction, ETriggerEvent::Triggered, this, &ARCN_Player::SolveCube);
 }
 
-void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
+void ARCN_Player::RubikCubeInit()
 {
-	NetworkRubikCube = InRubikCube;
-		
 	NetworkRubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
-	NetworkRubikCube->SetActorRotation(GetActorRotation());
+	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
 
 	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::CubeSpinEvent);
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		ServerRPC_SetCubeLocation(FVector::ForwardVector * 400.0f);
-		ServerRPC_SetCubeRotation(FRotator(30.0f, 120.0f, 0.0f));
-	}), 1.0f, false);
+	ServerRPC_SetCubeLocation(FVector::ForwardVector * 400.0f);
+	ServerRPC_SetCubeRotation(FRotator(30.0f, 120.0f, 0.0f));
 }
 
 void ARCN_Player::SetControl() const
