@@ -77,16 +77,13 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("NetDriver 없음."));
 	}
 
-	if (ARCN_RubikCube* Cube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
-		Cube->SetReplicates(true);
+		RubikCube->SetReplicates(true);
 	
 		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 		{
-			Cube->SetActorLocation(Player->GetActorLocation() + Player->GetActorForwardVector() * 400.0f);
-			Cube->SetActorRotation(Player->GetActorRotation());
-		
-			Player->SetRubikCube(Cube);
+			Player->SetRubikCube(RubikCube);
 		}
 	}
 
