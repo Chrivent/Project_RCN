@@ -20,5 +20,5 @@
 // 네트워크 멀티 플레이어에 관련된 로그 매크로
 // 소스 코드를 전방위적으로 이 매크로를 사용할 것이기 때문에
 // 모든 소스 파일을 쉽게 참조할 수 있는 Project_RCN.h에 작성했음
-DECLARE_LOG_CATEGORY_EXTERN(LogRCNNetwork, Log, All);
-DECLARE_LOG_CATEGORY_EXTERN(RubikCube, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogNetwork, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogRubikCube, Log, All);

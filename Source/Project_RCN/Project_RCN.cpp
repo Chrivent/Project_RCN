@@ -3,6 +3,6 @@
 #include "Project_RCN.h"
 #include "Modules/ModuleManager.h"
 
-DEFINE_LOG_CATEGORY(LogRCNNetwork);
-DEFINE_LOG_CATEGORY(RubikCube);
+DEFINE_LOG_CATEGORY(LogNetwork);
+DEFINE_LOG_CATEGORY(LogRubikCube);
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Project_RCN, "Project_RCN" );

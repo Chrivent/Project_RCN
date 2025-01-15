@@ -25,7 +25,7 @@ ARCN_Player::ARCN_Player()
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(LogNetwork, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 
@@ -43,7 +43,7 @@ ARCN_Player::ARCN_Player()
 // Called when the game starts or when spawned
 void ARCN_Player::BeginPlay()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::BeginPlay();
 	
@@ -69,21 +69,21 @@ void ARCN_Player::BeginPlay()
 		}), 8.0f, true);
 	}
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::PossessedBy(AController* NewController)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	AActor* OwnerActor = GetOwner();
 	if (IsValid(OwnerActor))
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+		RCN_LOG(LogNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
 	}
 
 	Super::PossessedBy(NewController);
@@ -91,42 +91,42 @@ void ARCN_Player::PossessedBy(AController* NewController)
 	OwnerActor = GetOwner();
 	if (IsValid(OwnerActor))
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+		RCN_LOG(LogNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
 	}
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::OnRep_Owner()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s %s"), *GetName(), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s %s"), *GetName(), TEXT("Begin"));
 
 	Super::OnRep_Owner();
 
 	AActor* OwnerActor = GetOwner();
 	if (IsValid(OwnerActor))
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+		RCN_LOG(LogNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
 	}
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::PostNetInit()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s %s"), TEXT("Begin"), *GetName());
+	RCN_LOG(LogNetwork, Log, TEXT("%s %s"), TEXT("Begin"), *GetName());
 
 	Super::PostNetInit();
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 // Called every frame
@@ -209,11 +209,11 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::OnActorChannelOpen(InBunch, Connection);
 	
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::ServerRPC_Rotate_Implementation(const FVector2D RotateAxisVector)
