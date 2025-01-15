@@ -22,3 +22,5 @@
 // 모든 소스 파일을 쉽게 참조할 수 있는 Project_RCN.h에 작성했음
 DECLARE_LOG_CATEGORY_EXTERN(LogNetwork, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogRubikCube, Log, All);
+
+DECLARE_LOG_CATEGORY_EXTERN(LogRCNSingleModeBase, Log, All);
