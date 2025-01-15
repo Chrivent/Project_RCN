@@ -278,7 +278,6 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 	
 }
 
-
 void ARCN_RubikCube::Scramble()
 {
 	FString Command = TEXT("");
