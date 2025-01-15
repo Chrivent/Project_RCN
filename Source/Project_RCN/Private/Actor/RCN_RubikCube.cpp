@@ -261,6 +261,11 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 
 void ARCN_RubikCube::Scramble()
 {
+	if (bIsTurning)
+	{
+		return;
+	}
+	
 	FString Command = TEXT("");
 
 	FString LastSign = TEXT(" ");
@@ -283,6 +288,11 @@ void ARCN_RubikCube::Scramble()
 
 void ARCN_RubikCube::Solve()
 {
+	if (bIsTurning)
+	{
+		return;
+	}
+	
 	FString Command = TEXT("");
 
 	Command = solution(
@@ -298,12 +308,11 @@ void ARCN_RubikCube::Solve()
 
 void ARCN_RubikCube::Spin(const FString& Command)
 {
-	//RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
+	RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
 
 	TArray<FString> ParsedCommands;
 	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
 
-	SignQueue.Empty();
 	for (const FString& ParsedCommand : ParsedCommands)
 	{
 		for (auto SignInfo : SignInfos)

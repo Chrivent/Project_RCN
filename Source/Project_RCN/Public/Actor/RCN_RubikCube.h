@@ -73,9 +73,6 @@ protected:
 	uint8 bIsTurning : 1;
 
 	UPROPERTY(VisibleAnywhere)
-	uint8 bRequestedSolving : 1;
-
-	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
 
 	UPROPERTY(VisibleAnywhere)
