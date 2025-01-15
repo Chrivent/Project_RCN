@@ -14,6 +14,8 @@ class USpringArmComponent;
 enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, FString)
+
 UCLASS()
 class PROJECT_RCN_API ARCN_RubikCube : public AActor
 {
@@ -34,10 +36,10 @@ public:
 	void Spin(const FString& Command);
 	void Scramble();
 	void Solve();
-	void Rotate(FVector2D RotateAxisVector) const;
+
+	FSpinDelegate SpinDelegate;
 
 protected:
-	
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
 	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat);
@@ -51,12 +53,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> PitchComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> YawComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> CoreComponent;
@@ -75,9 +71,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;
-
-	UPROPERTY(VisibleAnywhere)
-	uint8 bRequestedSolving : 1;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;

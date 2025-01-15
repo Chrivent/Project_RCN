@@ -21,23 +21,15 @@ ARCN_RubikCube::ARCN_RubikCube()
 	}
 	else
 	{
-		RCN_LOG(RubikCube, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(LogRubikCube, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 
 	DefaultComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 	RootComponent = DefaultComponent;
 
-	PitchComponent = CreateDefaultSubobject<USceneComponent>(TEXT("PitchComponent"));
-	PitchComponent->SetupAttachment(RootComponent);
-	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
-
-	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
-	YawComponent->SetupAttachment(PitchComponent);
-	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
-
 	CoreComponent = CreateDefaultSubobject<USceneComponent>(TEXT("CoreComponent"));
-	CoreComponent->SetupAttachment(YawComponent);
+	CoreComponent->SetupAttachment(RootComponent);
 
 	const float PieceDistance = RubikCubeDataAsset->PieceDistance;
 	const float PieceSize = RubikCubeDataAsset->PieceSize;
@@ -58,7 +50,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 				UStaticMeshComponent* PieceMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("PieceComponent [%d, %d, %d]"), X, Y, Z));
 				
-				PieceMeshComponent->SetupAttachment(YawComponent);
+				PieceMeshComponent->SetupAttachment(RootComponent);
 				PieceMeshComponent->SetRelativeLocation(FVector(X * PieceDistance, Y * PieceDistance, Z * PieceDistance));
 				PieceMeshComponent->SetRelativeScale3D(FVector(PieceSize));
 				PieceMeshComponent->SetStaticMesh(RubikCubeDataAsset->PieceMesh);
@@ -257,18 +249,6 @@ void ARCN_RubikCube::BeginPlay()
 	Super::BeginPlay();
 
 	SortFacelet();
-
-	/*FTimerHandle TestTimerHandle;
-	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		Scramble();
-
-		FTimerHandle TestTimerHandle2;
-		GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
-		{
-			Solve();
-		}), 3.0f, false);
-	}), 6.0f, true);*/
 }
 
 // Called every frame
@@ -280,6 +260,11 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 
 void ARCN_RubikCube::Scramble()
 {
+	if (bIsTurning)
+	{
+		return;
+	}
+	
 	FString Command = TEXT("");
 
 	FString LastSign = TEXT(" ");
@@ -302,6 +287,11 @@ void ARCN_RubikCube::Scramble()
 
 void ARCN_RubikCube::Solve()
 {
+	if (bIsTurning)
+	{
+		return;
+	}
+	
 	FString Command = TEXT("");
 
 	Command = solution(
@@ -317,12 +307,11 @@ void ARCN_RubikCube::Solve()
 
 void ARCN_RubikCube::Spin(const FString& Command)
 {
-	RCN_LOG(RubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
+	RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
 
 	TArray<FString> ParsedCommands;
 	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
 
-	SignQueue.Empty();
 	for (const FString& ParsedCommand : ParsedCommands)
 	{
 		for (auto SignInfo : SignInfos)
@@ -340,18 +329,8 @@ void ARCN_RubikCube::Spin(const FString& Command)
 
 		TurnNext();
 	}
-}
 
-void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector) const
-{
-	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
-	FRotator YawRotator = YawComponent->GetRelativeRotation();
-
-	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
-	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
-
-	PitchComponent->SetRelativeRotation(PitchRotator);
-	YawComponent->SetRelativeRotation(YawRotator);
+	SpinDelegate.Broadcast(Command);
 }
 
 void ARCN_RubikCube::TurnNext()
@@ -359,7 +338,7 @@ void ARCN_RubikCube::TurnNext()
 	if (SignQueue.Num() == 0)
 	{
 		bIsTurning = false;
-		RCN_LOG(RubikCube, Log, TEXT("회전 완료 및 패슬릿 : %s"), *Facelet)
+		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패슬릿 : %s"), *Facelet)
 		return;
 	}
 
@@ -450,7 +429,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 	{
 		if (UStaticMeshComponent* PieceMeshComponent = Cast<UStaticMeshComponent>(ChildPieceComponent))
 		{
-			PieceMeshComponent->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
+			PieceMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 			const FVector CurrentPiecePosition = PiecePositions[PieceMeshComponent];
 			const FVector NewPiecePosition = GetRotationMatrix(SignInfo).TransformPosition(CurrentPiecePosition);

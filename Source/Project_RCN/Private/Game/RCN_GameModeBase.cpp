@@ -18,7 +18,7 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(LogNetwork, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 	
@@ -30,30 +30,30 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 
 void ARCN_GameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("========================================"));
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("========================================"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
 	//ErrorMessage = TEXT("접속 차단");
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 APlayerController* ARCN_GameModeBase::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	APlayerController* NewPlayerController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 	
 	return NewPlayerController;
 }
 
 void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::PostLogin(NewPlayer);
 
@@ -62,42 +62,39 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 	{
 		if (NetDriver->ClientConnections.Num() == 0)
 		{
-			RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("클라이언트 연결 안됨."));
+			RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("클라이언트 연결 안됨."));
 		}
 		else
 		{
 			for (const auto& Connection : NetDriver->ClientConnections)
 			{
-				RCN_LOG(LogRCNNetwork, Log, TEXT("클라이언트 연결됨 : %s"), *Connection->GetName());
+				RCN_LOG(LogNetwork, Log, TEXT("클라이언트 연결됨 : %s"), *Connection->GetName());
 			}
 		}
 	}
 	else
 	{
-		RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("NetDriver 없음."));
+		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("NetDriver 없음."));
 	}
 
-	if (ARCN_RubikCube* Cube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
-		Cube->SetReplicates(true);
+		RubikCube->SetReplicates(true);
 	
 		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 		{
-			Cube->SetActorLocation(Player->GetActorLocation() + Player->GetActorForwardVector() * 400.0f);
-			Cube->SetActorRotation(Player->GetActorRotation());
-		
-			Player->SetRubikCube(Cube);
+			Player->SetRubikCube(RubikCube);
 		}
 	}
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_GameModeBase::StartPlay()
 {
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::StartPlay();
 
-	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }

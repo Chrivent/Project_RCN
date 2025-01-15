@@ -25,6 +25,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> RotateAction;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> ScrambleAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> SolveAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;
