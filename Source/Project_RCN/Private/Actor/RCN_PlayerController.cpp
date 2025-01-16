@@ -4,9 +4,10 @@
 #include "Actor/RCN_PlayerController.h"
 
 #include "Actor/RCN_Player.h"
+#include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
-#include "UI/RCN_PlayerWidget.h"
+#include "UI/RCN_TimerWidget.h"
 
 ARCN_PlayerController::ARCN_PlayerController()
 {
@@ -28,7 +29,27 @@ ARCN_PlayerController::ARCN_PlayerController()
 		HUDWidgetClass = HUDWidgetRef.Class;
 	}*/
 
-	HUDWidgetClass = UIDataAsset->HUDWidgetClass;
+	TimerWidgetClass = UIDataAsset->TimerWidgetClass;
+}
+
+void ARCN_PlayerController::CreateTimerWidget()
+{
+	//HUDWidget = CreateWidget<URCN_PlayerWidget>(this, HUDWidgetClass); DataAsset 추가로 인한 변경부분 나중에 확인 받기
+	TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
+	
+	if (IsValid(TimerWidget))
+	{
+		TimerWidget->AddToViewport();
+
+		if (ARCN_Player* Player = Cast<ARCN_Player>(GetPawn()))
+		{
+			ARCN_RubikCube* RubikCube = Player->GetRubikCube();
+			if (IsValid(RubikCube))
+			{
+				TimerWidget->SetRubikCube(RubikCube);
+			}
+		}
+	}
 }
 
 void ARCN_PlayerController::PostInitializeComponents()
@@ -67,19 +88,6 @@ void ARCN_PlayerController::BeginPlay()
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::BeginPlay();
-
-	//HUDWidget = CreateWidget<URCN_PlayerWidget>(this, HUDWidgetClass); DataAsset 추가로 인한 변경부분 나중에 확인 받기
-	HUDWidget = CreateWidget<URCN_PlayerWidget>(this, UIDataAsset->HUDWidgetClass);
-	if (IsValid(HUDWidget))
-	{
-		HUDWidget->AddToViewport();
-
-		if (ARCN_Player* PlayerPawn = Cast<ARCN_Player>(GetPawn()))
-		{
-			HUDWidget->SetPlayer(PlayerPawn);
-			HUDWidget->BindTimerToRubikCube();
-		}
-	}
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }

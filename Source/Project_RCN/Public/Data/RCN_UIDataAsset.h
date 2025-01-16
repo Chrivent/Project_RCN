@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "UI/RCN_PlayerWidget.h"
 #include "RCN_UIDataAsset.generated.h"
 
+class URCN_TimerWidget;
 /**
  * 
  */
@@ -17,10 +17,7 @@ class PROJECT_RCN_API URCN_UIDataAsset : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UUserWidget> HUDWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<URCN_PlayerWidget> PlayerWidget;
+	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<URCN_TimerWidget> TimerWidget;

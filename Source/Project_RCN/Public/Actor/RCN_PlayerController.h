@@ -6,8 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_TimerWidget;
 class URCN_UIDataAsset;
-class URCN_PlayerWidget;
 /**
  * 
  */
@@ -25,10 +25,12 @@ protected:
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
-	TSubclassOf<UUserWidget> HUDWidgetClass;
+	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
-	TObjectPtr<URCN_PlayerWidget> HUDWidget;
+	TObjectPtr<URCN_TimerWidget> TimerWidget;
+
+	void CreateTimerWidget();
 	
 public:
 	// 네트워크 관련
