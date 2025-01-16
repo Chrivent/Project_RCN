@@ -158,7 +158,8 @@ void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
-	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::CubeSpinHandle);
+	NetworkRubikCube->SpinStartDelegate.AddUObject(this, &ARCN_Player::SpinStartHandle);
+	NetworkRubikCube->SpinEndDelegate.AddUObject(this, &ARCN_Player::SpinEndHandle);
 }
 
 void ARCN_Player::RenewalRubikCubeLocationAndRotation()
@@ -231,10 +232,16 @@ void ARCN_Player::SolveCube(const FInputActionValue& Value)
 	ServerRPC_SolveCube();
 }
 
-void ARCN_Player::CubeSpinHandle(const FString& Command)
+void ARCN_Player::SpinStartHandle(const FString& Command)
 {
 	NetworkCommand = Command;
-	bNetworkSpinRequestFlag = !bNetworkSpinRequestFlag;
+	bNetworkSpinStartFlag = !bNetworkSpinStartFlag;
+}
+
+void ARCN_Player::SpinEndHandle(const FString& Pattern)
+{
+	NetworkPattern = Pattern;
+	bNetworkSpinEndFlag = !bNetworkSpinEndFlag;
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -243,7 +250,9 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
 	DOREPLIFETIME(ARCN_Player, NetworkCommand)
-	DOREPLIFETIME(ARCN_Player, bNetworkSpinRequestFlag)
+	DOREPLIFETIME(ARCN_Player, NetworkPattern)
+	DOREPLIFETIME(ARCN_Player, bNetworkSpinStartFlag)
+	DOREPLIFETIME(ARCN_Player, bNetworkSpinEndFlag)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
@@ -255,13 +264,25 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::OnRep_RequestSpin() const
+void ARCN_Player::OnRep_SpinStart() const
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	if (IsValid(NetworkRubikCube))
 	{
 		NetworkRubikCube->Spin(NetworkCommand);
+	}
+	
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::OnRep_SpinEnd() const
+{
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (IsValid(NetworkRubikCube))
+	{
+		NetworkRubikCube->ChangePattern(NetworkPattern);
 	}
 	
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));

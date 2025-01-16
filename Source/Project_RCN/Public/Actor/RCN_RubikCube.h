@@ -4,17 +4,65 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Util/StructHelper.h"
 #include "RCN_RubikCube.generated.h"
 
 struct FInputActionValue;
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
-enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, const FString&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FSpinStartDelegate, const FString&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FSpinEndDelegate, const FString&)
+
+UENUM(BlueprintType)
+enum class EAxisType : uint8
+{
+	AxisX,
+	AxisY,
+	AxisZ
+};
+
+UENUM(BlueprintType)
+enum class EStickerType : uint8
+{
+	Red,
+	Orange,
+	Yellow,
+	Green,
+	Blue,
+	White
+};
+
+USTRUCT(BlueprintType)
+struct FSignInfo
+{
+	GENERATED_BODY()
+
+	FSignInfo(FString InSign = "L", const EAxisType InAxisType = EAxisType::AxisX, const int32 InLayer = -1, const bool InCCW = false, const int32 InTurnCount = 1)
+	{
+		Sign = InSign;
+		AxisType = InAxisType;
+		Layer = InLayer;
+		CCW = InCCW;
+		TurnCount = InTurnCount;
+	}
+
+	UPROPERTY(VisibleAnywhere)
+	FString Sign;
+
+	UPROPERTY(VisibleAnywhere)
+	EAxisType AxisType;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 Layer;
+
+	UPROPERTY(VisibleAnywhere)
+	uint8 CCW : 1;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 TurnCount;
+};
 
 UCLASS()
 class PROJECT_RCN_API ARCN_RubikCube : public AActor
@@ -36,8 +84,10 @@ public:
 	void Spin(const FString& Command);
 	void Scramble();
 	void Solve();
+	void ChangePattern(const FString& NewPattern);
 
-	FSpinDelegate SpinDelegate;
+	FSpinStartDelegate SpinStartDelegate;
+	FSpinEndDelegate SpinEndDelegate;
 
 protected:
 	void TurnNext();
@@ -46,7 +96,6 @@ protected:
 	void GrabPieces(const FSignInfo& SignInfo);
 	void ReleasePieces(const FSignInfo& SignInfo);
 	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);
-	void SortFacelet();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_RubikCubeDataAsset> RubikCubeDataAsset;
@@ -77,16 +126,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
-	
-	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FColor> StickerColors;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<FVector> CenterOrderPositions;
+	FString Pattern;
 
 	UPROPERTY(VisibleAnywhere)
-	FString Facelet;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<FVector> FaceletOrderPositions;
+	TArray<FVector> PatternOrderPositions;
 };

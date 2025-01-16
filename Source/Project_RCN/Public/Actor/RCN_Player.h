@@ -48,7 +48,10 @@ protected:
 	void SolveCube(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void CubeSpinHandle(const FString& Command);
+	void SpinStartHandle(const FString& Command);
+
+	UFUNCTION()
+	void SpinEndHandle(const FString& Pattern);
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
@@ -88,7 +91,10 @@ protected:
 	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
 
 	UFUNCTION()
-	void OnRep_RequestSpin() const;
+	void OnRep_SpinStart() const;
+
+	UFUNCTION()
+	void OnRep_SpinEnd() const;
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerRPC_SetCubeRotation(FRotator Rotator);
@@ -114,6 +120,12 @@ protected:
 	UPROPERTY(Replicated)
 	FString NetworkCommand;
 
-	UPROPERTY(ReplicatedUsing = OnRep_RequestSpin)
-	uint8 bNetworkSpinRequestFlag : 1;
+	UPROPERTY(Replicated)
+	FString NetworkPattern;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SpinStart)
+	uint8 bNetworkSpinStartFlag : 1;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SpinEnd)
+	uint8 bNetworkSpinEndFlag : 1;
 };
