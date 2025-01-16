@@ -39,6 +39,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetRubikCube(ARCN_RubikCube* InRubikCube);
+	void RenewalRubikCubeLocationAndRotation();
 	
 protected:
 	void SetControl() const;
@@ -47,10 +48,13 @@ protected:
 	void RotateCube(const FInputActionValue& Value);
 	void ScrambleCube(const FInputActionValue& Value);
 	void SolveCube(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void SpinStartHandle(const FString& Command);
 
 	UFUNCTION()
-	void CubeSpinEvent(FString Command);
-
+	void SpinEndHandle(const FString& Pattern);
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
 
@@ -89,7 +93,10 @@ protected:
 	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
 
 	UFUNCTION()
-	void OnRep_Command() const;
+	void OnRep_SpinStart() const;
+
+	UFUNCTION()
+	void OnRep_SpinEnd() const;
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerRPC_SetCubeRotation(FRotator Rotator);
@@ -112,6 +119,15 @@ protected:
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> NetworkRubikCube;
 
-	UPROPERTY(ReplicatedUsing=OnRep_Command)
+	UPROPERTY(Replicated)
 	FString NetworkCommand;
+
+	UPROPERTY(Replicated)
+	FString NetworkPattern;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SpinStart)
+	uint8 bNetworkSpinStartFlag : 1;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SpinEnd)
+	uint8 bNetworkSpinEndFlag : 1;
 };

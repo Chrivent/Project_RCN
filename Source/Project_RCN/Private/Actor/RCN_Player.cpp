@@ -148,19 +148,28 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 {
 	NetworkRubikCube = InRubikCube;
-		
+
 	NetworkRubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
-	NetworkRubikCube->SetActorRotation(GetActorRotation());
+	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
 
-	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::CubeSpinEvent);
+	PitchComponent->SetRelativeLocation(FVector::ForwardVector * 400.0f);
+	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
+	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		ServerRPC_SetCubeLocation(FVector::ForwardVector * 400.0f);
-		ServerRPC_SetCubeRotation(FRotator(30.0f, 120.0f, 0.0f));
-	}), 1.0f, false);
+	NetworkRubikCube->SpinStartDelegate.AddUObject(this, &ARCN_Player::SpinStartHandle);
+	NetworkRubikCube->SpinEndDelegate.AddUObject(this, &ARCN_Player::SpinEndHandle);
+}
+
+void ARCN_Player::RenewalRubikCubeLocationAndRotation()
+{
+	ServerRPC_SetCubeLocation(PitchComponent->GetRelativeLocation());
+
+	FRotator Rotator = FRotator::ZeroRotator;
+	Rotator.Pitch = PitchComponent->GetRelativeRotation().Pitch;
+	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw;
+	
+	ServerRPC_SetCubeRotation(Rotator);
 }
 
 void ARCN_Player::SetControl() const
@@ -202,15 +211,14 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 	FVector2D RotateAxisVector = Value.Get<FVector2D>();
 	RotateAxisVector *= PlayerDataAsset->RotateSensitivity;
 
-	FRotator Rotator = FRotator::ZeroRotator;
+	FRotator Rotator;
 	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
 	
 	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
 
-	ServerRPC_SetCubeLocation(PitchComponent->GetRelativeLocation());
-	ServerRPC_SetCubeRotation(Rotator);
+	RenewalRubikCubeLocationAndRotation();
 }
 
 void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
@@ -223,9 +231,16 @@ void ARCN_Player::SolveCube(const FInputActionValue& Value)
 	ServerRPC_SolveCube();
 }
 
-void ARCN_Player::CubeSpinEvent(FString Command)
+void ARCN_Player::SpinStartHandle(const FString& Command)
 {
 	NetworkCommand = Command;
+	bNetworkSpinStartFlag = !bNetworkSpinStartFlag;
+}
+
+void ARCN_Player::SpinEndHandle(const FString& Pattern)
+{
+	NetworkPattern = Pattern;
+	bNetworkSpinEndFlag = !bNetworkSpinEndFlag;
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -234,6 +249,9 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
 	DOREPLIFETIME(ARCN_Player, NetworkCommand)
+	DOREPLIFETIME(ARCN_Player, NetworkPattern)
+	DOREPLIFETIME(ARCN_Player, bNetworkSpinStartFlag)
+	DOREPLIFETIME(ARCN_Player, bNetworkSpinEndFlag)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
@@ -245,12 +263,27 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::OnRep_Command() const
+void ARCN_Player::OnRep_SpinStart() const
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
-	NetworkRubikCube->Spin(NetworkCommand);
+	if (IsValid(NetworkRubikCube))
+	{
+		NetworkRubikCube->Spin(NetworkCommand);
+	}
+	
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
 
+void ARCN_Player::OnRep_SpinEnd() const
+{
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (IsValid(NetworkRubikCube))
+	{
+		NetworkRubikCube->ChangePattern(NetworkPattern);
+	}
+	
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
