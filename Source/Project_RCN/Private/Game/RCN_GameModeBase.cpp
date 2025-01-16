@@ -4,6 +4,7 @@
 #include "Game/RCN_GameModeBase.h"
 
 #include "Actor/RCN_Player.h"
+#include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
@@ -87,6 +88,11 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 			{
 				Player->SetRubikCube(RubikCube);
+
+				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(NewPlayer))
+				{
+					PlayerController->CreateTimerWidget();
+				}
 			}
 			
 			for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)

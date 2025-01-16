@@ -19,11 +19,12 @@ class PROJECT_RCN_API ARCN_PlayerController : public APlayerController
 public:
 	ARCN_PlayerController();
 
+	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
+	
 	// HUD Section
-protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
 	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
 
@@ -32,7 +33,6 @@ protected:
 
 	void CreateTimerWidget();
 	
-public:
 	// 네트워크 관련
 	// 게임과 무관한 액터 초기화
 	virtual void PostInitializeComponents() override;

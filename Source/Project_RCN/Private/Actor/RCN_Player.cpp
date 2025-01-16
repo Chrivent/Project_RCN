@@ -5,12 +5,14 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Camera/CameraComponent.h"
 #include "Data/RCN_PlayerDataAsset.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
+#include "UI/RCN_TimerWidget.h"
 
 // Sets default values
 ARCN_Player::ARCN_Player()
@@ -159,6 +161,7 @@ void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 
 	NetworkRubikCube->SpinStartDelegate.AddUObject(this, &ARCN_Player::SpinStartHandle);
 	NetworkRubikCube->SpinEndDelegate.AddUObject(this, &ARCN_Player::SpinEndHandle);
+	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
 void ARCN_Player::RenewalRubikCubeLocationAndRotation()
@@ -241,6 +244,17 @@ void ARCN_Player::SpinEndHandle(const FString& Pattern)
 {
 	NetworkPattern = Pattern;
 	bNetworkSpinEndFlag = !bNetworkSpinEndFlag;
+}
+
+void ARCN_Player::FinishScrambleHandle()
+{
+	if (IsLocallyControlled())
+	{
+		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
+		{
+			PlayerController->GetTimerWidget()->StartTimer();
+		}
+	}
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

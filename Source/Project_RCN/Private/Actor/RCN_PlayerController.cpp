@@ -21,34 +21,17 @@ ARCN_PlayerController::ARCN_PlayerController()
 		RCN_LOG(LogNetwork, Error, TEXT("UI 데이터 에셋 로드 실패"))
 		return;
 	}
-	
-	/* DataAsset 추가로 인한 변경부분 나중에 확인 받기
-	static ConstructorHelpers::FClassFinder<URCN_PlayerWidget> HUDWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_PlayerWidget.WBP_PlayerWidget_C'"));
-	if (IsValid(HUDWidgetRef.Class))
-	{
-		HUDWidgetClass = HUDWidgetRef.Class;
-	}*/
 
 	TimerWidgetClass = UIDataAsset->TimerWidgetClass;
 }
 
 void ARCN_PlayerController::CreateTimerWidget()
 {
-	//HUDWidget = CreateWidget<URCN_PlayerWidget>(this, HUDWidgetClass); DataAsset 추가로 인한 변경부분 나중에 확인 받기
-	TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
+	TimerWidget = CreateWidget<URCN_TimerWidget>(this, TimerWidgetClass);
 	
 	if (IsValid(TimerWidget))
 	{
 		TimerWidget->AddToViewport();
-
-		if (ARCN_Player* Player = Cast<ARCN_Player>(GetPawn()))
-		{
-			ARCN_RubikCube* RubikCube = Player->GetRubikCube();
-			if (IsValid(RubikCube))
-			{
-				TimerWidget->SetRubikCube(RubikCube);
-			}
-		}
 	}
 }
 
@@ -88,7 +71,7 @@ void ARCN_PlayerController::BeginPlay()
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::BeginPlay();
-
+	
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 

@@ -17,20 +17,17 @@ class PROJECT_RCN_API URCN_TimerWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE void SetRubikCube(ARCN_RubikCube* InRubikCube) { RubikCube = InRubikCube; }
-	
 	void StartTimer();
 	void StopTimer();
 	void UpdateTimer(float NewTime);
 	FString GetTimerText();
 	
 protected:
+	virtual void NativeConstruct() override;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> TxtPlayTime;
-
-	UPROPERTY()
-	TObjectPtr<ARCN_RubikCube> RubikCube;
-
+	
 	UPROPERTY()
 	float Time;
 };

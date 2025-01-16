@@ -3,6 +3,7 @@
 
 #include "UI/RCN_TimerWidget.h"
 
+#include "Actor/RCN_RubikCube.h"
 #include "Project_RCN/Project_RCN.h"
 
 
@@ -29,4 +30,11 @@ void URCN_TimerWidget::UpdateTimer(float NewTime)
 FString URCN_TimerWidget::GetTimerText()
 {
 	return FString::Printf(TEXT("%.2f"), Time);
+}
+
+void URCN_TimerWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	
 }

@@ -54,6 +54,9 @@ protected:
 
 	UFUNCTION()
 	void SpinEndHandle(const FString& Pattern);
+
+	UFUNCTION()
+	void FinishScrambleHandle();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
@@ -131,3 +134,4 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_SpinEnd)
 	uint8 bNetworkSpinEndFlag : 1;
 };
+
