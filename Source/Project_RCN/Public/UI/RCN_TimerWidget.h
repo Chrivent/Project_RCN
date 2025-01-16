@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/TextBlock.h"
 #include "RCN_TimerWidget.generated.h"
 
+class UTextBlock;
 class ARCN_RubikCube;
 /**
  * 
@@ -20,7 +20,7 @@ public:
 	void StartTimer();
 	void StopTimer();
 	void UpdateTimer(float NewTime);
-	FString GetTimerText();
+	FString GetTimerText() const;
 	
 protected:
 	virtual void NativeConstruct() override;

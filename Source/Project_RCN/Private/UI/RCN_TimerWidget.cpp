@@ -3,9 +3,7 @@
 
 #include "UI/RCN_TimerWidget.h"
 
-#include "Actor/RCN_RubikCube.h"
-#include "Project_RCN/Project_RCN.h"
-
+#include "Components/TextBlock.h"
 
 void URCN_TimerWidget::StartTimer()
 {
@@ -35,7 +33,7 @@ void URCN_TimerWidget::UpdateTimer(float NewTime)
 	}
 }
 
-FString URCN_TimerWidget::GetTimerText()
+FString URCN_TimerWidget::GetTimerText() const
 {
 	return FString::Printf(TEXT("%.2f"), Time);
 }
