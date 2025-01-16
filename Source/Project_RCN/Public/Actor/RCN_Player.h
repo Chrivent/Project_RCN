@@ -22,6 +22,8 @@ public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
 
+	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return NetworkRubikCube; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

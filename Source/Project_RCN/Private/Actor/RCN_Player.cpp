@@ -129,7 +129,6 @@ void ARCN_Player::PostNetInit()
 void ARCN_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input

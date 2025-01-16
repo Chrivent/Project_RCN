@@ -283,6 +283,8 @@ void ARCN_RubikCube::Scramble()
 	Command.RemoveAt(Command.Len() - 1);
 	
 	Spin(Command);
+
+	bIsScrambling = true;
 }
 
 void ARCN_RubikCube::Solve()
@@ -339,6 +341,13 @@ void ARCN_RubikCube::TurnNext()
 	{
 		bIsTurning = false;
 		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패슬릿 : %s"), *Facelet)
+
+		if (bIsScrambling)
+		{
+			bIsScrambling = false;
+			FinishScrambleDelegate.Broadcast();
+		}
+		
 		return;
 	}
 

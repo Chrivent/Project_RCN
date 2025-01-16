@@ -15,6 +15,7 @@ enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, FString)
+DECLARE_MULTICAST_DELEGATE(FFinishScramble)
 
 UCLASS()
 class PROJECT_RCN_API ARCN_RubikCube : public AActor
@@ -38,6 +39,7 @@ public:
 	void Solve();
 
 	FSpinDelegate SpinDelegate;
+	FFinishScramble FinishScrambleDelegate;
 
 protected:
 	void TurnNext();
@@ -71,6 +73,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;
+
+	UPROPERTY(VisibleAnywhere)
+	uint8 bIsScrambling : 1;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;

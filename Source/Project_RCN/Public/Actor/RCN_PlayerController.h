@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_UIDataAsset;
+class URCN_PlayerWidget;
 /**
  * 
  */
@@ -13,6 +15,20 @@ UCLASS()
 class PROJECT_RCN_API ARCN_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	ARCN_PlayerController();
+
+	// HUD Section
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
+	TSubclassOf<UUserWidget> HUDWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
+	TObjectPtr<URCN_PlayerWidget> HUDWidget;
 	
 public:
 	// 네트워크 관련
