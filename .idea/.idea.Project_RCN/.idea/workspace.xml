@@ -251,7 +251,7 @@
       <workItem from="1737034706091" duration="8033000" />
       <workItem from="1737043837617" duration="10075000" />
       <workItem from="1737054140616" duration="1249000" />
-      <workItem from="1737055400636" duration="6159000" />
+      <workItem from="1737055400636" duration="8443000" />
     </task>
     <servers />
   </component>
@@ -261,16 +261,5 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_TimerWidget.cpp</url>
-          <line>11</line>
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

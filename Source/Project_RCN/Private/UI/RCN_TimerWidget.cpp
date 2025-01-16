@@ -9,7 +9,15 @@
 
 void URCN_TimerWidget::StartTimer()
 {
-	UE_LOG(LogTimerStart, Log, TEXT("StartTimer"))
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		FString TimeString = FString::Printf(TEXT("%.2f"), Time);
+		
+		TxtPlayTime->SetText(FText::FromString(TimeString));
+		Time += 1.0f;
+		
+	}), 1.0f, true);
 }
 
 void URCN_TimerWidget::StopTimer()
