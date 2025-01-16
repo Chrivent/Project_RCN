@@ -3,9 +3,6 @@
 
 #include "Game/RCN_GameModeBase.h"
 
-#include "Actor/RCN_Player.h"
-#include "Actor/RCN_PlayerController.h"
-#include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Game/RCN_GameState.h"
@@ -76,34 +73,6 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 	else
 	{
 		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("NetDriver 없음."));
-	}
-
-	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
-	{
-		RubikCube->SetReplicates(true);
-		
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-		{
-			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
-			{
-				Player->SetRubikCube(RubikCube);
-
-				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(NewPlayer))
-				{
-					PlayerController->CreateTimerWidget();
-				}
-			}
-			
-			for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-			{
-				if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
-				{
-					MultiPlayer->RenewalRubikCubeLocationAndRotation();
-					MultiPlayer->RenewalRubikCubePattern();
-				}
-			}
-		}), 1.0f, false);
 	}
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));

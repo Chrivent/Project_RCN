@@ -9,6 +9,7 @@
 #include "Actor/RCN_RubikCube.h"
 #include "Camera/CameraComponent.h"
 #include "Data/RCN_PlayerDataAsset.h"
+#include "Game/RCN_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
@@ -253,13 +254,7 @@ void ARCN_Player::PatternChangedHandle(const FString& Pattern)
 
 void ARCN_Player::FinishScrambleHandle()
 {
-	if (IsLocallyControlled())
-	{
-		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
-		{
-			PlayerController->GetTimerWidget()->StartTimer();
-		}
-	}
+	ServerRPC_FinishScramble();
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -357,6 +352,18 @@ void ARCN_Player::ServerRPC_SolveCube_Implementation()
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	NetworkRubikCube->Solve();
+
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_FinishScramble_Implementation()
+{
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		GameModeBase->FinishScramble();
+	}
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }

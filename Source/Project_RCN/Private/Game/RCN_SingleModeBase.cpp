@@ -3,12 +3,31 @@
 
 #include "Game/RCN_SingleModeBase.h"
 
+#include "Actor/RCN_Player.h"
+#include "Actor/RCN_PlayerController.h"
+#include "Actor/RCN_RubikCube.h"
+#include "Data/RCN_GameModeBaseDataAsset.h"
+#include "UI/RCN_TimerWidget.h"
 
-
-void ARCN_SingleModeBase::BeginPlay()
+void ARCN_SingleModeBase::PostLogin(APlayerController* NewPlayer)
 {
-	Super::BeginPlay();
+	Super::PostLogin(NewPlayer);
 
-	
+	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	{
+		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
+		{
+			Player->SetRubikCube(RubikCube);
+		}
+	}
 }
 
+void ARCN_SingleModeBase::FinishScramble()
+{
+	Super::FinishScramble();
+
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PlayerController->GetTimerWidget()->StartTimer();
+	}
+}

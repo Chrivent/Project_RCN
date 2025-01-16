@@ -120,6 +120,9 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SolveCube();
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_FinishScramble();
+
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> NetworkRubikCube;
 
