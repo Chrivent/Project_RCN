@@ -12,8 +12,8 @@ class UCameraComponent;
 class USpringArmComponent;
 class URCN_RubikCubeDataAsset;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FSpinStartDelegate, const FString&)
-DECLARE_MULTICAST_DELEGATE_OneParam(FSpinEndDelegate, const FString&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, const FString&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FPatternChangedDelegate, const FString&)
 
 UENUM(BlueprintType)
 enum class EAxisType : uint8
@@ -73,6 +73,8 @@ public:
 	// Sets default values for this actor's properties
 	ARCN_RubikCube();
 
+	FORCEINLINE FString GetPattern() const { return Pattern; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -86,8 +88,8 @@ public:
 	void Solve();
 	void ChangePattern(const FString& NewPattern);
 
-	FSpinStartDelegate SpinStartDelegate;
-	FSpinEndDelegate SpinEndDelegate;
+	FSpinDelegate SpinDelegate;
+	FPatternChangedDelegate PatternChangedDelegate;
 
 protected:
 	void TurnNext();
