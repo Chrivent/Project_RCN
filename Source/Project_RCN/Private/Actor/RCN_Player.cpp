@@ -9,6 +9,7 @@
 #include "Actor/RCN_RubikCube.h"
 #include "Camera/CameraComponent.h"
 #include "Data/RCN_PlayerDataAsset.h"
+#include "Game/RCN_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
@@ -159,8 +160,7 @@ void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
-	NetworkRubikCube->SpinStartDelegate.AddUObject(this, &ARCN_Player::SpinStartHandle);
-	NetworkRubikCube->SpinEndDelegate.AddUObject(this, &ARCN_Player::SpinEndHandle);
+	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::SpinHandle);
 	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
@@ -173,6 +173,12 @@ void ARCN_Player::RenewalRubikCubeLocationAndRotation()
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw;
 	
 	ServerRPC_SetCubeRotation(Rotator);
+}
+
+void ARCN_Player::RenewalRubikCubePattern()
+{
+	NetworkPattern = NetworkRubikCube->GetPattern();
+	bNetworkChangePatternFlag = !bNetworkChangePatternFlag;
 }
 
 void ARCN_Player::SetControl() const
@@ -234,27 +240,21 @@ void ARCN_Player::SolveCube(const FInputActionValue& Value)
 	ServerRPC_SolveCube();
 }
 
-void ARCN_Player::SpinStartHandle(const FString& Command)
+void ARCN_Player::SpinHandle(const FString& Command)
 {
 	NetworkCommand = Command;
-	bNetworkSpinStartFlag = !bNetworkSpinStartFlag;
+	bNetworkSpinFlag = !bNetworkSpinFlag;
 }
 
-void ARCN_Player::SpinEndHandle(const FString& Pattern)
+void ARCN_Player::PatternChangedHandle(const FString& Pattern)
 {
 	NetworkPattern = Pattern;
-	bNetworkSpinEndFlag = !bNetworkSpinEndFlag;
+	bNetworkChangePatternFlag = !bNetworkChangePatternFlag;
 }
 
 void ARCN_Player::FinishScrambleHandle()
 {
-	if (IsLocallyControlled())
-	{
-		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
-		{
-			PlayerController->GetTimerWidget()->StartTimer();
-		}
-	}
+	ServerRPC_FinishScramble();
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -264,8 +264,8 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
 	DOREPLIFETIME(ARCN_Player, NetworkCommand)
 	DOREPLIFETIME(ARCN_Player, NetworkPattern)
-	DOREPLIFETIME(ARCN_Player, bNetworkSpinStartFlag)
-	DOREPLIFETIME(ARCN_Player, bNetworkSpinEndFlag)
+	DOREPLIFETIME(ARCN_Player, bNetworkSpinFlag)
+	DOREPLIFETIME(ARCN_Player, bNetworkChangePatternFlag)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
@@ -277,7 +277,7 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::OnRep_SpinStart() const
+void ARCN_Player::OnRep_SpinCube() const
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
@@ -289,15 +289,15 @@ void ARCN_Player::OnRep_SpinStart() const
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::OnRep_SpinEnd() const
+void ARCN_Player::OnRep_ChangeCubePattern() const
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
+	
 	if (IsValid(NetworkRubikCube))
 	{
 		NetworkRubikCube->ChangePattern(NetworkPattern);
 	}
-	
+
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
@@ -352,6 +352,18 @@ void ARCN_Player::ServerRPC_SolveCube_Implementation()
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	NetworkRubikCube->Solve();
+
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_FinishScramble_Implementation()
+{
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		GameModeBase->FinishScramble();
+	}
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }

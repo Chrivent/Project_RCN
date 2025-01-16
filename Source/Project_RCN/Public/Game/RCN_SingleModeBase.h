@@ -16,7 +16,10 @@ class PROJECT_RCN_API ARCN_SingleModeBase : public ARCN_GameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
 public:
-	virtual void BeginPlay() override;
+	virtual void FinishScramble() override;
 };
 

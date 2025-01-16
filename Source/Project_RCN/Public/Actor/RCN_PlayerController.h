@@ -30,8 +30,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
 	TObjectPtr<URCN_TimerWidget> TimerWidget;
-
-	void CreateTimerWidget();
 	
 	// 네트워크 관련
 	// 게임과 무관한 액터 초기화

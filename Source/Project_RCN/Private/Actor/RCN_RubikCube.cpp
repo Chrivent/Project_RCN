@@ -383,7 +383,7 @@ void ARCN_RubikCube::Spin(const FString& Command)
 		TurnNext();
 	}
 
-	SpinStartDelegate.Broadcast(Command);
+	SpinDelegate.Broadcast(Command);
 }
 
 void ARCN_RubikCube::TurnNext()
@@ -391,8 +391,9 @@ void ARCN_RubikCube::TurnNext()
 	if (SignQueue.Num() == 0)
 	{
 		bIsTurning = false;
-		SpinEndDelegate.Broadcast(Pattern);
+
 		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
+		PatternChangedDelegate.Broadcast(Pattern);
 
 		if (bIsScrambling)
 		{

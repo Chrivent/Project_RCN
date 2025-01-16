@@ -40,6 +40,7 @@ public:
 
 	void SetRubikCube(ARCN_RubikCube* InRubikCube);
 	void RenewalRubikCubeLocationAndRotation();
+	void RenewalRubikCubePattern();
 	
 protected:
 	void SetControl() const;
@@ -50,10 +51,10 @@ protected:
 	void SolveCube(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void SpinStartHandle(const FString& Command);
+	void SpinHandle(const FString& Command);
 
 	UFUNCTION()
-	void SpinEndHandle(const FString& Pattern);
+	void PatternChangedHandle(const FString& Pattern);
 
 	UFUNCTION()
 	void FinishScrambleHandle();
@@ -96,10 +97,10 @@ protected:
 	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
 
 	UFUNCTION()
-	void OnRep_SpinStart() const;
+	void OnRep_SpinCube() const;
 
 	UFUNCTION()
-	void OnRep_SpinEnd() const;
+	void OnRep_ChangeCubePattern() const;
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerRPC_SetCubeRotation(FRotator Rotator);
@@ -119,6 +120,9 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SolveCube();
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_FinishScramble();
+
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> NetworkRubikCube;
 
@@ -128,10 +132,10 @@ protected:
 	UPROPERTY(Replicated)
 	FString NetworkPattern;
 
-	UPROPERTY(ReplicatedUsing = OnRep_SpinStart)
-	uint8 bNetworkSpinStartFlag : 1;
+	UPROPERTY(ReplicatedUsing = OnRep_SpinCube)
+	uint8 bNetworkSpinFlag : 1;
 
-	UPROPERTY(ReplicatedUsing = OnRep_SpinEnd)
-	uint8 bNetworkSpinEndFlag : 1;
+	UPROPERTY(ReplicatedUsing = OnRep_ChangeCubePattern)
+	uint8 bNetworkChangePatternFlag : 1;
 };
 
