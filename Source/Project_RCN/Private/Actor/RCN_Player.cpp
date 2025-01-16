@@ -158,7 +158,7 @@ void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
-	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::CubeSpinEvent);
+	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::CubeSpinHandle);
 }
 
 void ARCN_Player::RenewalRubikCubeLocationAndRotation()
@@ -231,9 +231,10 @@ void ARCN_Player::SolveCube(const FInputActionValue& Value)
 	ServerRPC_SolveCube();
 }
 
-void ARCN_Player::CubeSpinEvent(FString Command)
+void ARCN_Player::CubeSpinHandle(const FString& Command)
 {
 	NetworkCommand = Command;
+	bNetworkSpinRequestFlag = !bNetworkSpinRequestFlag;
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -242,6 +243,7 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
 	DOREPLIFETIME(ARCN_Player, NetworkCommand)
+	DOREPLIFETIME(ARCN_Player, bNetworkSpinRequestFlag)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
@@ -253,12 +255,15 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::OnRep_Command() const
+void ARCN_Player::OnRep_RequestSpin() const
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
-	NetworkRubikCube->Spin(NetworkCommand);
-
+	if (IsValid(NetworkRubikCube))
+	{
+		NetworkRubikCube->Spin(NetworkCommand);
+	}
+	
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 

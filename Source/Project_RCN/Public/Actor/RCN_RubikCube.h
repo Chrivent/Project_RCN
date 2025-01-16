@@ -14,7 +14,7 @@ class USpringArmComponent;
 enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, FString)
+DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, const FString&)
 
 UCLASS()
 class PROJECT_RCN_API ARCN_RubikCube : public AActor
