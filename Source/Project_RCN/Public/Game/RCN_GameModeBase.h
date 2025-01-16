@@ -17,7 +17,11 @@ class PROJECT_RCN_API ARCN_GameModeBase : public AGameModeBase
 
 public:
 	ARCN_GameModeBase();
-
+	
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Game)
+	uint8 bIsGameCleared : 1;
+	
+	// 네트워크 관련
 protected:
 // 로그인 관련 함수
 	// 클라이언트의 접속 요청을 처리하는 함수

@@ -5,12 +5,14 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Camera/CameraComponent.h"
 #include "Data/RCN_PlayerDataAsset.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
+#include "UI/RCN_TimerWidget.h"
 
 // Sets default values
 ARCN_Player::ARCN_Player()
@@ -129,7 +131,6 @@ void ARCN_Player::PostNetInit()
 void ARCN_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -159,6 +160,7 @@ void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
 	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::SpinHandle);
+	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
 void ARCN_Player::RenewalRubikCubeLocationAndRotation()
@@ -220,7 +222,7 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 	FRotator Rotator;
 	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
-
+	
 	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
 
@@ -247,6 +249,17 @@ void ARCN_Player::PatternChangedHandle(const FString& Pattern)
 {
 	NetworkPattern = Pattern;
 	bNetworkChangePatternFlag = !bNetworkChangePatternFlag;
+}
+
+void ARCN_Player::FinishScrambleHandle()
+{
+	if (IsLocallyControlled())
+	{
+		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
+		{
+			PlayerController->GetTimerWidget()->StartTimer();
+		}
+	}
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

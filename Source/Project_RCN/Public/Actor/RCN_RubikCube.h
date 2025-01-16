@@ -14,6 +14,7 @@ class URCN_RubikCubeDataAsset;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, const FString&)
 DECLARE_MULTICAST_DELEGATE_OneParam(FPatternChangedDelegate, const FString&)
+DECLARE_MULTICAST_DELEGATE(FFinishScramble)
 
 UENUM(BlueprintType)
 enum class EAxisType : uint8
@@ -90,6 +91,7 @@ public:
 
 	FSpinDelegate SpinDelegate;
 	FPatternChangedDelegate PatternChangedDelegate;
+	FFinishScramble FinishScrambleDelegate;
 
 protected:
 	void TurnNext();
@@ -122,6 +124,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;
+
+	UPROPERTY(VisibleAnywhere)
+	uint8 bIsScrambling : 1;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;

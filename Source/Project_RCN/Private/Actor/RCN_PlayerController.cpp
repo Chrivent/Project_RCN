@@ -2,7 +2,38 @@
 
 
 #include "Actor/RCN_PlayerController.h"
+
+#include "Actor/RCN_Player.h"
+#include "Actor/RCN_RubikCube.h"
+#include "Data/RCN_UIDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
+#include "UI/RCN_TimerWidget.h"
+
+ARCN_PlayerController::ARCN_PlayerController()
+{
+	static ConstructorHelpers::FObjectFinder<URCN_UIDataAsset> UIDataAssetRef(TEXT("/Script/Project_RCN.RCN_UIDataAsset'/Game/Data/DA_UI.DA_UI'"));
+	if (UIDataAssetRef.Object)
+	{
+		UIDataAsset = UIDataAssetRef.Object;
+	}
+	else
+	{
+		RCN_LOG(LogNetwork, Error, TEXT("UI 데이터 에셋 로드 실패"))
+		return;
+	}
+
+	TimerWidgetClass = UIDataAsset->TimerWidgetClass;
+}
+
+void ARCN_PlayerController::CreateTimerWidget()
+{
+	TimerWidget = CreateWidget<URCN_TimerWidget>(this, TimerWidgetClass);
+	
+	if (IsValid(TimerWidget))
+	{
+		TimerWidget->AddToViewport();
+	}
+}
 
 void ARCN_PlayerController::PostInitializeComponents()
 {
@@ -40,7 +71,7 @@ void ARCN_PlayerController::BeginPlay()
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::BeginPlay();
-
+	
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 

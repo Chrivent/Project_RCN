@@ -251,7 +251,6 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 	
 }
 
-
 void ARCN_RubikCube::Scramble()
 {
 	if (bIsTurning)
@@ -277,6 +276,8 @@ void ARCN_RubikCube::Scramble()
 	Command.RemoveAt(Command.Len() - 1);
 	
 	Spin(Command);
+
+	bIsScrambling = true;
 }
 
 void ARCN_RubikCube::Solve()
@@ -390,8 +391,16 @@ void ARCN_RubikCube::TurnNext()
 	if (SignQueue.Num() == 0)
 	{
 		bIsTurning = false;
+
 		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
 		PatternChangedDelegate.Broadcast(Pattern);
+
+		if (bIsScrambling)
+		{
+			bIsScrambling = false;
+			FinishScrambleDelegate.Broadcast();
+		}
+		
 		return;
 	}
 

@@ -22,6 +22,8 @@ public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
 
+	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return NetworkRubikCube; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -53,6 +55,9 @@ protected:
 
 	UFUNCTION()
 	void PatternChangedHandle(const FString& Pattern);
+
+	UFUNCTION()
+	void FinishScrambleHandle();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
@@ -130,3 +135,4 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_ChangeCubePattern)
 	uint8 bNetworkChangePatternFlag : 1;
 };
+
