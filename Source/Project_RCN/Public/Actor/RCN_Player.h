@@ -97,10 +97,10 @@ protected:
 	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
 
 	UFUNCTION()
-	void OnRep_SpinCube() const;
+	void OnRep_Command() const;
 
 	UFUNCTION()
-	void OnRep_ChangeCubePattern() const;
+	void OnRep_Pattern() const;
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerRPC_SetCubeRotation(FRotator Rotator);
@@ -129,13 +129,10 @@ protected:
 	UPROPERTY(Replicated)
 	FString NetworkCommand;
 
-	UPROPERTY(Replicated)
-	FString NetworkPattern;
-
-	UPROPERTY(ReplicatedUsing = OnRep_SpinCube)
+	UPROPERTY(ReplicatedUsing = OnRep_Command)
 	uint8 bNetworkSpinFlag : 1;
 
-	UPROPERTY(ReplicatedUsing = OnRep_ChangeCubePattern)
-	uint8 bNetworkChangePatternFlag : 1;
+	UPROPERTY(ReplicatedUsing = OnRep_Pattern)
+	FString NetworkPattern;
 };
 

@@ -161,6 +161,7 @@ void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
 
 	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::SpinHandle);
+	NetworkRubikCube->PatternChangedDelegate.AddUObject(this, &ARCN_Player::PatternChangedHandle);
 	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
@@ -178,7 +179,6 @@ void ARCN_Player::RenewalRubikCubeLocationAndRotation()
 void ARCN_Player::RenewalRubikCubePattern()
 {
 	NetworkPattern = NetworkRubikCube->GetPattern();
-	bNetworkChangePatternFlag = !bNetworkChangePatternFlag;
 }
 
 void ARCN_Player::SetControl() const
@@ -249,7 +249,6 @@ void ARCN_Player::SpinHandle(const FString& Command)
 void ARCN_Player::PatternChangedHandle(const FString& Pattern)
 {
 	NetworkPattern = Pattern;
-	bNetworkChangePatternFlag = !bNetworkChangePatternFlag;
 }
 
 void ARCN_Player::FinishScrambleHandle()
@@ -263,9 +262,8 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
 	DOREPLIFETIME(ARCN_Player, NetworkCommand)
-	DOREPLIFETIME(ARCN_Player, NetworkPattern)
 	DOREPLIFETIME(ARCN_Player, bNetworkSpinFlag)
-	DOREPLIFETIME(ARCN_Player, bNetworkChangePatternFlag)
+	DOREPLIFETIME(ARCN_Player, NetworkPattern)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
@@ -277,7 +275,7 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::OnRep_SpinCube() const
+void ARCN_Player::OnRep_Command() const
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
@@ -289,7 +287,7 @@ void ARCN_Player::OnRep_SpinCube() const
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::OnRep_ChangeCubePattern() const
+void ARCN_Player::OnRep_Pattern() const
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
