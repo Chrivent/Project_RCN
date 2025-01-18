@@ -24,4 +24,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ARCN_RubikCube> RubikCubeClass;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float CubeStartDistance;
+
+	UPROPERTY(EditDefaultsOnly)
+	FRotator CubeStartRotation;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float CubeMultiOffset;
 };

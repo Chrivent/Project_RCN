@@ -40,7 +40,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void InitCube();
-	void SetCubeLocation(const FVector& Location);
+	void UpdateCubeLocation(const FVector& TargetLocation);
+	void UpdateCubeRotation(const FRotator& TargetRotation);
 	
 protected:
 	void RenewalRubikCubeLocationAndRotation();

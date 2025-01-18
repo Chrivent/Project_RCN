@@ -96,7 +96,7 @@ public:
 protected:
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
-	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat);
+	void UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& TargetQuat);
 	void GrabPieces(const FSignInfo& SignInfo);
 	void ReleasePieces(const FSignInfo& SignInfo);
 	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);

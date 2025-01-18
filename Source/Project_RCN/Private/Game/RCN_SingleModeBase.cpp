@@ -19,6 +19,9 @@ void ARCN_SingleModeBase::PostLogin(APlayerController* NewPlayer)
 		{
 			Player->SetRubikCube(RubikCube);
 			Player->InitCube();
+
+			Player->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
+			Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 		}
 	}
 }

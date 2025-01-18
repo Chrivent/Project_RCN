@@ -34,4 +34,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LocationSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LocationTolerance;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RotationSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RotationTolerance;
 };

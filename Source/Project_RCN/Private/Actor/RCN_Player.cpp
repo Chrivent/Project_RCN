@@ -153,20 +153,51 @@ void ARCN_Player::InitCube()
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
 	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
 
-	PitchComponent->SetRelativeLocation(FVector::ForwardVector * 400.0f);
-	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
-	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
-
 	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::SpinHandle);
 	NetworkRubikCube->PatternChangedDelegate.AddUObject(this, &ARCN_Player::PatternChangedHandle);
 	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
-void ARCN_Player::SetCubeLocation(const FVector& Location)
+void ARCN_Player::UpdateCubeLocation(const FVector& TargetLocation)
 {
-	PitchComponent->SetRelativeLocation(Location);
+	const FVector CurrentLocation = PitchComponent->GetRelativeLocation();
+	const FVector NewLocation = FMath::Lerp(CurrentLocation, TargetLocation, PlayerDataAsset->LocationSpeed);
+	PitchComponent->SetRelativeLocation(NewLocation);
 
 	RenewalRubikCubeLocationAndRotation();
+
+	if (NewLocation.Equals(TargetLocation,PlayerDataAsset->LocationTolerance))
+	{
+		PitchComponent->SetRelativeLocation(TargetLocation);
+		return;
+	}
+
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		UpdateCubeLocation(TargetLocation);
+	}));
+}
+
+void ARCN_Player::UpdateCubeRotation(const FRotator& TargetRotation)
+{
+	const FRotator CurrentRotator = FRotator(PitchComponent->GetRelativeRotation().Pitch, YawComponent->GetRelativeRotation().Yaw, 0.0f);
+	const FRotator NewRotator = FMath::Lerp(CurrentRotator, TargetRotation, PlayerDataAsset->RotationSpeed);
+	PitchComponent->SetRelativeRotation(FRotator(NewRotator.Pitch, 0.0f, 0.0f));
+	YawComponent->SetRelativeRotation(FRotator(0.0f, NewRotator.Yaw, 0.0f));
+
+	RenewalRubikCubeLocationAndRotation();
+
+	if (NewRotator.Equals(TargetRotation, PlayerDataAsset->RotationTolerance))
+	{
+		PitchComponent->SetRelativeRotation(FRotator(TargetRotation.Pitch, 0.0f, 0.0f));
+		YawComponent->SetRelativeRotation(FRotator(0.0f, TargetRotation.Yaw, 0.0f));
+		return;
+	}
+
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		UpdateCubeRotation(TargetRotation);
+	}));
 }
 
 void ARCN_Player::RenewalRubikCubeLocationAndRotation()

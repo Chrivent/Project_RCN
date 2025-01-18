@@ -435,7 +435,7 @@ void ARCN_RubikCube::TurnCore(const FSignInfo& SignInfo)
 	UpdateTurnCore(SignInfo, TargetQuat);
 }
 
-void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat)
+void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& TargetQuat)
 {
 	const FQuat CurrentQuat = CoreComponent->GetRelativeRotation().Quaternion();
 	const FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, RubikCubeDataAsset->TurnSpeed);
@@ -448,7 +448,7 @@ void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat)
 		return;
 	}
 
-	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, SignInfo, TargetQuat]
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		UpdateTurnCore(SignInfo, TargetQuat);
 	}));

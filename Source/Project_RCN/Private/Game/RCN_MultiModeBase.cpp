@@ -27,9 +27,20 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 			
 			for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 			{
+				if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
+				{
+					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+				}
+				
 				if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
 				{
-					MultiPlayer->SetCubeLocation(FVector::ForwardVector * 400.0f + FVector(0.0f, Iterator.GetIndex() * 600.0f - (GetWorld()->GetNumPlayerControllers() - 1) * 300.0f, 0.0f));
+					const float Offset = GameModeBaseDataAsset->CubeMultiOffset;
+					
+					MultiPlayer->UpdateCubeLocation(
+						FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance +
+						FVector(0.0f,
+							Iterator.GetIndex() * Offset - (GetWorld()->GetNumPlayerControllers() - 1) * Offset / 2.0f,
+							0.0f));
 				}
 			}
 		}), 1.0f, false);
