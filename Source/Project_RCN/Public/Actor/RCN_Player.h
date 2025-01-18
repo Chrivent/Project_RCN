@@ -22,6 +22,7 @@ public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
 
+	FORCEINLINE void SetRubikCube(ARCN_RubikCube* InRubikCube) { NetworkRubikCube = InRubikCube; }
 	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return NetworkRubikCube; }
 
 protected:
@@ -38,11 +39,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void SetRubikCube(ARCN_RubikCube* InRubikCube);
-	void RenewalRubikCubeLocationAndRotation();
-	void RenewalRubikCubePattern();
+	void InitCube();
+	void SetCubeLocation(const FVector& Location);
 	
 protected:
+	void RenewalRubikCubeLocationAndRotation();
+	void RenewalRubikCubePattern();
 	void SetControl() const;
 	void HoldTriggered(const FInputActionValue& Value);
 	void HoldCompleted(const FInputActionValue& Value);
@@ -130,7 +132,7 @@ protected:
 	FString NetworkCommand;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Command)
-	uint8 bNetworkSpinFlag : 1;
+	uint8 bNetworkCommandFlag : 1;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Pattern)
 	FString NetworkPattern;

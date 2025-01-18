@@ -22,14 +22,14 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 			{
 				Player->SetRubikCube(RubikCube);
+				Player->InitCube();
 			}
 			
 			for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 			{
 				if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
 				{
-					MultiPlayer->RenewalRubikCubeLocationAndRotation();
-					MultiPlayer->RenewalRubikCubePattern();
+					MultiPlayer->SetCubeLocation(FVector::ForwardVector * 400.0f + FVector(0.0f, Iterator.GetIndex() * 600.0f - (GetWorld()->GetNumPlayerControllers() - 1) * 300.0f, 0.0f));
 				}
 			}
 		}), 1.0f, false);

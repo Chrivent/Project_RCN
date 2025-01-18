@@ -13,7 +13,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
-#include "UI/RCN_TimerWidget.h"
 
 // Sets default values
 ARCN_Player::ARCN_Player()
@@ -148,10 +147,8 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(SolveAction, ETriggerEvent::Triggered, this, &ARCN_Player::SolveCube);
 }
 
-void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
+void ARCN_Player::InitCube()
 {
-	NetworkRubikCube = InRubikCube;
-
 	NetworkRubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
 	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
@@ -163,6 +160,13 @@ void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::SpinHandle);
 	NetworkRubikCube->PatternChangedDelegate.AddUObject(this, &ARCN_Player::PatternChangedHandle);
 	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
+}
+
+void ARCN_Player::SetCubeLocation(const FVector& Location)
+{
+	PitchComponent->SetRelativeLocation(Location);
+
+	RenewalRubikCubeLocationAndRotation();
 }
 
 void ARCN_Player::RenewalRubikCubeLocationAndRotation()
@@ -243,7 +247,7 @@ void ARCN_Player::SolveCube(const FInputActionValue& Value)
 void ARCN_Player::SpinHandle(const FString& Command)
 {
 	NetworkCommand = Command;
-	bNetworkSpinFlag = !bNetworkSpinFlag;
+	bNetworkCommandFlag = !bNetworkCommandFlag;
 }
 
 void ARCN_Player::PatternChangedHandle(const FString& Pattern)
@@ -262,7 +266,7 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
 	DOREPLIFETIME(ARCN_Player, NetworkCommand)
-	DOREPLIFETIME(ARCN_Player, bNetworkSpinFlag)
+	DOREPLIFETIME(ARCN_Player, bNetworkCommandFlag)
 	DOREPLIFETIME(ARCN_Player, NetworkPattern)
 }
 
