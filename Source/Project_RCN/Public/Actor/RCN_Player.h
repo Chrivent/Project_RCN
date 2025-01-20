@@ -84,10 +84,10 @@ protected:
 	TObjectPtr<USceneComponent> YawComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> DragFirstStickerMeshComponent;
+	FVector FirstStickerPosition;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> DragSecondStickerMeshComponent;
+	FVector SecondStickerPosition;
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsHolding : 1;
@@ -119,6 +119,9 @@ protected:
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SolveCube();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SpinCube(const FString& Command);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_FinishScramble();

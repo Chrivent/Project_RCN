@@ -88,6 +88,7 @@ public:
 	void Scramble();
 	void Solve();
 	void ChangePattern(const FString& NewPattern);
+	FVector GetStickerPosition(UStaticMeshComponent* StickerMeshComponent);
 
 	FSpinDelegate SpinDelegate;
 	FPatternChangedDelegate PatternChangedDelegate;

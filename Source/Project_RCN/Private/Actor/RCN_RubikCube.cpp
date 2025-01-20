@@ -366,6 +366,19 @@ void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
 	}
 }
 
+FVector ARCN_RubikCube::GetStickerPosition(UStaticMeshComponent* StickerMeshComponent)
+{
+	for (const auto StickerPosition : StickerPositions)
+	{
+		if (StickerPosition.Key == StickerMeshComponent)
+		{
+			return StickerPosition.Value;
+		}
+	}
+
+	return FVector::ZeroVector;
+}
+
 void ARCN_RubikCube::Spin(const FString& Command)
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)

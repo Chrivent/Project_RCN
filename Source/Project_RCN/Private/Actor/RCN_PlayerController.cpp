@@ -60,6 +60,8 @@ void ARCN_PlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
+		SetShowMouseCursor(true);
+		
 		TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
 	
 		if (IsValid(TimerWidget))
