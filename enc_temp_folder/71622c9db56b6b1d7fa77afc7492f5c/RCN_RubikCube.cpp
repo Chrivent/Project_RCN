@@ -6,6 +6,8 @@
 #include "Data/RCN_RubikCubeDataAsset.h"
 #include "KociembaAlgorithm/search.h"
 #include "Project_RCN/Project_RCN.h"
+#include "Util/EnumHelper.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ARCN_RubikCube::ARCN_RubikCube()
@@ -20,15 +22,23 @@ ARCN_RubikCube::ARCN_RubikCube()
 	}
 	else
 	{
-		RCN_LOG(LogRubikCube, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(RubikCube, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 
 	DefaultComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 	RootComponent = DefaultComponent;
 
+	PitchComponent = CreateDefaultSubobject<USceneComponent>(TEXT("PitchComponent"));
+	PitchComponent->SetupAttachment(RootComponent);
+	PitchComponent->SetRelativeRotation(FRotator(30.0f, 0.0f, 0.0f));
+
+	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
+	YawComponent->SetupAttachment(PitchComponent);
+	YawComponent->SetRelativeRotation(FRotator(0.0f, 120.0f, 0.0f));
+
 	CoreComponent = CreateDefaultSubobject<USceneComponent>(TEXT("CoreComponent"));
-	CoreComponent->SetupAttachment(RootComponent);
+	CoreComponent->SetupAttachment(YawComponent);
 
 	const float PieceDistance = RubikCubeDataAsset->PieceDistance;
 	const float PieceSize = RubikCubeDataAsset->PieceSize;
@@ -49,7 +59,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 
 				UStaticMeshComponent* PieceMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("PieceComponent [%d, %d, %d]"), X, Y, Z));
 				
-				PieceMeshComponent->SetupAttachment(RootComponent);
+				PieceMeshComponent->SetupAttachment(YawComponent);
 				PieceMeshComponent->SetRelativeLocation(FVector(X * PieceDistance, Y * PieceDistance, Z * PieceDistance));
 				PieceMeshComponent->SetRelativeScale3D(FVector(PieceSize));
 				PieceMeshComponent->SetStaticMesh(RubikCubeDataAsset->PieceMesh);
@@ -62,11 +72,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 					StickerMeshComponent->SetRelativeLocation(FVector(-StickerDistance, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
+					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Orange]);
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X - 1, Y, Z));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Orange);
 				}
 
 				if (X == 1)
@@ -77,11 +87,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 					StickerMeshComponent->SetRelativeLocation(FVector(StickerDistance, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
+					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Red]);
 					
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X + 1, Y, Z));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Red);
 				}
 
 				if (Y == -1)
@@ -92,11 +102,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, -StickerDistance, 0.0f));
 					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
+					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Green]);
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y - 1, Z));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Green);
 				}
 
 				if (Y == 1)
@@ -107,11 +117,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, StickerDistance, 0.0f));
 					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
+					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Blue]);
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y + 1, Z));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Blue);
 				}
 
 				if (Z == -1)
@@ -122,11 +132,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, -StickerDistance));
 					StickerMeshComponent->SetRelativeRotation(FRotator(180.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
+					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::White]);
 					
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y, Z - 1));
+					StickerColors.Emplace(StickerMeshComponent, FColor::White);
 				}
 
 				if (Z == 1)
@@ -137,11 +147,11 @@ ARCN_RubikCube::ARCN_RubikCube()
 					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, StickerDistance));
 					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
+					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh[EStickerType::Yellow]);
 
 					StickerMeshComponents.Emplace(StickerMeshComponent);
 					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y, Z + 1));
+					StickerColors.Emplace(StickerMeshComponent, FColor::Yellow);
 				}
 
 				PieceMeshComponents.Emplace(PieceMeshComponent);
@@ -186,11 +196,18 @@ ARCN_RubikCube::ARCN_RubikCube()
 	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, false, 1);
 	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, true, 2);
 
+	CenterOrderPositions.Emplace(FVector(0, 0, 2));
+	CenterOrderPositions.Emplace(FVector(2, 0, 0));
+	CenterOrderPositions.Emplace(FVector(0, 2, 0));
+	CenterOrderPositions.Emplace(FVector(0, 0, -2));
+	CenterOrderPositions.Emplace(FVector(-2, 0, 0));
+	CenterOrderPositions.Emplace(FVector(0, -2, 0));
+
 	for (int32 Y = -1; Y <= 1; Y++)
 	{
 		for (int32 X = -1; X <= 1; X++)
 		{
-			PatternOrderPositions.Emplace(FVector(X, Y, 2));
+			FaceletOrderPositions.Emplace(FVector(X, Y, 2));
 		}
 	}
 
@@ -198,7 +215,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 	{
 		for (int32 Y = 1; Y >= -1; Y--)
 		{
-			PatternOrderPositions.Emplace(FVector(2, Y, Z));
+			FaceletOrderPositions.Emplace(FVector(2, Y, Z));
 		}
 	}
 	
@@ -206,7 +223,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 	{
 		for (int32 X = -1; X <= 1; X++)
 		{
-			PatternOrderPositions.Emplace(FVector(X, 2, Z));
+			FaceletOrderPositions.Emplace(FVector(X, 2, Z));
 		}
 	}
 
@@ -214,7 +231,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 	{
 		for (int32 X = -1; X <= 1; X++)
 		{
-			PatternOrderPositions.Emplace(FVector(X, Y, -2));
+			FaceletOrderPositions.Emplace(FVector(X, Y, -2));
 		}
 	}
 
@@ -222,7 +239,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 	{
 		for (int32 Y = -1; Y <= 1; Y++)
 		{
-			PatternOrderPositions.Emplace(FVector(-2, Y, Z));
+			FaceletOrderPositions.Emplace(FVector(-2, Y, Z));
 		}
 	}
 
@@ -230,18 +247,31 @@ ARCN_RubikCube::ARCN_RubikCube()
 	{
 		for (int32 X = 1; X >= -1; X--)
 		{
-			PatternOrderPositions.Emplace(FVector(X, -2, Z));
+			FaceletOrderPositions.Emplace(FVector(X, -2, Z));
 		}
 	}
 
-	Pattern = TEXT("YYYYYYYYYRRRRRRRRRBBBBBBBBBWWWWWWWWWOOOOOOOOOGGGGGGGGG");
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
 void ARCN_RubikCube::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SortFacelet();
+
+	/*FTimerHandle TestTimerHandle;
+	GetWorldTimerManager().SetTimer(TestTimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		Scramble();
+
+		FTimerHandle TestTimerHandle2;
+		GetWorldTimerManager().SetTimer(TestTimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
+		{
+			Solve();
+		}), 3.0f, false);
+	}), 6.0f, true);*/
 }
 
 // Called every frame
@@ -251,138 +281,10 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 	
 }
 
-void ARCN_RubikCube::Scramble()
-{
-	if (bIsTurning)
-	{
-		return;
-	}
-	
-	FString Command = TEXT("");
-
-	FString LastSign = TEXT(" ");
-	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
-	{
-		FString CurrentSign;
-		do
-		{
-			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
-		} while (LastSign[0] == CurrentSign[0]);
-		LastSign = CurrentSign;
-
-		Command += CurrentSign + TEXT(" ");
-	}
-
-	Command.RemoveAt(Command.Len() - 1);
-	
-	Spin(Command);
-
-	bIsScrambling = true;
-}
-
-void ARCN_RubikCube::Solve()
-{
-	if (bIsTurning)
-	{
-		return;
-	}
-	
-	FString Command = TEXT("");
-
-	TMap<TCHAR, TCHAR> ReplacementInfo = {
-		{ Pattern[4], TEXT('U') },
-		{ Pattern[13], TEXT('R') },
-		{ Pattern[22], TEXT('F') },
-		{ Pattern[31], TEXT('D') },
-		{ Pattern[40], TEXT('L') },
-		{ Pattern[49], TEXT('B') }
-	};
-
-	FString Facelet = Pattern;
-	for (auto& FaceletChar : Facelet)
-	{
-		FaceletChar = ReplacementInfo[FaceletChar];
-	}
-
-	Command = solution(
-		TCHAR_TO_ANSI(*Facelet),
-		24,
-		1000,
-		0,
-		"cache"
-	);
-
-	Spin(Command);
-}
-
-void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
-{
-	if (bIsTurning)
-	{
-		GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
-		{
-			ChangePattern(NewPattern);
-		}));
-	}
-	
-	Pattern = NewPattern;
-	
-	int32 Index = 0;
-	for (auto PatternOrderPosition : PatternOrderPositions)
-	{
-		for (auto StickerPosition : StickerPositions)
-		{
-			if (PatternOrderPosition == StickerPosition.Value)
-			{
-				if (NewPattern[Index] == TEXT('Y'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
-				}
-				else if (NewPattern[Index] == TEXT('R'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
-				}
-				else if (NewPattern[Index] == TEXT('B'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
-				}
-				else if (NewPattern[Index] == TEXT('W'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
-				}
-				else if (NewPattern[Index] == TEXT('O'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
-				}
-				else if (NewPattern[Index] == TEXT('G'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
-				}
-
-				Index++;
-				break;
-			}
-		}
-	}
-}
-
-FVector ARCN_RubikCube::GetStickerPosition(UStaticMeshComponent* StickerMeshComponent)
-{
-	for (const auto StickerPosition : StickerPositions)
-	{
-		if (StickerPosition.Key == StickerMeshComponent)
-		{
-			return StickerPosition.Value;
-		}
-	}
-
-	return FVector::ZeroVector;
-}
-
 void ARCN_RubikCube::Spin(const FString& Command)
 {
-	RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
-
+	RCN_LOG(RubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
+	
 	TArray<FString> ParsedCommands;
 	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
 
@@ -400,28 +302,82 @@ void ARCN_RubikCube::Spin(const FString& Command)
 	if (!bIsTurning)
 	{
 		bIsTurning = true;
-
 		TurnNext();
 	}
+}
 
-	SpinDelegate.Broadcast(Command);
+void ARCN_RubikCube::Scramble()
+{
+	FString Command = TEXT("");
+
+	FString LastSign = TEXT(" ");
+	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
+	{
+		FString CurrentSign;
+		do
+		{
+			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
+		}
+		while (LastSign[0] == CurrentSign[0]);
+		LastSign = CurrentSign;
+		
+		Command += CurrentSign + TEXT(" ");
+	}
+
+	Command.RemoveAt(Command.Len() - 1);
+	Spin(Command);
+}
+
+void ARCN_RubikCube::Solve()
+{
+	bRequestedSolving = true;
+
+	if (!bIsTurning)
+	{
+		TurnNext();
+	}
+}
+
+void ARCN_RubikCube::Rotate(FVector2D RotateAxisVector)
+{
+	FRotator PitchRotator = PitchComponent->GetRelativeRotation();
+	FRotator YawRotator = YawComponent->GetRelativeRotation();
+	
+	PitchRotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
+	YawRotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+
+	PitchComponent->SetRelativeRotation(PitchRotator);
+	YawComponent->SetRelativeRotation(YawRotator);
+
+	NetworkPitchRotator = PitchRotator;
+	NetworkYawRotator = YawRotator;
 }
 
 void ARCN_RubikCube::TurnNext()
 {
+	if (bRequestedSolving)
+	{
+		bRequestedSolving = false;
+		
+		bIsTurning = false;
+		SignQueue.Empty();
+		
+		const FString SolveCommand = solution(
+			TCHAR_TO_ANSI(*Facelet),
+			24,
+			1000,
+			0,
+			"cache"
+		);
+		
+		Spin(SolveCommand);
+		return;
+	}
+	
 	if (SignQueue.Num() == 0)
 	{
 		bIsTurning = false;
-
-		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
-		PatternChangedDelegate.Broadcast(Pattern);
-
-		if (bIsScrambling)
-		{
-			bIsScrambling = false;
-			FinishScrambleDelegate.Broadcast();
-		}
-		
+		RCN_LOG(RubikCube, Log, TEXT("회전 완료 및 패슬릿 : %s"), *Facelet)
 		return;
 	}
 
@@ -456,7 +412,7 @@ void ARCN_RubikCube::TurnCore(const FSignInfo& SignInfo)
 	UpdateTurnCore(SignInfo, TargetQuat);
 }
 
-void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& TargetQuat)
+void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetQuat)
 {
 	const FQuat CurrentQuat = CoreComponent->GetRelativeRotation().Quaternion();
 	const FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, RubikCubeDataAsset->TurnSpeed);
@@ -469,7 +425,7 @@ void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& Targ
 		return;
 	}
 
-	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, SignInfo, TargetQuat]
 	{
 		UpdateTurnCore(SignInfo, TargetQuat);
 	}));
@@ -512,7 +468,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 	{
 		if (UStaticMeshComponent* PieceMeshComponent = Cast<UStaticMeshComponent>(ChildPieceComponent))
 		{
-			PieceMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+			PieceMeshComponent->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 			const FVector CurrentPiecePosition = PiecePositions[PieceMeshComponent];
 			const FVector NewPiecePosition = GetRotationMatrix(SignInfo).TransformPosition(CurrentPiecePosition);
@@ -531,43 +487,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 		}
 	}
 	
-	Pattern = TEXT("");
-	
-	for (auto PatternOrderPosition : PatternOrderPositions)
-	{
-		for (auto StickerPosition : StickerPositions)
-		{
-			if (PatternOrderPosition == StickerPosition.Value)
-			{
-				if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow])
-				{
-					Pattern += 'Y';
-				}
-				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Red])
-				{
-					Pattern += 'R';
-				}
-				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Blue])
-				{
-					Pattern += 'B';
-				}
-				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::White])
-				{
-					Pattern += 'W';
-				}
-				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Orange])
-				{
-					Pattern += 'O';
-				}
-				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Green])
-				{
-					Pattern += 'G';
-				}
-				
-				break;
-			}
-		}
-	}
+	SortFacelet();
 
 	CoreComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	TurnNext();
@@ -606,5 +526,83 @@ FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
 	}
 	
 	return FMatrix::Identity;
+}
+
+void ARCN_RubikCube::SortFacelet()
+{
+	Facelet = TEXT("");
+	
+	TArray<FColor> CenterOrderColors;
+	for (auto CenterOrderPosition : CenterOrderPositions)
+	{
+		for (auto StickerPosition : StickerPositions)
+		{
+			if (CenterOrderPosition == StickerPosition.Value)
+			{
+				CenterOrderColors.Emplace(StickerColors[StickerPosition.Key]);
+			}
+		}
+	}
+	
+	for (auto FaceletOrderPosition : FaceletOrderPositions)
+	{
+		for (auto StickerPosition : StickerPositions)
+		{
+			if (FaceletOrderPosition == StickerPosition.Value)
+			{
+				if (CenterOrderColors[0] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'U';
+				}
+				else if (CenterOrderColors[1] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'R';
+				}
+				else if (CenterOrderColors[2] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'F';
+				}
+				else if (CenterOrderColors[3] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'D';
+				}
+				else if (CenterOrderColors[4] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'L';
+				}
+				else if (CenterOrderColors[5] == StickerColors[StickerPosition.Key])
+				{
+					Facelet += 'B';
+				}
+				
+				break;
+			}
+		}
+	}
+}
+
+void ARCN_RubikCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARCN_RubikCube, NetworkPitchRotator)
+	DOREPLIFETIME(ARCN_RubikCube, NetworkYawRotator)
+}
+
+void ARCN_RubikCube::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	
+	Super::OnActorChannelOpen(InBunch, Connection);
+	
+	RCN_LOG(LogRCNNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::OnRep_Rotate()
+{
+	RCN_LOG(LogRCNNetwork, Log, TEXT("Pitch : %s, Yaw : %s"), *NetworkPitchRotator.ToString(), *NetworkYawRotator.ToString())
+
+	PitchComponent->SetRelativeRotation(NetworkPitchRotator);
+	YawComponent->SetRelativeRotation(NetworkYawRotator);
 }
 
