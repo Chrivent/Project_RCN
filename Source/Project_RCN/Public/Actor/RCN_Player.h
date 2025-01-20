@@ -47,11 +47,14 @@ public:
 	
 protected:
 	void SetControl() const;
-	void HoldTriggered(const FInputActionValue& Value);
-	void HoldCompleted(const FInputActionValue& Value);
+	void RotateSwitchStarted(const FInputActionValue& Value);
+	void RotateSwitchCompleted(const FInputActionValue& Value);
 	void RotateCube(const FInputActionValue& Value);
 	void ScrambleCube(const FInputActionValue& Value);
 	void SolveCube(const FInputActionValue& Value);
+	void StickerDragStarted(const FInputActionValue& Value);
+	void StickerDragTriggered(const FInputActionValue& Value);
+	void StickerDragCompleted(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	void SpinHandle(const FString& Command);
@@ -81,19 +84,13 @@ protected:
 	TObjectPtr<USceneComponent> YawComponent;
 
 	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> DragFirstStickerMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> DragSecondStickerMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
 	uint8 bIsHolding : 1;
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UInputAction> HoldAction;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UInputAction> RotateAction;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UInputAction> ScrambleAction;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UInputAction> SolveAction;
 
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -135,7 +132,7 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_Command)
 	uint8 bNetworkCommandFlag : 1;
 
-	UPROPERTY(ReplicatedUsing = OnRep_Pattern)
+	UPROPERTY(Replicated)
 	FString NetworkPattern;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_Pattern)

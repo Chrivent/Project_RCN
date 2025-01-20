@@ -46,11 +46,6 @@ ARCN_Player::ARCN_Player()
 
 	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
 	YawComponent->SetupAttachment(PitchComponent);
-
-	HoldAction = PlayerDataAsset->HoldAction;
-	RotateAction = PlayerDataAsset->RotateAction;
-	ScrambleAction = PlayerDataAsset->ScrambleAction;
-	SolveAction = PlayerDataAsset->SolveAction;
 }
 
 // Called when the game starts or when spawned
@@ -140,11 +135,14 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Triggered, this, &ARCN_Player::HoldTriggered);
-	EnhancedInputComponent->BindAction(HoldAction, ETriggerEvent::Completed, this, &ARCN_Player::HoldCompleted);
-	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARCN_Player::RotateCube);
-	EnhancedInputComponent->BindAction(ScrambleAction, ETriggerEvent::Triggered, this, &ARCN_Player::ScrambleCube);
-	EnhancedInputComponent->BindAction(SolveAction, ETriggerEvent::Triggered, this, &ARCN_Player::SolveCube);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->RotateSwitchAction, ETriggerEvent::Started, this, &ARCN_Player::RotateSwitchStarted);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->RotateSwitchAction, ETriggerEvent::Completed, this, &ARCN_Player::RotateSwitchCompleted);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->RotateAction, ETriggerEvent::Triggered, this, &ARCN_Player::RotateCube);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->ScrambleAction, ETriggerEvent::Triggered, this, &ARCN_Player::ScrambleCube);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SolveAction, ETriggerEvent::Triggered, this, &ARCN_Player::SolveCube);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Started, this, &ARCN_Player::StickerDragStarted);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Triggered, this, &ARCN_Player::StickerDragTriggered);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Completed, this, &ARCN_Player::StickerDragCompleted);
 }
 
 void ARCN_Player::InitCube()
@@ -236,12 +234,12 @@ void ARCN_Player::SetControl() const
 	}
 }
 
-void ARCN_Player::HoldTriggered(const FInputActionValue& Value)
+void ARCN_Player::RotateSwitchStarted(const FInputActionValue& Value)
 {
 	bIsHolding = true;
 }
 
-void ARCN_Player::HoldCompleted(const FInputActionValue& Value)
+void ARCN_Player::RotateSwitchCompleted(const FInputActionValue& Value)
 {
 	bIsHolding = false;
 }
@@ -274,6 +272,49 @@ void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
 void ARCN_Player::SolveCube(const FInputActionValue& Value)
 {
 	ServerRPC_SolveCube();
+}
+
+void ARCN_Player::StickerDragStarted(const FInputActionValue& Value)
+{
+	/*if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
+	{
+		FVector CursorLocation, CursorDirection;
+		if (PlayerController->DeprojectMousePositionToWorld(CursorLocation, CursorDirection))
+		{
+			const FVector TraceStart = CursorLocation;
+			const FVector TraceEnd = CursorLocation + CursorDirection * 10000.0f;
+
+			FHitResult HitResult;
+			FCollisionQueryParams Params;
+			Params.bReturnPhysicalMaterial = true;
+
+			if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params))
+			{
+				// Draw debug line to visualize the trace
+				DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, 2.0f, 0, 1.0f);
+
+				if (HitResult.PhysMaterial == )
+				{
+					if (UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent()))
+					{
+						FString MeshName = MeshComponent->GetName();
+						
+						UE_LOG(LogTemp, Log, TEXT("Mesh Component Name: %s"), *MeshName);
+					}
+				}
+			}
+		}
+	}*/
+}
+
+void ARCN_Player::StickerDragTriggered(const FInputActionValue& Value)
+{
+	RCN_LOG(LogTemp, Log, TEXT("T"))
+}
+
+void ARCN_Player::StickerDragCompleted(const FInputActionValue& Value)
+{
+	RCN_LOG(LogTemp, Log, TEXT("C"))
 }
 
 void ARCN_Player::SpinHandle(const FString& Command)

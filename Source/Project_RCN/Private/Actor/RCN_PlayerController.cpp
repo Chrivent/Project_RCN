@@ -19,8 +19,6 @@ ARCN_PlayerController::ARCN_PlayerController()
 		RCN_LOG(LogNetwork, Error, TEXT("UI 데이터 에셋 로드 실패"))
 		return;
 	}
-
-	TimerWidgetClass = UIDataAsset->TimerWidgetClass;
 }
 
 void ARCN_PlayerController::PostInitializeComponents()
@@ -62,7 +60,7 @@ void ARCN_PlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
-		TimerWidget = CreateWidget<URCN_TimerWidget>(this, TimerWidgetClass);
+		TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
 	
 		if (IsValid(TimerWidget))
 		{

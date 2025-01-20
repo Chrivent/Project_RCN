@@ -17,8 +17,5 @@ class PROJECT_RCN_API URCN_UIDataAsset : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<URCN_TimerWidget> TimerWidget;
+	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;;
 };

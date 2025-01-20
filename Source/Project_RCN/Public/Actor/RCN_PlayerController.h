@@ -26,9 +26,6 @@ public:
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
-	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
 	TObjectPtr<URCN_TimerWidget> TimerWidget;
 	
 	// 네트워크 관련

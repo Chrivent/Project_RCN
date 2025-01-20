@@ -21,7 +21,7 @@ public:
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> HoldAction;
+	TObjectPtr<UInputAction> RotateSwitchAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> RotateAction;
@@ -31,6 +31,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> SolveAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> StickerDragAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;
