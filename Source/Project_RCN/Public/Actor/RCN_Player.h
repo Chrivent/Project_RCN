@@ -137,5 +137,8 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_Pattern)
 	FString NetworkPattern;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_Pattern)
+    uint8 bNetworkPatternFlag : 1;
 };
 

@@ -214,6 +214,7 @@ void ARCN_Player::RenewalRubikCubeLocationAndRotation()
 void ARCN_Player::RenewalRubikCubePattern()
 {
 	NetworkPattern = NetworkRubikCube->GetPattern();
+	bNetworkPatternFlag = !bNetworkPatternFlag;
 }
 
 void ARCN_Player::SetControl() const
@@ -284,6 +285,7 @@ void ARCN_Player::SpinHandle(const FString& Command)
 void ARCN_Player::PatternChangedHandle(const FString& Pattern)
 {
 	NetworkPattern = Pattern;
+	bNetworkPatternFlag = !bNetworkPatternFlag;
 }
 
 void ARCN_Player::FinishScrambleHandle()
@@ -299,6 +301,7 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARCN_Player, NetworkCommand)
 	DOREPLIFETIME(ARCN_Player, bNetworkCommandFlag)
 	DOREPLIFETIME(ARCN_Player, NetworkPattern)
+	DOREPLIFETIME(ARCN_Player, bNetworkPatternFlag)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
