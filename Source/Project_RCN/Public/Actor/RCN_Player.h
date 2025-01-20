@@ -66,13 +66,13 @@ protected:
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCameraComponent> CameraComponent;
+	TObjectPtr<USceneComponent> DefaultComponent;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> DefaultComponent;
+	TObjectPtr<UCameraComponent> CameraComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> PitchComponent;
