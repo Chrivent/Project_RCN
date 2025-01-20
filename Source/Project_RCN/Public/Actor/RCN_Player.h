@@ -55,6 +55,7 @@ protected:
 	void StickerDragStarted(const FInputActionValue& Value);
 	void StickerDragTriggered(const FInputActionValue& Value);
 	void StickerDragCompleted(const FInputActionValue& Value);
+	void StickerDown(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	void SpinHandle(const FString& Command);

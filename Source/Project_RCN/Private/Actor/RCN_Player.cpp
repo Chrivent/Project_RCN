@@ -143,6 +143,7 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Started, this, &ARCN_Player::StickerDragStarted);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Triggered, this, &ARCN_Player::StickerDragTriggered);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Completed, this, &ARCN_Player::StickerDragCompleted);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDownAction, ETriggerEvent::Started, this, &ARCN_Player::StickerDown);
 }
 
 void ARCN_Player::InitCube()
@@ -389,6 +390,56 @@ void ARCN_Player::StickerDragCompleted(const FInputActionValue& Value)
 {
 	FirstStickerPosition = FVector::ZeroVector;
 	SecondStickerPosition = FVector::ZeroVector;
+}
+
+void ARCN_Player::StickerDown(const FInputActionValue& Value)
+{
+	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
+	{
+		FVector CursorLocation, CursorDirection;
+		if (PlayerController->DeprojectMousePositionToWorld(CursorLocation, CursorDirection))
+		{
+			const FVector TraceStart = CursorLocation;
+			const FVector TraceEnd = CursorLocation + CursorDirection * 10000.0f;
+
+			FHitResult HitResult;
+			FCollisionQueryParams Params;
+			if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params))
+			{
+				if (UStaticMeshComponent* StickerMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent()))
+				{
+					
+				}
+			}
+		}
+	}
+}
+
+FVector FindClosestVector(const FVector& TargetVector, const TArray<FVector>& CandidateVectors)
+{
+	FVector ClosestVector = FVector::ZeroVector; // 초기화
+	float MaxDotProduct = -1.0f; // 내적의 최소값은 -1
+    
+	// TargetVector를 단위 벡터로 변환
+	FVector NormalizedTarget = TargetVector.GetSafeNormal();
+
+	for (const FVector& Candidate : CandidateVectors)
+	{
+		// Candidate를 단위 벡터로 변환
+		FVector NormalizedCandidate = Candidate.GetSafeNormal();
+
+		// TargetVector와 Candidate 벡터의 내적 계산
+		float DotProduct = FVector::DotProduct(NormalizedTarget, NormalizedCandidate);
+
+		// 내적 값이 최대값이라면 가장 가까운 벡터로 업데이트
+		if (DotProduct > MaxDotProduct)
+		{
+			MaxDotProduct = DotProduct;
+			ClosestVector = Candidate;
+		}
+	}
+
+	return ClosestVector;
 }
 
 void ARCN_Player::SpinHandle(const FString& Command)
