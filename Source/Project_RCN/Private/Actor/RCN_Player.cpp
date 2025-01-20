@@ -336,39 +336,39 @@ void ARCN_Player::OnRep_Pattern() const
 
 void ARCN_Player::ServerRPC_SetCubeLocation_Implementation(const FVector Location)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	
 	MulticastRPC_SetCubeLocation(Location);
 	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::MulticastRPC_SetCubeLocation_Implementation(const FVector Location)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	PitchComponent->SetRelativeLocation(Location);
 	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::ServerRPC_SetCubeRotation_Implementation(const FRotator Rotator)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	MulticastRPC_SetCubeRotation(Rotator);
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::MulticastRPC_SetCubeRotation_Implementation(const FRotator Rotator)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
 	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::ServerRPC_ScrambleCube_Implementation()

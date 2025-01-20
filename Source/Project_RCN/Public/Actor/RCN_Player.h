@@ -42,10 +42,10 @@ public:
 	void InitCube();
 	void UpdateCubeLocation(const FVector& TargetLocation);
 	void UpdateCubeRotation(const FRotator& TargetRotation);
-	
-protected:
 	void RenewalRubikCubeLocationAndRotation();
 	void RenewalRubikCubePattern();
+	
+protected:
 	void SetControl() const;
 	void HoldTriggered(const FInputActionValue& Value);
 	void HoldCompleted(const FInputActionValue& Value);

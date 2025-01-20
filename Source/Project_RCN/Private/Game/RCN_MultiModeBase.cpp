@@ -23,15 +23,12 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 			{
 				Player->SetRubikCube(RubikCube);
 				Player->InitCube();
+
+				Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 			}
 			
 			for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 			{
-				if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
-				{
-					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
-				}
-				
 				if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
 				{
 					const float Offset = GameModeBaseDataAsset->CubeMultiOffset;
@@ -41,6 +38,7 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 						FVector(0.0f,
 							Iterator.GetIndex() * Offset - (GetWorld()->GetNumPlayerControllers() - 1) * Offset / 2.0f,
 							0.0f));
+					MultiPlayer->RenewalRubikCubePattern();
 				}
 			}
 		}), 1.0f, false);
