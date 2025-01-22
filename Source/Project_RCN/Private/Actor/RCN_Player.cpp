@@ -306,6 +306,11 @@ void ARCN_Player::StickerDragStarted(const FInputActionValue& Value)
 
 void ARCN_Player::StickerDragTriggered(const FInputActionValue& Value)
 {
+	if (!IsValid(SelectedStickerMeshComponent))
+	{
+		return;
+	}
+	
 	FVector SelectedStickerPosition = NetworkRubikCube->GetStickerPosition(SelectedStickerMeshComponent);
 	if (SelectedStickerPosition == FVector::ZeroVector)
 	{
