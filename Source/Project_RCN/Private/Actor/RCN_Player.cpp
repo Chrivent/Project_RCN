@@ -237,17 +237,17 @@ void ARCN_Player::SetControl() const
 
 void ARCN_Player::RotateSwitchStarted(const FInputActionValue& Value)
 {
-	bIsHolding = true;
+	bRotateSwitchStarted = true;
 }
 
 void ARCN_Player::RotateSwitchCompleted(const FInputActionValue& Value)
 {
-	bIsHolding = false;
+	bRotateSwitchStarted = false;
 }
 
 void ARCN_Player::RotateCube(const FInputActionValue& Value)
 {
-	if (!bIsHolding)
+	if (!bRotateSwitchStarted)
 	{
 		return;
 	}
@@ -287,11 +287,17 @@ void ARCN_Player::StickerDragStarted(const FInputActionValue& Value)
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params;
-			if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params))
+			if (GetWorld()->LineTraceSingleByChannel(
+				HitResult,
+				TraceStart,
+				TraceEnd,
+				ECC_Visibility,
+				Params))
 			{
 				if (UStaticMeshComponent* StickerMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent()))
 				{
-					FirstStickerPosition = NetworkRubikCube->GetStickerPosition(StickerMeshComponent);
+					SelectedStickerMeshComponent = StickerMeshComponent;
+					DragStartHitLocation = HitResult.Location;
 				}
 			}
 		}
@@ -300,6 +306,14 @@ void ARCN_Player::StickerDragStarted(const FInputActionValue& Value)
 
 void ARCN_Player::StickerDragTriggered(const FInputActionValue& Value)
 {
+	FVector SelectedStickerPosition = NetworkRubikCube->GetStickerPosition(SelectedStickerMeshComponent);
+	if (SelectedStickerPosition == FVector::ZeroVector)
+	{
+		return;
+	}
+	
+	UStaticMeshComponent* CurrentStaticMeshComponent;
+	FVector CurrentHitLocation;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
 		FVector CursorLocation, CursorDirection;
@@ -310,86 +324,116 @@ void ARCN_Player::StickerDragTriggered(const FInputActionValue& Value)
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params;
-			if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params))
+			if (GetWorld()->LineTraceSingleByChannel(
+				HitResult,
+				TraceStart,
+				TraceEnd,
+				ECC_Visibility,
+				Params))
 			{
-				if (UStaticMeshComponent* StickerMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent()))
-				{
-					SecondStickerPosition = NetworkRubikCube->GetStickerPosition(StickerMeshComponent);
-				}
+				CurrentStaticMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent());
+				CurrentHitLocation = HitResult.Location;
 			}
 		}
 	}
 
-	if (FirstStickerPosition != FVector::ZeroVector && SecondStickerPosition != FVector::ZeroVector && FirstStickerPosition != SecondStickerPosition)
+	if (CurrentStaticMeshComponent != SelectedStickerMeshComponent)
 	{
-		FVector DragDirection = (SecondStickerPosition - FirstStickerPosition).GetSafeNormal();
-		FVector NormalVector = FVector(
-			FMath::Abs(FirstStickerPosition.X) == 2 ? FirstStickerPosition.X / 2.0f : 0,
-			FMath::Abs(FirstStickerPosition.Y) == 2 ? FirstStickerPosition.Y / 2.0f : 0,
-			FMath::Abs(FirstStickerPosition.Z) == 2 ? FirstStickerPosition.Z / 2.0f : 0
-			);
-		RCN_LOG(LogTemp, Log, TEXT("%s"), *NormalVector.ToString())
+		TMap<FVector, FVector> CubeVectors;
+		if (FMath::Abs(SelectedStickerPosition.X) != 2)
+		{
+			CubeVectors.Emplace(FVector(1, 0, 0), NetworkRubikCube->GetActorForwardVector());
+			CubeVectors.Emplace(FVector(-1, 0, 0), NetworkRubikCube->GetActorForwardVector() * -1);
+		}
 		
+		if (FMath::Abs(SelectedStickerPosition.Y) != 2)
+		{
+			CubeVectors.Emplace(FVector(0, 1, 0), NetworkRubikCube->GetActorRightVector());
+			CubeVectors.Emplace(FVector(0, -1, 0), NetworkRubikCube->GetActorRightVector() * -1);
+		}
+		
+		if (FMath::Abs(SelectedStickerPosition.Z) != 2)
+		{
+			CubeVectors.Emplace(FVector(0, 0, 1), NetworkRubikCube->GetActorUpVector());
+			CubeVectors.Emplace(FVector(0, 0, -1), NetworkRubikCube->GetActorUpVector() * -1);
+		}
+
+		FVector DragDirection = FVector::ZeroVector;
+		float MaxDot = -1.0f;
+		for (auto CubeVector : CubeVectors)
+		{
+			float Dot = (DragEndHitLocation - DragStartHitLocation).GetSafeNormal().Dot(CubeVector.Value);
+			if (Dot > MaxDot)
+			{
+				MaxDot = Dot;
+				DragDirection = CubeVector.Key;
+			}
+		}
+		
+		FVector NormalVector = FVector(
+			FMath::Abs(SelectedStickerPosition.X) == 2 ? SelectedStickerPosition.X / 2.0f : 0,
+			FMath::Abs(SelectedStickerPosition.Y) == 2 ? SelectedStickerPosition.Y / 2.0f : 0,
+			FMath::Abs(SelectedStickerPosition.Z) == 2 ? SelectedStickerPosition.Z / 2.0f : 0
+			);
 		FVector Cross = DragDirection.Cross(NormalVector).GetSafeNormal();
-		RCN_LOG(LogTemp, Log, TEXT("%s"), *Cross.ToString())
 
 		FString Command;
 		if (FMath::Abs(Cross.X) == 1)
 		{
-			if (FirstStickerPosition.X == 1)
+			if (SelectedStickerPosition.X == 1)
 			{
 				Command.Append(TEXT("R")) += Cross.X > 0.0f ? TEXT("'") : TEXT("");
 			}
-			else if (FirstStickerPosition.X == 0)
+			else if (SelectedStickerPosition.X == 0)
 			{
 				Command.Append(TEXT("M")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
 			}
-			else if (FirstStickerPosition.X == -1)
+			else if (SelectedStickerPosition.X == -1)
 			{
 				Command.Append(TEXT("L")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
 			}
 		}
 		else if (FMath::Abs(Cross.Y) == 1)
 		{
-			if (FirstStickerPosition.Y == 1)
+			if (SelectedStickerPosition.Y == 1)
 			{
 				Command.Append(TEXT("F")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
 			}
-			else if (FirstStickerPosition.Y == 0)
+			else if (SelectedStickerPosition.Y == 0)
 			{
 				Command.Append(TEXT("S")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
 			}
-			else if (FirstStickerPosition.Y == -1)
+			else if (SelectedStickerPosition.Y == -1)
 			{
 				Command.Append(TEXT("B")) += Cross.Y > 0.0f ? TEXT("") : TEXT("'");
 			}
 		}
 		else if (FMath::Abs(Cross.Z) == 1)
 		{
-			if (FirstStickerPosition.Z == 1)
+			if (SelectedStickerPosition.Z == 1)
 			{
 				Command.Append(TEXT("U")) += Cross.Z > 0.0f ? TEXT("'") : TEXT("");
 			}
-			else if (FirstStickerPosition.Z == 0)
+			else if (SelectedStickerPosition.Z == 0)
 			{
 				Command.Append(TEXT("E")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
 			}
-			else if (FirstStickerPosition.Z == -1)
+			else if (SelectedStickerPosition.Z == -1)
 			{
 				Command.Append(TEXT("D")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
 			}
 		}
 		ServerRPC_SpinCube(Command);
 
-		FirstStickerPosition = FVector::ZeroVector;
-		SecondStickerPosition = FVector::ZeroVector;
+		SelectedStickerMeshComponent = nullptr;
 	}
+
+	DragEndHitLocation = CurrentHitLocation;
 }
 
 void ARCN_Player::StickerDragCompleted(const FInputActionValue& Value)
 {
-	FirstStickerPosition = FVector::ZeroVector;
-	SecondStickerPosition = FVector::ZeroVector;
+	SelectedStickerMeshComponent = nullptr;
 }
 
 void ARCN_Player::StickerDown(const FInputActionValue& Value)

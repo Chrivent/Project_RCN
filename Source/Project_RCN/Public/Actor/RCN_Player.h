@@ -83,15 +83,18 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> YawComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> SelectedStickerMeshComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	FVector FirstStickerPosition;
+	FVector DragStartHitLocation;
 
 	UPROPERTY(VisibleAnywhere)
-	FVector SecondStickerPosition;
+	FVector DragEndHitLocation;
 
 	UPROPERTY(VisibleAnywhere)
-	uint8 bIsHolding : 1;
+	uint8 bRotateSwitchStarted : 1;
 
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
