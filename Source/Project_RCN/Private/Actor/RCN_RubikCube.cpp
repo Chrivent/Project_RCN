@@ -319,10 +319,7 @@ void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
 {
 	if (bIsTurning)
 	{
-		GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
-		{
-			ChangePattern(NewPattern);
-		}));
+		return;
 	}
 	
 	Pattern = NewPattern;
