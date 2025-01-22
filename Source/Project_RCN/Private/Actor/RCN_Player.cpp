@@ -138,12 +138,12 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(PlayerDataAsset->RotateSwitchAction, ETriggerEvent::Started, this, &ARCN_Player::RotateSwitchStarted);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->RotateSwitchAction, ETriggerEvent::Completed, this, &ARCN_Player::RotateSwitchCompleted);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->RotateAction, ETriggerEvent::Triggered, this, &ARCN_Player::RotateCube);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->ScrambleAction, ETriggerEvent::Triggered, this, &ARCN_Player::ScrambleCube);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->SolveAction, ETriggerEvent::Triggered, this, &ARCN_Player::SolveCube);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->ScrambleAction, ETriggerEvent::Started, this, &ARCN_Player::ScrambleCube);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SolveAction, ETriggerEvent::Started, this, &ARCN_Player::SolveCube);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Started, this, &ARCN_Player::StickerDragStarted);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Triggered, this, &ARCN_Player::StickerDragTriggered);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Completed, this, &ARCN_Player::StickerDragCompleted);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDownAction, ETriggerEvent::Started, this, &ARCN_Player::StickerDown);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerInputAction, ETriggerEvent::Triggered, this, &ARCN_Player::StickerInput);
 }
 
 void ARCN_Player::InitCube()
@@ -339,91 +339,9 @@ void ARCN_Player::StickerDragTriggered(const FInputActionValue& Value)
 
 	if (CurrentStaticMeshComponent != SelectedStickerMeshComponent)
 	{
-		TMap<FVector, FVector> CubeVectors;
-		if (FMath::Abs(SelectedStickerPosition.X) != 2)
-		{
-			CubeVectors.Emplace(FVector(1, 0, 0), NetworkRubikCube->GetActorForwardVector());
-			CubeVectors.Emplace(FVector(-1, 0, 0), NetworkRubikCube->GetActorForwardVector() * -1);
-		}
-		
-		if (FMath::Abs(SelectedStickerPosition.Y) != 2)
-		{
-			CubeVectors.Emplace(FVector(0, 1, 0), NetworkRubikCube->GetActorRightVector());
-			CubeVectors.Emplace(FVector(0, -1, 0), NetworkRubikCube->GetActorRightVector() * -1);
-		}
-		
-		if (FMath::Abs(SelectedStickerPosition.Z) != 2)
-		{
-			CubeVectors.Emplace(FVector(0, 0, 1), NetworkRubikCube->GetActorUpVector());
-			CubeVectors.Emplace(FVector(0, 0, -1), NetworkRubikCube->GetActorUpVector() * -1);
-		}
-
-		FVector DragDirection = FVector::ZeroVector;
-		float MaxDot = -1.0f;
-		for (auto CubeVector : CubeVectors)
-		{
-			float Dot = (DragEndHitLocation - DragStartHitLocation).GetSafeNormal().Dot(CubeVector.Value);
-			if (Dot > MaxDot)
-			{
-				MaxDot = Dot;
-				DragDirection = CubeVector.Key;
-			}
-		}
-		
-		FVector NormalVector = FVector(
-			FMath::Abs(SelectedStickerPosition.X) == 2 ? SelectedStickerPosition.X / 2.0f : 0,
-			FMath::Abs(SelectedStickerPosition.Y) == 2 ? SelectedStickerPosition.Y / 2.0f : 0,
-			FMath::Abs(SelectedStickerPosition.Z) == 2 ? SelectedStickerPosition.Z / 2.0f : 0
-			);
-		FVector Cross = DragDirection.Cross(NormalVector).GetSafeNormal();
-
-		FString Command;
-		if (FMath::Abs(Cross.X) == 1)
-		{
-			if (SelectedStickerPosition.X == 1)
-			{
-				Command.Append(TEXT("R")) += Cross.X > 0.0f ? TEXT("'") : TEXT("");
-			}
-			else if (SelectedStickerPosition.X == 0)
-			{
-				Command.Append(TEXT("M")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
-			}
-			else if (SelectedStickerPosition.X == -1)
-			{
-				Command.Append(TEXT("L")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
-			}
-		}
-		else if (FMath::Abs(Cross.Y) == 1)
-		{
-			if (SelectedStickerPosition.Y == 1)
-			{
-				Command.Append(TEXT("F")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
-			}
-			else if (SelectedStickerPosition.Y == 0)
-			{
-				Command.Append(TEXT("S")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
-			}
-			else if (SelectedStickerPosition.Y == -1)
-			{
-				Command.Append(TEXT("B")) += Cross.Y > 0.0f ? TEXT("") : TEXT("'");
-			}
-		}
-		else if (FMath::Abs(Cross.Z) == 1)
-		{
-			if (SelectedStickerPosition.Z == 1)
-			{
-				Command.Append(TEXT("U")) += Cross.Z > 0.0f ? TEXT("'") : TEXT("");
-			}
-			else if (SelectedStickerPosition.Z == 0)
-			{
-				Command.Append(TEXT("E")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
-			}
-			else if (SelectedStickerPosition.Z == -1)
-			{
-				Command.Append(TEXT("D")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
-			}
-		}
-		ServerRPC_SpinCube(Command);
+		FVector DragDirection = (DragEndHitLocation - DragStartHitLocation).GetSafeNormal();
+		FVector SpinDirection = GetClosestSpinDirection(SelectedStickerPosition, DragDirection);
+		SpinCube(SelectedStickerPosition, SpinDirection);
 
 		SelectedStickerMeshComponent = nullptr;
 	}
@@ -436,8 +354,11 @@ void ARCN_Player::StickerDragCompleted(const FInputActionValue& Value)
 	SelectedStickerMeshComponent = nullptr;
 }
 
-void ARCN_Player::StickerDown(const FInputActionValue& Value)
+void ARCN_Player::StickerInput(const FInputActionValue& Value)
 {
+	FVector SelectedStickerPosition;
+	FVector InputStartHitLocation;
+	float Distance;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
 		FVector CursorLocation, CursorDirection;
@@ -448,42 +369,142 @@ void ARCN_Player::StickerDown(const FInputActionValue& Value)
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params;
-			if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params))
+			if (GetWorld()->LineTraceSingleByChannel(
+				HitResult,
+				TraceStart,
+				TraceEnd,
+				ECC_Visibility,
+				Params))
 			{
 				if (UStaticMeshComponent* StickerMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent()))
 				{
-					
+					SelectedStickerPosition = NetworkRubikCube->GetStickerPosition(StickerMeshComponent);
+					InputStartHitLocation = HitResult.Location;
+					Distance = HitResult.Distance;
 				}
 			}
 		}
 	}
+
+	if (SelectedStickerPosition == FVector::ZeroVector)
+	{
+		return;
+	}
+
+	FVector SpinDirection;
+	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
+	{
+		FVector2D TargetPosition;
+		if (PlayerController->GetMousePosition(TargetPosition.X, TargetPosition.Y))
+		{
+			TargetPosition += Value.Get<FVector2D>();
+			
+			FVector TargetLocation, TargetDirection;
+			PlayerController->DeprojectScreenPositionToWorld(TargetPosition.X, TargetPosition.Y, TargetLocation, TargetDirection);
+
+			FVector InputEndHitLocation = TargetLocation + TargetDirection * Distance;
+			FVector InputDirection = (InputEndHitLocation - InputStartHitLocation).GetSafeNormal();
+
+			SpinDirection = GetClosestSpinDirection(SelectedStickerPosition, InputDirection);
+		}
+	}
+	
+	SpinCube(SelectedStickerPosition, SpinDirection);
 }
 
-FVector FindClosestVector(const FVector& TargetVector, const TArray<FVector>& CandidateVectors)
+FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedStickerPosition, const FVector& Direction) const
 {
-	FVector ClosestVector = FVector::ZeroVector; // 초기화
-	float MaxDotProduct = -1.0f; // 내적의 최소값은 -1
-    
-	// TargetVector를 단위 벡터로 변환
-	FVector NormalizedTarget = TargetVector.GetSafeNormal();
-
-	for (const FVector& Candidate : CandidateVectors)
+	TMap<FVector, FVector> CubeVectors;
+	if (FMath::Abs(SelectedStickerPosition.X) != 2)
 	{
-		// Candidate를 단위 벡터로 변환
-		FVector NormalizedCandidate = Candidate.GetSafeNormal();
+		CubeVectors.Emplace(FVector(1, 0, 0), NetworkRubikCube->GetActorForwardVector());
+		CubeVectors.Emplace(FVector(-1, 0, 0), NetworkRubikCube->GetActorForwardVector() * -1);
+	}
+		
+	if (FMath::Abs(SelectedStickerPosition.Y) != 2)
+	{
+		CubeVectors.Emplace(FVector(0, 1, 0), NetworkRubikCube->GetActorRightVector());
+		CubeVectors.Emplace(FVector(0, -1, 0), NetworkRubikCube->GetActorRightVector() * -1);
+	}
+		
+	if (FMath::Abs(SelectedStickerPosition.Z) != 2)
+	{
+		CubeVectors.Emplace(FVector(0, 0, 1), NetworkRubikCube->GetActorUpVector());
+		CubeVectors.Emplace(FVector(0, 0, -1), NetworkRubikCube->GetActorUpVector() * -1);
+	}
 
-		// TargetVector와 Candidate 벡터의 내적 계산
-		float DotProduct = FVector::DotProduct(NormalizedTarget, NormalizedCandidate);
-
-		// 내적 값이 최대값이라면 가장 가까운 벡터로 업데이트
-		if (DotProduct > MaxDotProduct)
+	FVector SpinDirection = FVector::ZeroVector;
+	float MaxDot = -1.0f;
+	for (auto CubeVector : CubeVectors)
+	{
+		float Dot = Direction.Dot(CubeVector.Value);
+		if (Dot > MaxDot)
 		{
-			MaxDotProduct = DotProduct;
-			ClosestVector = Candidate;
+			MaxDot = Dot;
+			SpinDirection = CubeVector.Key;
 		}
 	}
 
-	return ClosestVector;
+	return SpinDirection;
+}
+
+void ARCN_Player::SpinCube(const FVector& SelectedStickerPosition, const FVector& SpinDirection)
+{
+	const FVector NormalVector = FVector(
+			FMath::Abs(SelectedStickerPosition.X) == 2 ? SelectedStickerPosition.X / 2.0f : 0,
+			FMath::Abs(SelectedStickerPosition.Y) == 2 ? SelectedStickerPosition.Y / 2.0f : 0,
+			FMath::Abs(SelectedStickerPosition.Z) == 2 ? SelectedStickerPosition.Z / 2.0f : 0
+			);
+	const FVector Cross = SpinDirection.Cross(NormalVector).GetSafeNormal();
+
+	FString Command;
+	if (FMath::Abs(Cross.X) == 1)
+	{
+		if (SelectedStickerPosition.X == 1)
+		{
+			Command.Append(TEXT("R")) += Cross.X > 0.0f ? TEXT("'") : TEXT("");
+		}
+		else if (SelectedStickerPosition.X == 0)
+		{
+			Command.Append(TEXT("M")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
+		}
+		else if (SelectedStickerPosition.X == -1)
+		{
+			Command.Append(TEXT("L")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
+		}
+	}
+	else if (FMath::Abs(Cross.Y) == 1)
+	{
+		if (SelectedStickerPosition.Y == 1)
+		{
+			Command.Append(TEXT("F")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
+		}
+		else if (SelectedStickerPosition.Y == 0)
+		{
+			Command.Append(TEXT("S")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
+		}
+		else if (SelectedStickerPosition.Y == -1)
+		{
+			Command.Append(TEXT("B")) += Cross.Y > 0.0f ? TEXT("") : TEXT("'");
+		}
+	}
+	else if (FMath::Abs(Cross.Z) == 1)
+	{
+		if (SelectedStickerPosition.Z == 1)
+		{
+			Command.Append(TEXT("U")) += Cross.Z > 0.0f ? TEXT("'") : TEXT("");
+		}
+		else if (SelectedStickerPosition.Z == 0)
+		{
+			Command.Append(TEXT("E")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
+		}
+		else if (SelectedStickerPosition.Z == -1)
+		{
+			Command.Append(TEXT("D")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
+		}
+	}
+	
+	ServerRPC_SpinCube(Command);
 }
 
 void ARCN_Player::SpinHandle(const FString& Command)

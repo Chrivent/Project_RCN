@@ -368,6 +368,11 @@ void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
 
 FVector ARCN_RubikCube::GetStickerPosition(UStaticMeshComponent* StickerMeshComponent)
 {
+	if (bIsTurning)
+	{
+		return FVector::ZeroVector;
+	}
+	
 	for (const auto StickerPosition : StickerPositions)
 	{
 		if (StickerPosition.Key == StickerMeshComponent)

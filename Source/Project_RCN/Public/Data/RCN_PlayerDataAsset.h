@@ -36,7 +36,7 @@ public:
 	TObjectPtr<UInputAction> StickerDragAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> StickerDownAction;
+	TObjectPtr<UInputAction> StickerInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;
