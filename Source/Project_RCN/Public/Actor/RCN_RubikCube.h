@@ -76,6 +76,7 @@ public:
 	ARCN_RubikCube();
 
 	FORCEINLINE FString GetPattern() const { return Pattern; }
+	FORCEINLINE bool IsTurning() const { return bIsTurning; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -121,9 +122,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FSignInfo> SignInfos;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<FSignInfo> SignQueue;
+	TQueue<FSignInfo> SignQueue;
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;

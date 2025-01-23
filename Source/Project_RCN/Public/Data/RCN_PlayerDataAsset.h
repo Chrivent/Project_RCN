@@ -36,7 +36,16 @@ public:
 	TObjectPtr<UInputAction> SpinDragAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> SpinInputAction;
+	TObjectPtr<UInputAction> SpinInputUpAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> SpinInputLeftAction;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> SpinInputDownAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> SpinInputRightAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;

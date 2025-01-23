@@ -304,11 +304,6 @@ void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
 
 FVector ARCN_RubikCube::GetButtonPosition(UBoxComponent* ButtonBoxComponent)
 {
-	if (bIsTurning)
-	{
-		return FVector::ZeroVector;
-	}
-	
 	for (const auto ButtonPosition : ButtonPositions)
 	{
 		if (ButtonPosition.Key == ButtonBoxComponent)
@@ -333,7 +328,7 @@ void ARCN_RubikCube::Spin(const FString& Command)
 		{
 			if (ParsedCommand == SignInfo.Sign)
 			{
-				SignQueue.Emplace(SignInfo);
+				SignQueue.Enqueue(SignInfo);
 			}
 		}
 	}
@@ -402,6 +397,7 @@ void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshCompo
 		ButtonBoxComponent->SetBoxExtent(FVector(ButtonSize, ButtonSize, ButtonThickness));
 	}
 	ButtonBoxComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	ButtonBoxComponent->SetHiddenInGame(false);
 
 	ButtonBoxComponents.Emplace(ButtonBoxComponent);
 	ButtonPositions.Emplace(ButtonBoxComponent, Position);
@@ -409,7 +405,7 @@ void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshCompo
 
 void ARCN_RubikCube::TurnNext()
 {
-	if (SignQueue.Num() == 0)
+	if (SignQueue.IsEmpty())
 	{
 		bIsTurning = false;
 
@@ -425,8 +421,8 @@ void ARCN_RubikCube::TurnNext()
 		return;
 	}
 
-	const FSignInfo NextSign = SignQueue[0];
-	SignQueue.RemoveAt(0);
+	FSignInfo NextSign;
+	SignQueue.Dequeue(NextSign);
 
 	TurnCore(NextSign);
 }

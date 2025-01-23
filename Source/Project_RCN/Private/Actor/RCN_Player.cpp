@@ -144,7 +144,10 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinDragAction, ETriggerEvent::Started, this, &ARCN_Player::SpinDragStarted);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinDragAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinDragTriggered);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinDragAction, ETriggerEvent::Completed, this, &ARCN_Player::SpinDragCompleted);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputUpAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputLeftAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputDownAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputRightAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
 }
 
 void ARCN_Player::InitCube()
@@ -398,8 +401,37 @@ void ARCN_Player::SpinInput(const FInputActionValue& Value)
 			SpinDirection = GetClosestSpinDirection(SelectedButtonPosition, InputDirection);
 		}
 	}
+
+	SelectedButtonPositionQueue.Enqueue(SelectedButtonPosition);
+	SpinDirectionQueue.Enqueue(SpinDirection);
+
+	if (!NetworkRubikCube->IsTurning())
+	{
+		SpinInputNext();
+	}
+}
+
+void ARCN_Player::SpinInputNext()
+{
+	if (!NetworkRubikCube->IsTurning())
+	{
+		if (SelectedButtonPositionQueue.IsEmpty() || SpinDirectionQueue.IsEmpty())
+		{
+			return;
+		}
+
+		FVector SelectedButtonPosition;
+		FVector SpinDirection;
+		SelectedButtonPositionQueue.Dequeue(SelectedButtonPosition);
+		SpinDirectionQueue.Dequeue(SpinDirection);
 	
-	SpinCube(SelectedButtonPosition, SpinDirection);
+		SpinCube(SelectedButtonPosition, SpinDirection);
+	}
+
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		SpinInputNext();
+	}));
 }
 
 FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const

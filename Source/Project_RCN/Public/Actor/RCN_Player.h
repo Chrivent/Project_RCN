@@ -57,6 +57,7 @@ protected:
 	void SpinDragCompleted(const FInputActionValue& Value);
 	void SpinInput(const FInputActionValue& Value);
 
+	void SpinInputNext();
 	FVector GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const;
 	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
 	
@@ -98,6 +99,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bRotateSwitchStarted : 1;
+
+	TQueue<FVector> SelectedButtonPositionQueue;
+	TQueue<FVector> SpinDirectionQueue;
 
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
