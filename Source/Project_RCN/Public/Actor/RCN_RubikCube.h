@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Util/StructHelper.h"
 #include "RCN_RubikCube.generated.h"
 
-struct FSignInfo;
 enum class EAxisType : uint8;
 class URCN_RubikCubeDataAsset;
+
+DECLARE_LOG_CATEGORY_EXTERN(RubikCube, Log, All);
 
 UCLASS()
 class PROJECT_RCN_API ARCN_RubikCube : public APawn
@@ -26,15 +28,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	void Spin(const FString& Order);
+	
+	void Spin(const FString& Command);
+	void Scramble();
 
 protected:
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
-	void UpdateTurnCore(FQuat TargetRotator);
+	void UpdateTurnCore(const FSignInfo& SignInfo, FQuat TargetRotator);
 	void GrabPieces(const FSignInfo& SignInfo);
-	void ReleasePieces();
+	void ReleasePieces(const FSignInfo& SignInfo);
+	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);
+	void SortFacelet();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_RubikCubeDataAsset> RubikCubeDataAsset;
@@ -49,6 +54,9 @@ protected:
 	TArray<TObjectPtr<UStaticMeshComponent>> PieceMeshComponents;
 
 	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PieceMeshPositions;
+
+	UPROPERTY(VisibleAnywhere)
 	TArray<FSignInfo> SignInfos;
 
 	UPROPERTY(VisibleAnywhere)
@@ -56,4 +64,19 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	FString Facelet;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
+	
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UStaticMeshComponent>, FString> StickerFacelets;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FVector> FaceletOrderPositions;
 };

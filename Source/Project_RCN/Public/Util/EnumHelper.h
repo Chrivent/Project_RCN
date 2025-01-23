@@ -12,3 +12,14 @@ enum class EAxisType : uint8
 	AxisY,
 	AxisZ
 };
+
+UENUM(BlueprintType)
+enum class EStickerType : uint8
+{
+	Red,
+	Orange,
+	Yellow,
+	Green,
+	Blue,
+	White
+};
