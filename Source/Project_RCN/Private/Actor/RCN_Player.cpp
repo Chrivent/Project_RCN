@@ -156,8 +156,8 @@ void ARCN_Player::InitCube()
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
 	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
 
-	NetworkRubikCube->SpinDelegate.AddUObject(this, &ARCN_Player::SpinHandle);
-	NetworkRubikCube->PatternChangedDelegate.AddUObject(this, &ARCN_Player::PatternChangedHandle);
+	NetworkRubikCube->SpinStartDelegate.AddUObject(this, &ARCN_Player::SpinStartHandle);
+	NetworkRubikCube->SpinEndDelegate.AddUObject(this, &ARCN_Player::SpinEndHandle);
 	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
@@ -402,24 +402,13 @@ void ARCN_Player::SpinInput(const FInputActionValue& Value)
 		}
 	}
 
-	SelectedButtonPositionQueue.Enqueue(SelectedButtonPosition);
-	SpinDirectionQueue.Enqueue(SpinDirection);
-
-	if (!NetworkRubikCube->IsTurning())
-	{
-		SpinInputNext();
-	}
+	ServerRPC_SpinInput(SelectedButtonPosition, SpinDirection);
 }
 
 void ARCN_Player::SpinInputNext()
 {
-	if (!NetworkRubikCube->IsTurning())
+	if (!SelectedButtonPositionQueue.IsEmpty() && !SpinDirectionQueue.IsEmpty())
 	{
-		if (SelectedButtonPositionQueue.IsEmpty() || SpinDirectionQueue.IsEmpty())
-		{
-			return;
-		}
-
 		FVector SelectedButtonPosition;
 		FVector SpinDirection;
 		SelectedButtonPositionQueue.Dequeue(SelectedButtonPosition);
@@ -427,11 +416,6 @@ void ARCN_Player::SpinInputNext()
 	
 		SpinCube(SelectedButtonPosition, SpinDirection);
 	}
-
-	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		SpinInputNext();
-	}));
 }
 
 FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const
@@ -529,16 +513,18 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 	ServerRPC_SpinCube(Command);
 }
 
-void ARCN_Player::SpinHandle(const FString& Command)
+void ARCN_Player::SpinStartHandle(const FString& Command)
 {
 	NetworkCommand = Command;
 	bNetworkCommandFlag = !bNetworkCommandFlag;
 }
 
-void ARCN_Player::PatternChangedHandle(const FString& Pattern)
+void ARCN_Player::SpinEndHandle(const FString& Pattern)
 {
 	NetworkPattern = Pattern;
 	bNetworkPatternFlag = !bNetworkPatternFlag;
+
+	SpinInputNext();
 }
 
 void ARCN_Player::FinishScrambleHandle()
@@ -646,6 +632,26 @@ void ARCN_Player::ServerRPC_SpinCube_Implementation(const FString& Command)
 	
 	NetworkRubikCube->Spin(Command);
 
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_SpinInput_Implementation(const FVector& SelectedButtonPosition, const FVector& SpinDirection)
+{
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (SelectedButtonPositionQueue.IsEmpty() || SpinDirectionQueue.IsEmpty())
+	{
+		SelectedButtonPositionQueue.Enqueue(SelectedButtonPosition);
+		SpinDirectionQueue.Enqueue(SpinDirection);
+		
+		SpinInputNext();
+	}
+	else
+	{
+		SelectedButtonPositionQueue.Enqueue(SelectedButtonPosition);
+		SpinDirectionQueue.Enqueue(SpinDirection);
+	}
+	
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 

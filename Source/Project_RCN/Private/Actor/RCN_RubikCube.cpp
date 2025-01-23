@@ -340,7 +340,7 @@ void ARCN_RubikCube::Spin(const FString& Command)
 		TurnNext();
 	}
 
-	SpinDelegate.Broadcast(Command);
+	SpinStartDelegate.Broadcast(Command);
 }
 
 void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType)
@@ -410,7 +410,7 @@ void ARCN_RubikCube::TurnNext()
 		bIsTurning = false;
 
 		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
-		PatternChangedDelegate.Broadcast(Pattern);
+		SpinEndDelegate.Broadcast(Pattern);
 
 		if (bIsScrambling)
 		{

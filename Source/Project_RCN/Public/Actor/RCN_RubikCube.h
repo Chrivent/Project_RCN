@@ -13,8 +13,8 @@ class UCameraComponent;
 class USpringArmComponent;
 class URCN_RubikCubeDataAsset;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FSpinDelegate, const FString&)
-DECLARE_MULTICAST_DELEGATE_OneParam(FPatternChangedDelegate, const FString&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FSpinStartDelegate, const FString&)
+DECLARE_MULTICAST_DELEGATE_OneParam(FSpinEndDelegate, const FString&)
 DECLARE_MULTICAST_DELEGATE(FFinishScramble)
 
 UENUM(BlueprintType)
@@ -76,7 +76,6 @@ public:
 	ARCN_RubikCube();
 
 	FORCEINLINE FString GetPattern() const { return Pattern; }
-	FORCEINLINE bool IsTurning() const { return bIsTurning; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -92,8 +91,8 @@ public:
 	void ChangePattern(const FString& NewPattern);
 	FVector GetButtonPosition(UBoxComponent* ButtonBoxComponent);
 
-	FSpinDelegate SpinDelegate;
-	FPatternChangedDelegate PatternChangedDelegate;
+	FSpinStartDelegate SpinStartDelegate;
+	FSpinEndDelegate SpinEndDelegate;
 	FFinishScramble FinishScrambleDelegate;
 
 protected:

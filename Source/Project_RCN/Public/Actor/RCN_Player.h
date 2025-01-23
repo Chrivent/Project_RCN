@@ -62,10 +62,10 @@ protected:
 	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
 	
 	UFUNCTION()
-	void SpinHandle(const FString& Command);
+	void SpinStartHandle(const FString& Command);
 
 	UFUNCTION()
-	void PatternChangedHandle(const FString& Pattern);
+	void SpinEndHandle(const FString& Pattern);
 
 	UFUNCTION()
 	void FinishScrambleHandle();
@@ -130,6 +130,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SpinCube(const FString& Command);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SpinInput(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_FinishScramble();
