@@ -38,7 +38,7 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 						FVector(0.0f,
 							Iterator.GetIndex() * Offset - (GetWorld()->GetNumPlayerControllers() - 1) * Offset / 2.0f,
 							0.0f));
-					MultiPlayer->RenewalRubikCubePattern();
+					MultiPlayer->RenewalCube();
 				}
 			}
 		}), 1.0f, false);

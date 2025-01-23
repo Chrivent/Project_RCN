@@ -43,8 +43,7 @@ public:
 	void InitCube();
 	void UpdateCubeLocation(const FVector& TargetLocation);
 	void UpdateCubeRotation(const FRotator& TargetRotation);
-	void RenewalRubikCubeLocationAndRotation();
-	void RenewalRubikCubePattern();
+	void RenewalCube();
 	
 protected:
 	void SetControl() const;
@@ -109,18 +108,15 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Pattern() const;
-	
-	UFUNCTION(Server, Unreliable)
-	void ServerRPC_SetCubeRotation(FRotator Rotator);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_SetCubeRotation(FRotator Rotator);
 
-	UFUNCTION(Server, Unreliable)
-	void ServerRPC_SetCubeLocation(FVector Location);
-
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_SetCubeLocation(FVector Location);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerRPC_RotateCube(const FVector2D RotateAxisVector);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_ScrambleCube();

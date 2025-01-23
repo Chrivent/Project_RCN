@@ -162,13 +162,11 @@ void ARCN_Player::UpdateCubeLocation(const FVector& TargetLocation)
 {
 	const FVector CurrentLocation = PitchComponent->GetRelativeLocation();
 	const FVector NewLocation = FMath::Lerp(CurrentLocation, TargetLocation, PlayerDataAsset->LocationSpeed);
-	PitchComponent->SetRelativeLocation(NewLocation);
+	MulticastRPC_SetCubeLocation(NewLocation);
 
-	RenewalRubikCubeLocationAndRotation();
-
-	if (NewLocation.Equals(TargetLocation,PlayerDataAsset->LocationTolerance))
+	if (NewLocation.Equals(TargetLocation, PlayerDataAsset->LocationTolerance))
 	{
-		PitchComponent->SetRelativeLocation(TargetLocation);
+		MulticastRPC_SetCubeLocation(TargetLocation);
 		return;
 	}
 
@@ -182,15 +180,11 @@ void ARCN_Player::UpdateCubeRotation(const FRotator& TargetRotation)
 {
 	const FRotator CurrentRotator = FRotator(PitchComponent->GetRelativeRotation().Pitch, YawComponent->GetRelativeRotation().Yaw, 0.0f);
 	const FRotator NewRotator = FMath::Lerp(CurrentRotator, TargetRotation, PlayerDataAsset->RotationSpeed);
-	PitchComponent->SetRelativeRotation(FRotator(NewRotator.Pitch, 0.0f, 0.0f));
-	YawComponent->SetRelativeRotation(FRotator(0.0f, NewRotator.Yaw, 0.0f));
-
-	RenewalRubikCubeLocationAndRotation();
+	MulticastRPC_SetCubeRotation(NewRotator);
 
 	if (NewRotator.Equals(TargetRotation, PlayerDataAsset->RotationTolerance))
 	{
-		PitchComponent->SetRelativeRotation(FRotator(TargetRotation.Pitch, 0.0f, 0.0f));
-		YawComponent->SetRelativeRotation(FRotator(0.0f, TargetRotation.Yaw, 0.0f));
+		MulticastRPC_SetCubeRotation(TargetRotation);
 		return;
 	}
 
@@ -200,19 +194,16 @@ void ARCN_Player::UpdateCubeRotation(const FRotator& TargetRotation)
 	}));
 }
 
-void ARCN_Player::RenewalRubikCubeLocationAndRotation()
+void ARCN_Player::RenewalCube()
 {
-	ServerRPC_SetCubeLocation(PitchComponent->GetRelativeLocation());
+	MulticastRPC_SetCubeLocation(PitchComponent->GetRelativeLocation());
 
 	FRotator Rotator = FRotator::ZeroRotator;
 	Rotator.Pitch = PitchComponent->GetRelativeRotation().Pitch;
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw;
 	
-	ServerRPC_SetCubeRotation(Rotator);
-}
+	MulticastRPC_SetCubeRotation(Rotator);
 
-void ARCN_Player::RenewalRubikCubePattern()
-{
 	NetworkPattern = NetworkRubikCube->GetPattern();
 	bNetworkPatternFlag = !bNetworkPatternFlag;
 }
@@ -255,15 +246,8 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 	
 	FVector2D RotateAxisVector = Value.Get<FVector2D>();
 	RotateAxisVector *= PlayerDataAsset->RotateSensitivity;
-
-	FRotator Rotator;
-	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
-	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
 	
-	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
-	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
-
-	RenewalRubikCubeLocationAndRotation();
+	ServerRPC_RotateCube(RotateAxisVector);
 }
 
 void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
@@ -574,15 +558,6 @@ void ARCN_Player::OnRep_Pattern() const
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::ServerRPC_SetCubeLocation_Implementation(const FVector Location)
-{
-	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-	
-	MulticastRPC_SetCubeLocation(Location);
-	
-	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
 void ARCN_Player::MulticastRPC_SetCubeLocation_Implementation(const FVector Location)
 {
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
@@ -592,21 +567,25 @@ void ARCN_Player::MulticastRPC_SetCubeLocation_Implementation(const FVector Loca
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::ServerRPC_SetCubeRotation_Implementation(const FRotator Rotator)
-{
-	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
-	MulticastRPC_SetCubeRotation(Rotator);
-
-	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
 void ARCN_Player::MulticastRPC_SetCubeRotation_Implementation(const FRotator Rotator)
 {
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
 	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
 	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
+	
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_RotateCube_Implementation(const FVector2D RotateAxisVector)
+{
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	FRotator Rotator = FRotator::ZeroRotator;
+	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
+	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+
+	MulticastRPC_SetCubeRotation(Rotator);
 	
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
