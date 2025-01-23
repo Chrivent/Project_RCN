@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "RCN_Player.generated.h"
 
+class UBoxComponent;
 class ARCN_RubikCube;
 class URCN_PlayerDataAsset;
 class USpringArmComponent;
@@ -52,13 +53,13 @@ protected:
 	void RotateCube(const FInputActionValue& Value);
 	void ScrambleCube(const FInputActionValue& Value);
 	void SolveCube(const FInputActionValue& Value);
-	void StickerDragStarted(const FInputActionValue& Value);
-	void StickerDragTriggered(const FInputActionValue& Value);
-	void StickerDragCompleted(const FInputActionValue& Value);
-	void StickerInput(const FInputActionValue& Value);
+	void SpinDragStarted(const FInputActionValue& Value);
+	void SpinDragTriggered(const FInputActionValue& Value);
+	void SpinDragCompleted(const FInputActionValue& Value);
+	void SpinInput(const FInputActionValue& Value);
 
-	FVector GetClosestSpinDirection(const FVector& SelectedStickerPosition, const FVector& Direction) const;
-	void SpinCube(const FVector& SelectedStickerPosition, const FVector& SpinDirection);
+	FVector GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const;
+	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
 	
 	UFUNCTION()
 	void SpinHandle(const FString& Command);
@@ -88,7 +89,7 @@ protected:
 	TObjectPtr<USceneComponent> YawComponent;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> SelectedStickerMeshComponent;
+	TObjectPtr<UBoxComponent> SelectedButtonBoxComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	FVector DragStartHitLocation;

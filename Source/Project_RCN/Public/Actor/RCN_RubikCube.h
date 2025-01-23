@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "RCN_RubikCube.generated.h"
 
+class UBoxComponent;
 struct FInputActionValue;
 class UInputAction;
 class UCameraComponent;
@@ -88,13 +89,14 @@ public:
 	void Scramble();
 	void Solve();
 	void ChangePattern(const FString& NewPattern);
-	FVector GetStickerPosition(UStaticMeshComponent* StickerMeshComponent);
+	FVector GetButtonPosition(UBoxComponent* ButtonBoxComponent);
 
 	FSpinDelegate SpinDelegate;
 	FPatternChangedDelegate PatternChangedDelegate;
 	FFinishScramble FinishScrambleDelegate;
 
 protected:
+	void CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType);
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
 	void UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& TargetQuat);
@@ -140,4 +142,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> PatternOrderPositions;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<UBoxComponent>> ButtonBoxComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UBoxComponent>, FVector> ButtonPositions;
 };

@@ -47,4 +47,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 ScrambleTurnCount;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ButtonSize;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float ButtonThickness;
 };

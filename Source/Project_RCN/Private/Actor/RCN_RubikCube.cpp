@@ -3,6 +3,7 @@
 
 #include "Actor/RCN_RubikCube.h"
 
+#include "Components/BoxComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
 #include "KociembaAlgorithm/search.h"
 #include "Project_RCN/Project_RCN.h"
@@ -33,9 +34,6 @@ ARCN_RubikCube::ARCN_RubikCube()
 	const float PieceDistance = RubikCubeDataAsset->PieceDistance;
 	const float PieceSize = RubikCubeDataAsset->PieceSize;
 
-	const float StickerDistance = RubikCubeDataAsset->StickerDistance;
-	const float StickerSize = RubikCubeDataAsset->StickerSize;
-	
 	for (int32 Z = -1; Z <= 1; Z++)
 	{
 		for (int32 Y = -1; Y <= 1; Y++)
@@ -47,101 +45,42 @@ ARCN_RubikCube::ARCN_RubikCube()
 					continue;
 				}
 
-				UStaticMeshComponent* PieceMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("PieceComponent [%d, %d, %d]"), X, Y, Z));
+				UStaticMeshComponent* PieceMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("PieceComponent %d"), PieceMeshComponents.Num()));
 				
 				PieceMeshComponent->SetupAttachment(RootComponent);
 				PieceMeshComponent->SetRelativeLocation(FVector(X * PieceDistance, Y * PieceDistance, Z * PieceDistance));
 				PieceMeshComponent->SetRelativeScale3D(FVector(PieceSize));
 				PieceMeshComponent->SetStaticMesh(RubikCubeDataAsset->PieceMesh);
+				PieceMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 				if (X == -1)
 				{
-					UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent Orange [%d, %d, %d]"), X, Y, Z));
-					
-					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
-					StickerMeshComponent->SetRelativeLocation(FVector(-StickerDistance, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
-
-					StickerMeshComponents.Emplace(StickerMeshComponent);
-					StickerPositions.Emplace(StickerMeshComponent, FVector(X - 1, Y, Z));
+					CreateStickerAndButton(PieceMeshComponent, PieceSize, FVector(X - 1, Y, Z), EStickerType::Orange);
 				}
 
 				if (X == 1)
 				{
-					UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent Red [%d, %d, %d]"), X, Y, Z));
-					
-					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
-					StickerMeshComponent->SetRelativeLocation(FVector(StickerDistance, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
-					
-					StickerMeshComponents.Emplace(StickerMeshComponent);
-					StickerPositions.Emplace(StickerMeshComponent, FVector(X + 1, Y, Z));
+					CreateStickerAndButton(PieceMeshComponent, PieceSize, FVector(X + 1, Y, Z), EStickerType::Red);
 				}
 
 				if (Y == -1)
 				{
-					UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent Green [%d, %d, %d]"), X, Y, Z));
-					
-					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
-					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, -StickerDistance, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
-					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
-
-					StickerMeshComponents.Emplace(StickerMeshComponent);
-					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y - 1, Z));
+					CreateStickerAndButton(PieceMeshComponent, PieceSize, FVector(X, Y - 1, Z), EStickerType::Green);
 				}
 
 				if (Y == 1)
 				{
-					UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent Blue [%d, %d, %d]"), X, Y, Z));
-					
-					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
-					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, StickerDistance, 0.0f));
-					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
-					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
-
-					StickerMeshComponents.Emplace(StickerMeshComponent);
-					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y + 1, Z));
+					CreateStickerAndButton(PieceMeshComponent, PieceSize, FVector(X, Y + 1, Z), EStickerType::Blue);
 				}
 
 				if (Z == -1)
 				{
-					UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent White [%d, %d, %d]"), X, Y, Z));
-					
-					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
-					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, -StickerDistance));
-					StickerMeshComponent->SetRelativeRotation(FRotator(180.0f, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
-					
-					StickerMeshComponents.Emplace(StickerMeshComponent);
-					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y, Z - 1));
+					CreateStickerAndButton(PieceMeshComponent, PieceSize, FVector(X, Y, Z - 1), EStickerType::White);
 				}
 
 				if (Z == 1)
 				{
-					UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent Yellow [%d, %d, %d]"), X, Y, Z));
-					
-					StickerMeshComponent->SetupAttachment(PieceMeshComponent);
-					StickerMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, StickerDistance));
-					StickerMeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
-					StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
-					StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
-					StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
-
-					StickerMeshComponents.Emplace(StickerMeshComponent);
-					StickerPositions.Emplace(StickerMeshComponent, FVector(X, Y, Z + 1));
+					CreateStickerAndButton(PieceMeshComponent, PieceSize, FVector(X, Y, Z + 1), EStickerType::Yellow);
 				}
 
 				PieceMeshComponents.Emplace(PieceMeshComponent);
@@ -363,18 +302,18 @@ void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
 	}
 }
 
-FVector ARCN_RubikCube::GetStickerPosition(UStaticMeshComponent* StickerMeshComponent)
+FVector ARCN_RubikCube::GetButtonPosition(UBoxComponent* ButtonBoxComponent)
 {
 	if (bIsTurning)
 	{
 		return FVector::ZeroVector;
 	}
 	
-	for (const auto StickerPosition : StickerPositions)
+	for (const auto ButtonPosition : ButtonPositions)
 	{
-		if (StickerPosition.Key == StickerMeshComponent)
+		if (ButtonPosition.Key == ButtonBoxComponent)
 		{
-			return StickerPosition.Value;
+			return ButtonPosition.Value;
 		}
 	}
 
@@ -407,6 +346,65 @@ void ARCN_RubikCube::Spin(const FString& Command)
 	}
 
 	SpinDelegate.Broadcast(Command);
+}
+
+void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType)
+{
+	const float StickerDistance = RubikCubeDataAsset->StickerDistance;
+	const float StickerSize = RubikCubeDataAsset->StickerSize;
+
+	const float ButtonThickness = RubikCubeDataAsset->ButtonThickness;
+	const float ButtonSize = RubikCubeDataAsset->ButtonSize;
+	
+	UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent Orange %d"), StickerMeshComponents.Num()));
+					
+	StickerMeshComponent->SetupAttachment(PieceMeshComponent);
+	if (FMath::Abs(Position.X) == 2)
+	{
+		StickerMeshComponent->SetRelativeLocation(FVector(StickerDistance * Position.X / 2, 0, 0));
+		StickerMeshComponent->SetRelativeRotation(FRotator(-90.0f * Position.X / 2, 0, 0));
+	}
+	else if (FMath::Abs(Position.Y) == 2)
+	{
+		StickerMeshComponent->SetRelativeLocation(FVector(0, StickerDistance * Position.Y / 2, 0));
+		StickerMeshComponent->SetRelativeRotation(FRotator(0, 0, 90.0f * Position.Y / 2));
+	}
+	else if (FMath::Abs(Position.Z) == 2)
+	{
+		StickerMeshComponent->SetRelativeLocation(FVector(0, 0, StickerDistance * Position.Z / 2));
+		StickerMeshComponent->SetRelativeRotation(FRotator(-180.0f * FMath::Clamp(Position.Z, -1, 0), 0, 0));
+	}
+	StickerMeshComponent->SetRelativeScale3D(FVector(StickerSize));
+	StickerMeshComponent->SetStaticMesh(RubikCubeDataAsset->StickerMesh);
+	StickerMeshComponent->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[StickerType]);
+	StickerMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	StickerMeshComponents.Emplace(StickerMeshComponent);
+	StickerPositions.Emplace(StickerMeshComponent, Position);
+
+	UBoxComponent* ButtonBoxComponent = CreateDefaultSubobject<UBoxComponent>(*FString::Printf(TEXT("Button [%d, %d, %d]"),
+		static_cast<int>(Position.X),
+		static_cast<int>(Position.Y),
+		static_cast<int>(Position.Z)));
+
+	ButtonBoxComponent->SetupAttachment(RootComponent);
+	ButtonBoxComponent->SetRelativeLocation(PieceMeshComponent->GetRelativeLocation() + StickerMeshComponent->GetRelativeLocation() * PieceSize);
+	if (FMath::Abs(Position.X) == 2)
+	{
+		ButtonBoxComponent->SetBoxExtent(FVector(ButtonThickness, ButtonSize, ButtonSize));
+	}
+	else if (FMath::Abs(Position.Y) == 2)
+	{
+		ButtonBoxComponent->SetBoxExtent(FVector(ButtonSize, ButtonThickness, ButtonSize));
+	}
+	else if (FMath::Abs(Position.Z) == 2)
+	{
+		ButtonBoxComponent->SetBoxExtent(FVector(ButtonSize, ButtonSize, ButtonThickness));
+	}
+	ButtonBoxComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	ButtonBoxComponents.Emplace(ButtonBoxComponent);
+	ButtonPositions.Emplace(ButtonBoxComponent, Position);
 }
 
 void ARCN_RubikCube::TurnNext()

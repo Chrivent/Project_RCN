@@ -33,10 +33,10 @@ public:
 	TObjectPtr<UInputAction> SolveAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> StickerDragAction;
+	TObjectPtr<UInputAction> SpinDragAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> StickerInputAction;
+	TObjectPtr<UInputAction> SpinInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;

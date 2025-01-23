@@ -8,6 +8,7 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "Data/RCN_PlayerDataAsset.h"
 #include "Game/RCN_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -140,10 +141,10 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(PlayerDataAsset->RotateAction, ETriggerEvent::Triggered, this, &ARCN_Player::RotateCube);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->ScrambleAction, ETriggerEvent::Started, this, &ARCN_Player::ScrambleCube);
 	EnhancedInputComponent->BindAction(PlayerDataAsset->SolveAction, ETriggerEvent::Started, this, &ARCN_Player::SolveCube);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Started, this, &ARCN_Player::StickerDragStarted);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Triggered, this, &ARCN_Player::StickerDragTriggered);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerDragAction, ETriggerEvent::Completed, this, &ARCN_Player::StickerDragCompleted);
-	EnhancedInputComponent->BindAction(PlayerDataAsset->StickerInputAction, ETriggerEvent::Triggered, this, &ARCN_Player::StickerInput);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinDragAction, ETriggerEvent::Started, this, &ARCN_Player::SpinDragStarted);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinDragAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinDragTriggered);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinDragAction, ETriggerEvent::Completed, this, &ARCN_Player::SpinDragCompleted);
+	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
 }
 
 void ARCN_Player::InitCube()
@@ -275,7 +276,7 @@ void ARCN_Player::SolveCube(const FInputActionValue& Value)
 	ServerRPC_SolveCube();
 }
 
-void ARCN_Player::StickerDragStarted(const FInputActionValue& Value)
+void ARCN_Player::SpinDragStarted(const FInputActionValue& Value)
 {
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
@@ -294,9 +295,9 @@ void ARCN_Player::StickerDragStarted(const FInputActionValue& Value)
 				ECC_Visibility,
 				Params))
 			{
-				if (UStaticMeshComponent* StickerMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent()))
+				if (UBoxComponent* ButtonBoxComponent = Cast<UBoxComponent>(HitResult.GetComponent()))
 				{
-					SelectedStickerMeshComponent = StickerMeshComponent;
+					SelectedButtonBoxComponent = ButtonBoxComponent;
 					DragStartHitLocation = HitResult.Location;
 				}
 			}
@@ -304,20 +305,20 @@ void ARCN_Player::StickerDragStarted(const FInputActionValue& Value)
 	}
 }
 
-void ARCN_Player::StickerDragTriggered(const FInputActionValue& Value)
+void ARCN_Player::SpinDragTriggered(const FInputActionValue& Value)
 {
-	if (!IsValid(SelectedStickerMeshComponent))
+	if (!IsValid(SelectedButtonBoxComponent))
 	{
 		return;
 	}
 	
-	FVector SelectedStickerPosition = NetworkRubikCube->GetStickerPosition(SelectedStickerMeshComponent);
-	if (SelectedStickerPosition == FVector::ZeroVector)
+	FVector SelectedButtonPosition = NetworkRubikCube->GetButtonPosition(SelectedButtonBoxComponent);
+	if (SelectedButtonPosition == FVector::ZeroVector)
 	{
 		return;
 	}
 	
-	UStaticMeshComponent* CurrentStaticMeshComponent;
+	UBoxComponent* CurrentBoxComponent;
 	FVector CurrentHitLocation;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
@@ -336,34 +337,34 @@ void ARCN_Player::StickerDragTriggered(const FInputActionValue& Value)
 				ECC_Visibility,
 				Params))
 			{
-				CurrentStaticMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent());
+				CurrentBoxComponent = Cast<UBoxComponent>(HitResult.GetComponent());
 				CurrentHitLocation = HitResult.Location;
 			}
 		}
 	}
 
-	if (CurrentStaticMeshComponent != SelectedStickerMeshComponent)
+	if (CurrentBoxComponent != SelectedButtonBoxComponent)
 	{
 		FVector DragDirection = (DragEndHitLocation - DragStartHitLocation).GetSafeNormal();
-		FVector SpinDirection = GetClosestSpinDirection(SelectedStickerPosition, DragDirection);
-		SpinCube(SelectedStickerPosition, SpinDirection);
+		FVector SpinDirection = GetClosestSpinDirection(SelectedButtonPosition, DragDirection);
+		SpinCube(SelectedButtonPosition, SpinDirection);
 
-		SelectedStickerMeshComponent = nullptr;
+		SelectedButtonBoxComponent = nullptr;
 	}
 
 	DragEndHitLocation = CurrentHitLocation;
 }
 
-void ARCN_Player::StickerDragCompleted(const FInputActionValue& Value)
+void ARCN_Player::SpinDragCompleted(const FInputActionValue& Value)
 {
-	SelectedStickerMeshComponent = nullptr;
+	SelectedButtonBoxComponent = nullptr;
 }
 
-void ARCN_Player::StickerInput(const FInputActionValue& Value)
+void ARCN_Player::SpinInput(const FInputActionValue& Value)
 {
-	FVector SelectedStickerPosition;
+	FVector SelectedButtonPosition;
 	FVector InputStartHitLocation;
-	float Distance;
+	float HitDistance;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
 		FVector CursorLocation, CursorDirection;
@@ -381,17 +382,17 @@ void ARCN_Player::StickerInput(const FInputActionValue& Value)
 				ECC_Visibility,
 				Params))
 			{
-				if (UStaticMeshComponent* StickerMeshComponent = Cast<UStaticMeshComponent>(HitResult.GetComponent()))
+				if (UBoxComponent* ButtonBoxComponent = Cast<UBoxComponent>(HitResult.GetComponent()))
 				{
-					SelectedStickerPosition = NetworkRubikCube->GetStickerPosition(StickerMeshComponent);
+					SelectedButtonPosition = NetworkRubikCube->GetButtonPosition(ButtonBoxComponent);
 					InputStartHitLocation = HitResult.Location;
-					Distance = HitResult.Distance;
+					HitDistance = HitResult.Distance;
 				}
 			}
 		}
 	}
 
-	if (SelectedStickerPosition == FVector::ZeroVector)
+	if (SelectedButtonPosition == FVector::ZeroVector)
 	{
 		return;
 	}
@@ -407,32 +408,32 @@ void ARCN_Player::StickerInput(const FInputActionValue& Value)
 			FVector TargetLocation, TargetDirection;
 			PlayerController->DeprojectScreenPositionToWorld(TargetPosition.X, TargetPosition.Y, TargetLocation, TargetDirection);
 
-			FVector InputEndHitLocation = TargetLocation + TargetDirection * Distance;
+			FVector InputEndHitLocation = TargetLocation + TargetDirection * HitDistance;
 			FVector InputDirection = (InputEndHitLocation - InputStartHitLocation).GetSafeNormal();
 
-			SpinDirection = GetClosestSpinDirection(SelectedStickerPosition, InputDirection);
+			SpinDirection = GetClosestSpinDirection(SelectedButtonPosition, InputDirection);
 		}
 	}
 	
-	SpinCube(SelectedStickerPosition, SpinDirection);
+	SpinCube(SelectedButtonPosition, SpinDirection);
 }
 
-FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedStickerPosition, const FVector& Direction) const
+FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const
 {
 	TMap<FVector, FVector> CubeVectors;
-	if (FMath::Abs(SelectedStickerPosition.X) != 2)
+	if (FMath::Abs(SelectedButtonPosition.X) != 2)
 	{
 		CubeVectors.Emplace(FVector(1, 0, 0), NetworkRubikCube->GetActorForwardVector());
 		CubeVectors.Emplace(FVector(-1, 0, 0), NetworkRubikCube->GetActorForwardVector() * -1);
 	}
 		
-	if (FMath::Abs(SelectedStickerPosition.Y) != 2)
+	if (FMath::Abs(SelectedButtonPosition.Y) != 2)
 	{
 		CubeVectors.Emplace(FVector(0, 1, 0), NetworkRubikCube->GetActorRightVector());
 		CubeVectors.Emplace(FVector(0, -1, 0), NetworkRubikCube->GetActorRightVector() * -1);
 	}
 		
-	if (FMath::Abs(SelectedStickerPosition.Z) != 2)
+	if (FMath::Abs(SelectedButtonPosition.Z) != 2)
 	{
 		CubeVectors.Emplace(FVector(0, 0, 1), NetworkRubikCube->GetActorUpVector());
 		CubeVectors.Emplace(FVector(0, 0, -1), NetworkRubikCube->GetActorUpVector() * -1);
@@ -453,57 +454,57 @@ FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedStickerPosit
 	return SpinDirection;
 }
 
-void ARCN_Player::SpinCube(const FVector& SelectedStickerPosition, const FVector& SpinDirection)
+void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection)
 {
 	const FVector NormalVector = FVector(
-			FMath::Abs(SelectedStickerPosition.X) == 2 ? SelectedStickerPosition.X / 2.0f : 0,
-			FMath::Abs(SelectedStickerPosition.Y) == 2 ? SelectedStickerPosition.Y / 2.0f : 0,
-			FMath::Abs(SelectedStickerPosition.Z) == 2 ? SelectedStickerPosition.Z / 2.0f : 0
+			FMath::Abs(SelectedButtonPosition.X) == 2 ? SelectedButtonPosition.X / 2.0f : 0,
+			FMath::Abs(SelectedButtonPosition.Y) == 2 ? SelectedButtonPosition.Y / 2.0f : 0,
+			FMath::Abs(SelectedButtonPosition.Z) == 2 ? SelectedButtonPosition.Z / 2.0f : 0
 			);
 	const FVector Cross = SpinDirection.Cross(NormalVector).GetSafeNormal();
 
 	FString Command;
 	if (FMath::Abs(Cross.X) == 1)
 	{
-		if (SelectedStickerPosition.X == 1)
+		if (SelectedButtonPosition.X == 1)
 		{
 			Command.Append(TEXT("R")) += Cross.X > 0.0f ? TEXT("'") : TEXT("");
 		}
-		else if (SelectedStickerPosition.X == 0)
+		else if (SelectedButtonPosition.X == 0)
 		{
 			Command.Append(TEXT("M")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
 		}
-		else if (SelectedStickerPosition.X == -1)
+		else if (SelectedButtonPosition.X == -1)
 		{
 			Command.Append(TEXT("L")) += Cross.X > 0.0f ? TEXT("") : TEXT("'");
 		}
 	}
 	else if (FMath::Abs(Cross.Y) == 1)
 	{
-		if (SelectedStickerPosition.Y == 1)
+		if (SelectedButtonPosition.Y == 1)
 		{
 			Command.Append(TEXT("F")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
 		}
-		else if (SelectedStickerPosition.Y == 0)
+		else if (SelectedButtonPosition.Y == 0)
 		{
 			Command.Append(TEXT("S")) += Cross.Y > 0.0f ? TEXT("'") : TEXT("");
 		}
-		else if (SelectedStickerPosition.Y == -1)
+		else if (SelectedButtonPosition.Y == -1)
 		{
 			Command.Append(TEXT("B")) += Cross.Y > 0.0f ? TEXT("") : TEXT("'");
 		}
 	}
 	else if (FMath::Abs(Cross.Z) == 1)
 	{
-		if (SelectedStickerPosition.Z == 1)
+		if (SelectedButtonPosition.Z == 1)
 		{
 			Command.Append(TEXT("U")) += Cross.Z > 0.0f ? TEXT("'") : TEXT("");
 		}
-		else if (SelectedStickerPosition.Z == 0)
+		else if (SelectedButtonPosition.Z == 0)
 		{
 			Command.Append(TEXT("E")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
 		}
-		else if (SelectedStickerPosition.Z == -1)
+		else if (SelectedButtonPosition.Z == -1)
 		{
 			Command.Append(TEXT("D")) += Cross.Z > 0.0f ? TEXT("") : TEXT("'");
 		}
