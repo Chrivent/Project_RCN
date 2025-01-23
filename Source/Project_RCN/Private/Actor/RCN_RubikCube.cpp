@@ -190,6 +190,34 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 	
 }
 
+void ARCN_RubikCube::Spin(const FString& Command)
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
+
+	TArray<FString> ParsedCommands;
+	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
+
+	for (const FString& ParsedCommand : ParsedCommands)
+	{
+		for (auto SignInfo : SignInfos)
+		{
+			if (ParsedCommand == SignInfo.Sign)
+			{
+				SignQueue.Enqueue(SignInfo);
+			}
+		}
+	}
+
+	if (!bIsTurning)
+	{
+		bIsTurning = true;
+
+		TurnNext();
+	}
+
+	SpinStartDelegate.Broadcast(Command);
+}
+
 void ARCN_RubikCube::Scramble()
 {
 	if (bIsTurning)
@@ -313,34 +341,6 @@ FVector ARCN_RubikCube::GetButtonPosition(UBoxComponent* ButtonBoxComponent)
 	}
 
 	return FVector::ZeroVector;
-}
-
-void ARCN_RubikCube::Spin(const FString& Command)
-{
-	RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
-
-	TArray<FString> ParsedCommands;
-	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
-
-	for (const FString& ParsedCommand : ParsedCommands)
-	{
-		for (auto SignInfo : SignInfos)
-		{
-			if (ParsedCommand == SignInfo.Sign)
-			{
-				SignQueue.Enqueue(SignInfo);
-			}
-		}
-	}
-
-	if (!bIsTurning)
-	{
-		bIsTurning = true;
-
-		TurnNext();
-	}
-
-	SpinStartDelegate.Broadcast(Command);
 }
 
 void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType)
