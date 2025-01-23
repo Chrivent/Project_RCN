@@ -59,7 +59,7 @@ protected:
 
 	void SpinInputNext();
 	FVector GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const;
-	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
+	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection) const;
 	
 	UFUNCTION()
 	void SpinStartHandle(const FString& Command);
@@ -129,10 +129,7 @@ protected:
 	void ServerRPC_SolveCube();
 
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_SpinCube(const FString& Command);
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_SpinInput(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
+	void ServerRPC_SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_FinishScramble();

@@ -334,7 +334,7 @@ void ARCN_Player::SpinDragTriggered(const FInputActionValue& Value)
 	{
 		FVector DragDirection = (DragEndHitLocation - DragStartHitLocation).GetSafeNormal();
 		FVector SpinDirection = GetClosestSpinDirection(SelectedButtonPosition, DragDirection);
-		SpinCube(SelectedButtonPosition, SpinDirection);
+		ServerRPC_SpinCube(SelectedButtonPosition, SpinDirection);
 
 		SelectedButtonBoxComponent = nullptr;
 	}
@@ -402,7 +402,7 @@ void ARCN_Player::SpinInput(const FInputActionValue& Value)
 		}
 	}
 
-	ServerRPC_SpinInput(SelectedButtonPosition, SpinDirection);
+	ServerRPC_SpinCube(SelectedButtonPosition, SpinDirection);
 }
 
 void ARCN_Player::SpinInputNext()
@@ -454,7 +454,7 @@ FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedButtonPositi
 	return SpinDirection;
 }
 
-void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection)
+void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection) const
 {
 	const FVector NormalVector = FVector(
 			FMath::Abs(SelectedButtonPosition.X) == 2 ? SelectedButtonPosition.X / 2.0f : 0,
@@ -510,7 +510,7 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 		}
 	}
 	
-	ServerRPC_SpinCube(Command);
+	NetworkRubikCube->Spin(Command);
 }
 
 void ARCN_Player::SpinStartHandle(const FString& Command)
@@ -626,16 +626,7 @@ void ARCN_Player::ServerRPC_SolveCube_Implementation()
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::ServerRPC_SpinCube_Implementation(const FString& Command)
-{
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-	
-	NetworkRubikCube->Spin(Command);
-
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_Player::ServerRPC_SpinInput_Implementation(const FVector& SelectedButtonPosition, const FVector& SpinDirection)
+void ARCN_Player::ServerRPC_SpinCube_Implementation(const FVector& SelectedButtonPosition, const FVector& SpinDirection)
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
