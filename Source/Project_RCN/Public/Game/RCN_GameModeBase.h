@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "RCN_GameModeBase.generated.h"
 
+class URCN_UIDataAsset;
 class URCN_GameModeBaseDataAsset;
 /**
  * 

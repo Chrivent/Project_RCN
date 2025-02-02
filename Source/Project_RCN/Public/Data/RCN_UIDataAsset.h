@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RCN_UIDataAsset.generated.h"
 
+class URCN_OtherPlayerViewWidget;
 class URCN_TimerWidget;
 /**
  * 
@@ -17,5 +18,8 @@ class PROJECT_RCN_API URCN_UIDataAsset : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;;
+	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URCN_OtherPlayerViewWidget> OtherPlayerViewWidgetClass;
 };

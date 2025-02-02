@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class ARCN_Player;
 class URCN_TimerWidget;
 class URCN_UIDataAsset;
 /**
@@ -18,19 +19,13 @@ class PROJECT_RCN_API ARCN_PlayerController : public APlayerController
 
 public:
 	ARCN_PlayerController();
-
+	
 	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
-	
-	// HUD Section
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
-	TObjectPtr<URCN_TimerWidget> TimerWidget;
-	
-	// 네트워크 관련
+protected:
 	// 게임과 무관한 액터 초기화
 	virtual void PostInitializeComponents() override;
+	
 	// 게임과 무관하지만 네트워크 적용을 받는 초기화
 	virtual void PostNetInit() override;
 
@@ -38,4 +33,23 @@ public:
 	
 	// 폰이 빙의될때 호출하는 함수
 	virtual void OnPossess(APawn* InPawn) override;
+
+public:
+	void CreateTimerWidget();
+	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
+
+protected:
+	// HUD Section
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
+	TObjectPtr<URCN_TimerWidget> TimerWidget;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
+
+	// 네트워크 로직
+	UFUNCTION(Client, Reliable)
+	void ClientCreateTimerWidget();
+
+	UFUNCTION(Client, Reliable)
+	void ClientCreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 };

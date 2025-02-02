@@ -4,6 +4,7 @@
 #include "Game/RCN_MultiModeBase.h"
 
 #include "Actor/RCN_Player.h"
+#include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
@@ -12,13 +13,18 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
-		RubikCube->SetReplicates(true);
-		
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(NewPlayer))
 		{
+			PlayerController->CreateTimerWidget();
+		}
+		
+		if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+		{
+			RubikCube->SetReplicates(true);
+			
 			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 			{
 				Player->SetRubikCube(RubikCube);
@@ -39,11 +45,22 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 							Iterator.GetIndex() * Offset - (GetWorld()->GetNumPlayerControllers() - 1) * Offset / 2.0f,
 							0.0f));
 					MultiPlayer->RenewalCube();
+
+					if (Iterator->Get() != NewPlayer)
+					{
+						if (ARCN_PlayerController* OtherPlayerController = Cast<ARCN_PlayerController>(Iterator->Get()))
+						{
+							if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
+							{
+								OtherPlayerController->CreateOtherPlayerViewWidget(Player);
+							}
+						}
+					}
 				}
 			}
-		}), 1.0f, false);
-	}
-}
+		}
+	}), 1.0f, false);
+}		
 
 void ARCN_MultiModeBase::FinishScramble()
 {
