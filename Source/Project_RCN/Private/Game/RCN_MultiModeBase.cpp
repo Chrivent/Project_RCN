@@ -53,6 +53,8 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 							if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 							{
 								OtherPlayerController->CreateOtherPlayerViewWidget(Player);
+								// Todo: 임시 적용이므로 수정 필요
+								Cast<ARCN_PlayerController>(NewPlayer)->CreateOtherPlayerViewWidget(MultiPlayer);
 							}
 						}
 					}
