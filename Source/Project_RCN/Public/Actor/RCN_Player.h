@@ -24,7 +24,9 @@ public:
 	ARCN_Player();
 
 	FORCEINLINE void SetRubikCube(ARCN_RubikCube* InRubikCube) { NetworkRubikCube = InRubikCube; }
+	
 	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return NetworkRubikCube; }
+	FORCEINLINE UTextureRenderTarget2D* GetRenderTarget() const { return RenderTarget; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -90,6 +92,12 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> SelectedButtonBoxComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 
 	UPROPERTY(VisibleAnywhere)
 	FVector DragStartHitLocation;

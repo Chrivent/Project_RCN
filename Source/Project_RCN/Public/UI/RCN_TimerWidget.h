@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_TimerWidget.generated.h"
 
+class UImage;
 class UTextBlock;
 class ARCN_RubikCube;
 /**
@@ -16,6 +17,9 @@ class PROJECT_RCN_API URCN_TimerWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void NativeConstruct() override;
+
 public:
 	void StartTimer();
 	void StopTimer();
@@ -23,8 +27,6 @@ public:
 	FString GetTimerText() const;
 	
 protected:
-	virtual void NativeConstruct() override;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> TxtPlayTime;
 	

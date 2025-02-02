@@ -1,11 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/RCN_PlayerWidget.h"
+#include "UI/RCN_TimerWidget.h"
 
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Engine/TextureRenderTarget2D.h"
 
-void URCN_PlayerWidget::StartTimer()
+void URCN_TimerWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+}
+
+void URCN_TimerWidget::StartTimer()
 {
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
@@ -18,12 +26,12 @@ void URCN_PlayerWidget::StartTimer()
 	}), 1.0f, true);
 }
 
-void URCN_PlayerWidget::StopTimer()
+void URCN_TimerWidget::StopTimer()
 {
 	
 }
 
-void URCN_PlayerWidget::UpdateTimer(float NewTime)
+void URCN_TimerWidget::UpdateTimer(float NewTime)
 {
 	Time = NewTime;
 
@@ -33,14 +41,7 @@ void URCN_PlayerWidget::UpdateTimer(float NewTime)
 	}
 }
 
-FString URCN_PlayerWidget::GetTimerText() const
+FString URCN_TimerWidget::GetTimerText() const
 {
 	return FString::Printf(TEXT("%.2f"), Time);
-}
-
-void URCN_PlayerWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	
 }

@@ -9,6 +9,7 @@
 #include "Actor/RCN_RubikCube.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Data/RCN_PlayerDataAsset.h"
 #include "Game/RCN_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -18,7 +19,7 @@
 // Sets default values
 ARCN_Player::ARCN_Player()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	static ConstructorHelpers::FObjectFinder<URCN_PlayerDataAsset> PlayerDataAssetRef(TEXT("/Script/Project_RCN.RCN_PlayerDataAsset'/Game/Data/DA_Player.DA_Player'"));
@@ -47,6 +48,12 @@ ARCN_Player::ARCN_Player()
 
 	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
 	YawComponent->SetupAttachment(PitchComponent);
+
+	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent"));
+	SceneCaptureComponent->SetupAttachment(RootComponent);
+	SceneCaptureComponent->TextureTarget = PlayerDataAsset->RenderTarget;
+
+	RenderTarget = PlayerDataAsset->RenderTarget;
 }
 
 // Called when the game starts or when spawned

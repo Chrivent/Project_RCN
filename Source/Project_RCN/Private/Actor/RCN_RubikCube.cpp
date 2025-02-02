@@ -351,7 +351,7 @@ void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshCompo
 	const float ButtonThickness = RubikCubeDataAsset->ButtonThickness;
 	const float ButtonSize = RubikCubeDataAsset->ButtonSize;
 	
-	UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent Orange %d"), StickerMeshComponents.Num()));
+	UStaticMeshComponent* StickerMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(*FString::Printf(TEXT("StickerComponent %d"), StickerMeshComponents.Num()));
 					
 	StickerMeshComponent->SetupAttachment(PieceMeshComponent);
 	if (FMath::Abs(Position.X) == 2)

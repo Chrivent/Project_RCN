@@ -48,6 +48,9 @@ public:
 	TObjectPtr<UInputAction> SpinInputRightAction;
 
 	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
+
+	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;
 
 	UPROPERTY(EditDefaultsOnly)
