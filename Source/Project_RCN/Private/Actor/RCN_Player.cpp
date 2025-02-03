@@ -672,13 +672,13 @@ void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Play
 	USceneCaptureComponent2D* NewSceneCaptureComponent = NewObject<USceneCaptureComponent2D>(this);
 	NewSceneCaptureComponent->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
 	NewSceneCaptureComponent->RegisterComponent();
+	NewSceneCaptureComponent->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+	NewSceneCaptureComponent->ShowOnlyActors.Emplace(OtherPlayer->GetRubikCube());
 	SceneCaptureComponents.Emplace(NewSceneCaptureComponent);
 	
 	UTextureRenderTarget2D* NewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
-	if (NewRenderTarget)
-	{
-		NewRenderTarget->InitAutoFormat(1920, 1080);
-	}
+	NewRenderTarget->InitAutoFormat(1920, 1080);
+	NewRenderTarget->ClearColor = FLinearColor(0, 0, 0, 0);
 	NewSceneCaptureComponent->TextureTarget = NewRenderTarget;
 	
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))

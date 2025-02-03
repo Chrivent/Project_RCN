@@ -24,6 +24,7 @@ public:
 	ARCN_Player();
 
 	FORCEINLINE void SetRubikCube(ARCN_RubikCube* InRubikCube) { NetworkRubikCube = InRubikCube; }
+	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return NetworkRubikCube; }
 	FORCEINLINE USpringArmComponent* GetSpringArmComponent() const { return SpringArmComponent; }
 
 protected:
