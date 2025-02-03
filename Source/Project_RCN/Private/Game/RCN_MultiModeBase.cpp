@@ -7,6 +7,8 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
+#include "GameFramework/PlayerStart.h"
+#include "Kismet/GameplayStatics.h"
 #include "Project_RCN/Project_RCN.h"
 
 void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
@@ -59,6 +61,25 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 			}
 		}
 	}), 1.0f, false);
+}
+
+AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Actors);
+
+	for (const auto Actor : Actors)
+	{
+		if (APlayerStart* PlayerStart = Cast<APlayerStart>(Actor))
+		{
+			if (PlayerStart->PlayerStartTag == *FString::Printf(TEXT("%d"), GetNumPlayers()))
+			{
+				return PlayerStart;
+			}
+		}
+	}
+
+	return Super::ChoosePlayerStart_Implementation(Player);
 }
 
 void ARCN_MultiModeBase::FinishScramble()

@@ -17,6 +17,8 @@ class PROJECT_RCN_API ARCN_MultiModeBase : public ARCN_GameModeBase
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
 public:
 	virtual void FinishScramble() override;
 };

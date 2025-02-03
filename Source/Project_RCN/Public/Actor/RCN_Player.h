@@ -99,9 +99,6 @@ protected:
 	TArray<TObjectPtr<USceneCaptureComponent2D>> SceneCaptureComponents;
 
 	UPROPERTY(VisibleAnywhere)
-	int32 OtherPlayerViewWidgetCount;
-
-	UPROPERTY(VisibleAnywhere)
 	FVector DragStartHitLocation;
 
 	UPROPERTY(VisibleAnywhere)

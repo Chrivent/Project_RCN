@@ -49,12 +49,6 @@ ARCN_Player::ARCN_Player()
 
 	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
 	YawComponent->SetupAttachment(PitchComponent);
-
-	for (int i = 0; i < 3; i++)
-	{
-		USceneCaptureComponent2D* SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(*FString::Printf(TEXT("SceneCaptureComponent %d"), SceneCaptureComponents.Num()));
-		SceneCaptureComponents.Emplace(SceneCaptureComponent);
-	}
 }
 
 // Called when the game starts or when spawned
@@ -674,21 +668,23 @@ void ARCN_Player::ServerRPC_FinishScramble_Implementation()
 void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
 {
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	USceneCaptureComponent2D* NewSceneCaptureComponent = NewObject<USceneCaptureComponent2D>(this);
+	NewSceneCaptureComponent->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
+	NewSceneCaptureComponent->RegisterComponent();
+	SceneCaptureComponents.Emplace(NewSceneCaptureComponent);
 	
 	UTextureRenderTarget2D* NewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	if (NewRenderTarget)
 	{
 		NewRenderTarget->InitAutoFormat(1920, 1080);
 	}
-	SceneCaptureComponents[OtherPlayerViewWidgetCount]->TextureTarget = NewRenderTarget;
-	SceneCaptureComponents[OtherPlayerViewWidgetCount]->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
-
+	NewSceneCaptureComponent->TextureTarget = NewRenderTarget;
+	
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
 	{
 		PlayerController->CreateOtherPlayerViewWidget(NewRenderTarget);
 	}
-	
-	OtherPlayerViewWidgetCount++;
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
