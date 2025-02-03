@@ -11,6 +11,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Data/RCN_PlayerDataAsset.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "Game/RCN_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -49,11 +50,11 @@ ARCN_Player::ARCN_Player()
 	YawComponent = CreateDefaultSubobject<USceneComponent>(TEXT("YawComponent"));
 	YawComponent->SetupAttachment(PitchComponent);
 
-	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent"));
-	SceneCaptureComponent->SetupAttachment(RootComponent);
-	SceneCaptureComponent->TextureTarget = PlayerDataAsset->RenderTarget;
-
-	RenderTarget = PlayerDataAsset->RenderTarget;
+	for (int i = 0; i < 3; i++)
+	{
+		USceneCaptureComponent2D* SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(*FString::Printf(TEXT("SceneCaptureComponent %d"), SceneCaptureComponents.Num()));
+		SceneCaptureComponents.Emplace(SceneCaptureComponent);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -216,6 +217,11 @@ void ARCN_Player::RenewalCube()
 
 	NetworkPattern = NetworkRubikCube->GetPattern();
 	bNetworkPatternFlag = !bNetworkPatternFlag;
+}
+
+void ARCN_Player::CreateRenderTarget(ARCN_Player* OtherPlayer)
+{
+	ClientRPC_CreateOtherPlayerViewWidget(OtherPlayer);
 }
 
 void ARCN_Player::SetControl() const
@@ -661,6 +667,28 @@ void ARCN_Player::ServerRPC_FinishScramble_Implementation()
 	{
 		GameModeBase->FinishScramble();
 	}
+
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
+{
+	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	
+	UTextureRenderTarget2D* NewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
+	if (NewRenderTarget)
+	{
+		NewRenderTarget->InitAutoFormat(1920, 1080);
+	}
+	SceneCaptureComponents[OtherPlayerViewWidgetCount]->TextureTarget = NewRenderTarget;
+	SceneCaptureComponents[OtherPlayerViewWidgetCount]->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
+
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
+	{
+		PlayerController->CreateOtherPlayerViewWidget(NewRenderTarget);
+	}
+	
+	OtherPlayerViewWidgetCount++;
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }

@@ -21,4 +21,7 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UImage> OtherPlayerView;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* RenderTargetMaterial;
 };

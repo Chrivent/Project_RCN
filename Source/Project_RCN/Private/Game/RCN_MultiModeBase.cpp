@@ -16,9 +16,9 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
-		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(NewPlayer))
+		if (ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(NewPlayer))
 		{
-			PlayerController->CreateTimerWidget();
+			NewPlayerController->CreateTimerWidget();
 		}
 		
 		if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
@@ -30,6 +30,7 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 				Player->SetRubikCube(RubikCube);
 				Player->InitCube();
 
+				Player->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
 				Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 			}
 			
@@ -37,32 +38,28 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 			{
 				if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
 				{
-					const float Offset = GameModeBaseDataAsset->CubeMultiOffset;
-					
-					MultiPlayer->UpdateCubeLocation(
-						FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance +
-						FVector(0.0f,
-							Iterator.GetIndex() * Offset - (GetWorld()->GetNumPlayerControllers() - 1) * Offset / 2.0f,
-							0.0f));
 					MultiPlayer->RenewalCube();
+				}
 
-					if (Iterator->Get() != NewPlayer)
+				if (Iterator->Get() != NewPlayer)
+				{
+					const ARCN_PlayerController* OtherPlayerController = Cast<ARCN_PlayerController>(Iterator->Get());
+					const ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(NewPlayer);
+					if (IsValid(OtherPlayerController) && IsValid(NewPlayerController))
 					{
-						if (ARCN_PlayerController* OtherPlayerController = Cast<ARCN_PlayerController>(Iterator->Get()))
+						ARCN_Player* OtherPlayer = Cast<ARCN_Player>(OtherPlayerController->GetPawn());
+						ARCN_Player* Player = Cast<ARCN_Player>(NewPlayerController->GetPawn());
+						if (IsValid(OtherPlayer) && IsValid(Player))
 						{
-							if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
-							{
-								OtherPlayerController->CreateOtherPlayerViewWidget(Player);
-								// Todo: 임시 적용이므로 수정 필요
-								Cast<ARCN_PlayerController>(NewPlayer)->CreateOtherPlayerViewWidget(MultiPlayer);
-							}
+							OtherPlayer->CreateRenderTarget(Player);
+							Player->CreateRenderTarget(OtherPlayer);
 						}
 					}
 				}
 			}
 		}
 	}), 1.0f, false);
-}		
+}
 
 void ARCN_MultiModeBase::FinishScramble()
 {

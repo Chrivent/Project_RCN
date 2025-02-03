@@ -36,7 +36,7 @@ protected:
 
 public:
 	void CreateTimerWidget();
-	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
+	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
 protected:
 	// HUD Section
@@ -49,7 +49,4 @@ protected:
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
 	void ClientCreateTimerWidget();
-
-	UFUNCTION(Client, Reliable)
-	void ClientCreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 };

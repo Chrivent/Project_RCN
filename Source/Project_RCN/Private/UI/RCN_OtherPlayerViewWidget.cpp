@@ -8,7 +8,7 @@
 
 void URCN_OtherPlayerViewWidget::SetOtherPlayerView(UTextureRenderTarget2D* RenderTarget) const
 {
-	FSlateBrush Brush;
-	Brush.SetResourceObject(RenderTarget);
-	OtherPlayerView->SetBrush(Brush);
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(RenderTargetMaterial, GetWorld());
+	DynamicMaterial->SetTextureParameterValue(FName("Render Target Texture"), RenderTarget);
+	OtherPlayerView->SetBrushFromMaterial(DynamicMaterial);
 }

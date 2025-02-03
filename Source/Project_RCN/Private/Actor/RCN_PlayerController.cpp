@@ -5,7 +5,9 @@
 
 #include "Actor/RCN_Player.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Data/RCN_UIDataAsset.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_TimerWidget.h"
@@ -80,9 +82,11 @@ void ARCN_PlayerController::CreateTimerWidget()
 	ClientCreateTimerWidget();
 }
 
-void ARCN_PlayerController::CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer)
+void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget)
 {
-	ClientCreateOtherPlayerViewWidget(OtherPlayer);
+	URCN_OtherPlayerViewWidget* OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass);
+	OtherPlayerViewWidget->AddToViewport();
+	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
 }
 
 void ARCN_PlayerController::ClientCreateTimerWidget_Implementation()
@@ -91,17 +95,6 @@ void ARCN_PlayerController::ClientCreateTimerWidget_Implementation()
 	
 	TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
 	TimerWidget->AddToViewport();
-
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_PlayerController::ClientCreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
-{
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-	
-	URCN_OtherPlayerViewWidget* OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass);
-	OtherPlayerViewWidget->AddToViewport();
-	OtherPlayerViewWidget->SetOtherPlayerView(OtherPlayer->GetRenderTarget());
 
 	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
