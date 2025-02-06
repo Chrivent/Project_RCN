@@ -54,7 +54,7 @@ protected:
 	TArray<TObjectPtr<UStaticMeshComponent>> PieceMeshComponents;
 
 	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PieceMeshPositions;
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PiecePositions;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FSignInfo> SignInfos;
@@ -69,13 +69,16 @@ protected:
 	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
 
 	UPROPERTY(VisibleAnywhere)
-	FString Facelet;
-
-	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
 	
 	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FString> StickerFacelets;
+	TMap<TObjectPtr<UStaticMeshComponent>, FColor> StickerColors;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FVector> CenterOrderPositions;
+
+	UPROPERTY(VisibleAnywhere)
+	FString Facelet;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> FaceletOrderPositions;
