@@ -76,7 +76,7 @@ void ARCN_PlayerController::OnPossess(APawn* InPawn)
 
 void ARCN_PlayerController::CreateTimerWidget()
 {
-	ClientCreateTimerWidget();
+	ClientRPC_CreateTimerWidget();
 }
 
 void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget)
@@ -86,7 +86,7 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
 }
 
-void ARCN_PlayerController::ClientCreateTimerWidget_Implementation()
+void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
 {
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 	
