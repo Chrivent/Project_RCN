@@ -564,7 +564,7 @@ void ARCN_Player::MulticastRPC_RotateCube_Implementation(const FRotator Rotator)
 {
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
-	if (!IsLocallyControlled() || HasAuthority())
+	if (!IsLocallyControlled())
 	{
 		PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
 		YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
