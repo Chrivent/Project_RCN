@@ -3,7 +3,15 @@
 
 #include "UI/RCN_TimerWidget.h"
 
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Engine/TextureRenderTarget2D.h"
+
+void URCN_TimerWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+}
 
 void URCN_TimerWidget::StartTimer()
 {
@@ -36,11 +44,4 @@ void URCN_TimerWidget::UpdateTimer(float NewTime)
 FString URCN_TimerWidget::GetTimerText() const
 {
 	return FString::Printf(TEXT("%.2f"), Time);
-}
-
-void URCN_TimerWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	
 }

@@ -13,6 +13,11 @@ void ARCN_SingleModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
+	if (ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		NewPlayerController->CreateTimerWidget();
+	}
+
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))

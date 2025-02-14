@@ -30,7 +30,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	FRotator CubeStartRotation;
-	
-	UPROPERTY(EditDefaultsOnly)
-	float CubeMultiOffset;
 };

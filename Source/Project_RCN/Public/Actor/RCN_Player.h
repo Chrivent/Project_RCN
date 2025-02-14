@@ -25,6 +25,7 @@ public:
 
 	FORCEINLINE void SetRubikCube(ARCN_RubikCube* InRubikCube) { NetworkRubikCube = InRubikCube; }
 	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return NetworkRubikCube; }
+	FORCEINLINE USpringArmComponent* GetSpringArmComponent() const { return SpringArmComponent; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,6 +45,7 @@ public:
 	void UpdateCubeLocation(const FVector& TargetLocation);
 	void UpdateCubeRotation(const FRotator& TargetRotation);
 	void RenewalCube();
+	void CreateRenderTarget(ARCN_Player* OtherPlayer);
 	
 protected:
 	void SetControl() const;
@@ -87,9 +89,15 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> YawComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<ARCN_RubikCube> RubikCube;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> SelectedButtonBoxComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<USceneCaptureComponent2D>> SceneCaptureComponents;
 
 	UPROPERTY(VisibleAnywhere)
 	FVector DragStartHitLocation;
@@ -133,6 +141,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_FinishScramble();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> NetworkRubikCube;
