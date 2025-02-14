@@ -20,6 +20,8 @@ void ARCN_SingleModeBase::PostLogin(APlayerController* NewPlayer)
 
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
+		RubikCube->SetOwner(NewPlayer->GetPawn());
+		
 		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 		{
 			Player->SetRubikCube(RubikCube);

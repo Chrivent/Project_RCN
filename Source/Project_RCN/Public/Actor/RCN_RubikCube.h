@@ -13,8 +13,6 @@ class UCameraComponent;
 class USpringArmComponent;
 class URCN_RubikCubeDataAsset;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FSpinStartDelegate, const FString&)
-DECLARE_MULTICAST_DELEGATE_OneParam(FSpinEndDelegate, const FString&)
 DECLARE_MULTICAST_DELEGATE(FFinishScramble)
 
 UENUM(BlueprintType)
@@ -91,8 +89,6 @@ public:
 	void ChangePattern(const FString& NewPattern);
 	FVector GetButtonPosition(UBoxComponent* ButtonBoxComponent);
 
-	FSpinStartDelegate SpinStartDelegate;
-	FSpinEndDelegate SpinEndDelegate;
 	FFinishScramble FinishScrambleDelegate;
 
 protected:
@@ -146,4 +142,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<UBoxComponent>, FVector> ButtonPositions;
+
+	// 네트워크 로직
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Spin(const FString& Command);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_Spin(const FString& Command);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_ChangePattern(const FString& NewPattern);
 };

@@ -59,15 +59,8 @@ protected:
 	void SpinDragCompleted(const FInputActionValue& Value);
 	void SpinInput(const FInputActionValue& Value);
 
-	void SpinInputNext();
 	FVector GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const;
 	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection) const;
-	
-	UFUNCTION()
-	void SpinStartHandle(const FString& Command);
-
-	UFUNCTION()
-	void SpinEndHandle(const FString& Pattern);
 
 	UFUNCTION()
 	void FinishScrambleHandle();
@@ -108,18 +101,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	uint8 bRotateSwitchStarted : 1;
 
-	TQueue<FVector> SelectedButtonPositionQueue;
-	TQueue<FVector> SpinDirectionQueue;
-
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
-
-	UFUNCTION()
-	void OnRep_Command() const;
-
-	UFUNCTION()
-	void OnRep_Pattern() const;
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_SetCubeRotation(FRotator Rotator);
@@ -128,16 +112,16 @@ protected:
 	void MulticastRPC_SetCubeLocation(FVector Location);
 
 	UFUNCTION(Server, Unreliable)
-	void ServerRPC_RotateCube(const FVector2D RotateAxisVector);
+	void ServerRPC_RotateCube(const FRotator Rotator);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastRPC_RotateCube(const FRotator Rotator);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_ScrambleCube();
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SolveCube();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_FinishScramble();
@@ -147,17 +131,5 @@ protected:
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> NetworkRubikCube;
-
-	UPROPERTY(Replicated)
-	FString NetworkCommand;
-
-	UPROPERTY(ReplicatedUsing = OnRep_Command)
-	uint8 bNetworkCommandFlag : 1;
-
-	UPROPERTY(Replicated)
-	FString NetworkPattern;
-	
-	UPROPERTY(ReplicatedUsing = OnRep_Pattern)
-    uint8 bNetworkPatternFlag : 1;
 };
 

@@ -21,23 +21,23 @@ ARCN_PlayerController::ARCN_PlayerController()
 	}
 	else
 	{
-		RCN_LOG(LogNetwork, Error, TEXT("UI 데이터 에셋 로드 실패"))
+		RCN_LOG(LogPlayer, Error, TEXT("UI 데이터 에셋 로드 실패"))
 		return;
 	}
 }
 
 void ARCN_PlayerController::PostInitializeComponents()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::PostInitializeComponents();
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_PlayerController::PostNetInit()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::PostNetInit();
 
@@ -46,35 +46,35 @@ void ARCN_PlayerController::PostNetInit()
 	{
 		if (IsValid(NetDriver->ServerConnection))
 		{
-			RCN_LOG(LogNetwork, Log, TEXT("서버 연결됨 : %s"), *NetDriver->ServerConnection->GetName());
+			RCN_LOG(LogPlayer, Log, TEXT("서버 연결됨 : %s"), *NetDriver->ServerConnection->GetName());
 		}
 	}
 	else
 	{
-		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("NetDriver 없음."));
+		RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("NetDriver 없음."));
 	}
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_PlayerController::BeginPlay()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::BeginPlay();
 
 	SetShowMouseCursor(true);
 	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_PlayerController::OnPossess(APawn* InPawn)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::OnPossess(InPawn);
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_PlayerController::CreateTimerWidget()
@@ -91,10 +91,10 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 
 void ARCN_PlayerController::ClientCreateTimerWidget_Implementation()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 	
 	TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
 	TimerWidget->AddToViewport();
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

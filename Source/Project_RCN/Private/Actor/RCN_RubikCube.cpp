@@ -174,13 +174,15 @@ ARCN_RubikCube::ARCN_RubikCube()
 	}
 
 	Pattern = TEXT("YYYYYYYYYRRRRRRRRRBBBBBBBBBWWWWWWWWWOOOOOOOOOGGGGGGGGG");
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
 void ARCN_RubikCube::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -193,29 +195,8 @@ void ARCN_RubikCube::Tick(float DeltaTime)
 void ARCN_RubikCube::Spin(const FString& Command)
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("큐브 명령어 입력 : %s"), *Command)
-
-	TArray<FString> ParsedCommands;
-	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
-
-	for (const FString& ParsedCommand : ParsedCommands)
-	{
-		for (auto SignInfo : SignInfos)
-		{
-			if (ParsedCommand == SignInfo.Sign)
-			{
-				SignQueue.Enqueue(SignInfo);
-			}
-		}
-	}
-
-	if (!bIsTurning)
-	{
-		bIsTurning = true;
-
-		TurnNext();
-	}
-
-	SpinStartDelegate.Broadcast(Command);
+	
+	ServerRPC_Spin(Command);
 }
 
 void ARCN_RubikCube::Scramble()
@@ -284,50 +265,7 @@ void ARCN_RubikCube::Solve()
 
 void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
 {
-	if (bIsTurning)
-	{
-		return;
-	}
-	
-	Pattern = NewPattern;
-	
-	int32 Index = 0;
-	for (auto PatternOrderPosition : PatternOrderPositions)
-	{
-		for (auto StickerPosition : StickerPositions)
-		{
-			if (PatternOrderPosition == StickerPosition.Value)
-			{
-				if (NewPattern[Index] == TEXT('Y'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
-				}
-				else if (NewPattern[Index] == TEXT('R'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
-				}
-				else if (NewPattern[Index] == TEXT('B'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
-				}
-				else if (NewPattern[Index] == TEXT('W'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
-				}
-				else if (NewPattern[Index] == TEXT('O'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
-				}
-				else if (NewPattern[Index] == TEXT('G'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
-				}
-
-				Index++;
-				break;
-			}
-		}
-	}
+	MulticastRPC_ChangePattern(NewPattern);
 }
 
 FVector ARCN_RubikCube::GetButtonPosition(UBoxComponent* ButtonBoxComponent)
@@ -377,10 +315,7 @@ void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshCompo
 	StickerMeshComponents.Emplace(StickerMeshComponent);
 	StickerPositions.Emplace(StickerMeshComponent, Position);
 
-	UBoxComponent* ButtonBoxComponent = CreateDefaultSubobject<UBoxComponent>(*FString::Printf(TEXT("Button [%d, %d, %d]"),
-		static_cast<int>(Position.X),
-		static_cast<int>(Position.Y),
-		static_cast<int>(Position.Z)));
+	UBoxComponent* ButtonBoxComponent = CreateDefaultSubobject<UBoxComponent>(*FString::Printf(TEXT("Button %d"), ButtonBoxComponents.Num()));
 
 	ButtonBoxComponent->SetupAttachment(RootComponent);
 	ButtonBoxComponent->SetRelativeLocation(PieceMeshComponent->GetRelativeLocation() + StickerMeshComponent->GetRelativeLocation() * PieceSize);
@@ -409,15 +344,13 @@ void ARCN_RubikCube::TurnNext()
 	{
 		bIsTurning = false;
 
-		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
-		SpinEndDelegate.Broadcast(Pattern);
-
 		if (bIsScrambling)
 		{
 			bIsScrambling = false;
 			FinishScrambleDelegate.Broadcast();
 		}
 		
+		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
 		return;
 	}
 
@@ -604,3 +537,87 @@ FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
 	return FMatrix::Identity;
 }
 
+void ARCN_RubikCube::ServerRPC_Spin_Implementation(const FString& Command)
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
+
+	MulticastRPC_Spin(Command);
+	MulticastRPC_ChangePattern(Pattern);
+
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::MulticastRPC_Spin_Implementation(const FString& Command)
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
+
+	TArray<FString> ParsedCommands;
+	Command.ParseIntoArray(ParsedCommands, TEXT(" "), true);
+
+	for (const FString& ParsedCommand : ParsedCommands)
+	{
+		for (auto SignInfo : SignInfos)
+		{
+			if (ParsedCommand == SignInfo.Sign)
+			{
+				SignQueue.Enqueue(SignInfo);
+			}
+		}
+	}
+
+	if (!bIsTurning)
+	{
+		bIsTurning = true;
+
+		TurnNext();
+	}
+
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::MulticastRPC_ChangePattern_Implementation(const FString& NewPattern)
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
+
+	Pattern = NewPattern;
+	
+	int32 Index = 0;
+	for (auto PatternOrderPosition : PatternOrderPositions)
+	{
+		for (auto StickerPosition : StickerPositions)
+		{
+			if (PatternOrderPosition == StickerPosition.Value)
+			{
+				if (NewPattern[Index] == TEXT('Y'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
+				}
+				else if (NewPattern[Index] == TEXT('R'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
+				}
+				else if (NewPattern[Index] == TEXT('B'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
+				}
+				else if (NewPattern[Index] == TEXT('W'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
+				}
+				else if (NewPattern[Index] == TEXT('O'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
+				}
+				else if (NewPattern[Index] == TEXT('G'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
+				}
+
+				Index++;
+				break;
+			}
+		}
+	}
+
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
