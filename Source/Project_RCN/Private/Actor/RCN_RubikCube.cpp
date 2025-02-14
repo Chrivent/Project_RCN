@@ -579,42 +579,45 @@ void ARCN_RubikCube::MulticastRPC_ChangePattern_Implementation(const FString& Ne
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 
-	Pattern = NewPattern;
-	
-	int32 Index = 0;
-	for (auto PatternOrderPosition : PatternOrderPositions)
+	if (Pattern != NewPattern)
 	{
-		for (auto StickerPosition : StickerPositions)
+		Pattern = NewPattern;
+	
+		int32 Index = 0;
+		for (auto PatternOrderPosition : PatternOrderPositions)
 		{
-			if (PatternOrderPosition == StickerPosition.Value)
+			for (auto StickerPosition : StickerPositions)
 			{
-				if (NewPattern[Index] == TEXT('Y'))
+				if (PatternOrderPosition == StickerPosition.Value)
 				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
-				}
-				else if (NewPattern[Index] == TEXT('R'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
-				}
-				else if (NewPattern[Index] == TEXT('B'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
-				}
-				else if (NewPattern[Index] == TEXT('W'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
-				}
-				else if (NewPattern[Index] == TEXT('O'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
-				}
-				else if (NewPattern[Index] == TEXT('G'))
-				{
-					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
-				}
+					if (NewPattern[Index] == TEXT('Y'))
+					{
+						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
+					}
+					else if (NewPattern[Index] == TEXT('R'))
+					{
+						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
+					}
+					else if (NewPattern[Index] == TEXT('B'))
+					{
+						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
+					}
+					else if (NewPattern[Index] == TEXT('W'))
+					{
+						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
+					}
+					else if (NewPattern[Index] == TEXT('O'))
+					{
+						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
+					}
+					else if (NewPattern[Index] == TEXT('G'))
+					{
+						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
+					}
 
-				Index++;
-				break;
+					Index++;
+					break;
+				}
 			}
 		}
 	}
