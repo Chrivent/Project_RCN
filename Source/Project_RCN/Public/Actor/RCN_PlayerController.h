@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_MainMenuWidget;
+class URCN_OtherPlayerViewWidget;
 class ARCN_Player;
 class URCN_TimerWidget;
 class URCN_UIDataAsset;
@@ -35,17 +37,26 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 public:
+	void CreateMainMenu();
+	
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
-
-protected:
-	// HUD Section
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD")
-	TObjectPtr<URCN_TimerWidget> TimerWidget;
 	
+protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
-
+	
+	// MainMenu UI Section
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MainMenu")
+	TObjectPtr<URCN_MainMenuWidget> MainMenuWidget;
+	
+	// Game UI Section
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GameUI")
+	TObjectPtr<URCN_TimerWidget> TimerWidget;
+	
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category="GameUI")
+	TObjectPtr<URCN_OtherPlayerViewWidget> OtherPlayerViewWidget;
+	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
 	void ClientCreateTimerWidget();
