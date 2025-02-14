@@ -7,6 +7,8 @@
 #include "RCN_RubikCubeDataAsset.generated.h"
 
 enum class EStickerType : uint8;
+class UInputMappingContext;
+class UInputAction;
 /**
  * 
  */
@@ -32,7 +34,10 @@ public:
 	float TurnTolerance;
 
 	UPROPERTY(EditDefaultsOnly)
-	TMap<EStickerType, TObjectPtr<UStaticMesh>> StickerMesh;
+	TObjectPtr<UStaticMesh> StickerMesh;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<EStickerType, TObjectPtr<UMaterial>> StickerMaterials;
 
 	UPROPERTY(EditDefaultsOnly)
 	float StickerDistance;
@@ -42,4 +47,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 ScrambleTurnCount;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ButtonSize;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float ButtonThickness;
 };

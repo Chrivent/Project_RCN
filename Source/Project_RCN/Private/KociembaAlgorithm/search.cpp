@@ -1,11 +1,10 @@
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "search.h"
 #include "KociembaAlgorithm/search.h"
 #include "KociembaAlgorithm/color.h"
 #include "KociembaAlgorithm/facecube.h"
 #include "KociembaAlgorithm/coordcube.h"
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define MIN(a, b) (((a)<(b))?(a):(b))
 #define MAX(a, b) (((a)>(b))?(a):(b))
