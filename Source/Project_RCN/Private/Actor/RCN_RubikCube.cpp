@@ -581,7 +581,7 @@ void ARCN_RubikCube::MulticastRPC_ChangePattern_Implementation(const FString& Ne
 
 	if (Pattern != NewPattern)
 	{
-		RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("패턴 보정"));
+		RCN_LOG(LogRubikCube, Warning, TEXT("%s"), TEXT("패턴 보정"));
 		
 		Pattern = NewPattern;
 	

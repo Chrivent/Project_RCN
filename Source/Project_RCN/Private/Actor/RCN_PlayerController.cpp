@@ -3,11 +3,8 @@
 
 #include "Actor/RCN_PlayerController.h"
 
-#include "Actor/RCN_Player.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/SceneCaptureComponent2D.h"
 #include "Data/RCN_UIDataAsset.h"
-#include "Engine/TextureRenderTarget2D.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_TimerWidget.h"
