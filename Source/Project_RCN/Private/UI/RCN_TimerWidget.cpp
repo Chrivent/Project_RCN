@@ -3,9 +3,7 @@
 
 #include "UI/RCN_TimerWidget.h"
 
-#include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Engine/TextureRenderTarget2D.h"
 
 void URCN_TimerWidget::NativeConstruct()
 {

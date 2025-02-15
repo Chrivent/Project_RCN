@@ -6,6 +6,10 @@
 #include "Engine/DataAsset.h"
 #include "RCN_UIDataAsset.generated.h"
 
+class URCN_SettingWidget;
+class URCN_SinglePlayerMainMenuWidget;
+class URCN_MultiPlayerMainMenuWidget;
+class URCN_MainMenuWidget;
 class URCN_OtherPlayerViewWidget;
 class URCN_TimerWidget;
 /**
@@ -17,9 +21,21 @@ class PROJECT_RCN_API URCN_UIDataAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
+	TSubclassOf<URCN_MainMenuWidget> MainMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
+	TSubclassOf<URCN_MultiPlayerMainMenuWidget> MultiPlayerMainMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
+	TSubclassOf<URCN_SinglePlayerMainMenuWidget> SinglePlayerMainMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
+	TSubclassOf<URCN_SettingWidget> SettingWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_OtherPlayerViewWidget> OtherPlayerViewWidgetClass;
 };

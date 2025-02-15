@@ -3,22 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RCN_GameModeBase.h"
-#include "RCN_SingleModeBase.generated.h"
-
-class URCN_GameModeBaseDataAsset;
+#include "Game/RCN_GameModeBase.h"
+#include "UI/RCN_MainMenuWidget.h"
+#include "RCN_MainMenuModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_RCN_API ARCN_SingleModeBase : public ARCN_GameModeBase
+class PROJECT_RCN_API ARCN_MainMenuModeBase : public ARCN_GameModeBase
 {
 	GENERATED_BODY()
 
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-
-public:
-	virtual void FinishScramble() override;
 };
