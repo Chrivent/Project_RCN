@@ -6,7 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_MainMenuWidget.generated.h"
 
+class URCN_SettingWidget;
 class UWidgetSwitcher;
+class URCN_MultiPlayerMainMenuWidget;
 class URCN_SinglePlayerMainMenuWidget;
 class UButton;
 /**
@@ -21,10 +23,16 @@ protected:
  	virtual void NativeConstruct() override;
 
 	UFUNCTION()
+	void BackButtonReleasedHandle();
+	
+	UFUNCTION()
 	void SinglePlayerButtonReleasedHandle();
 
 	UFUNCTION()
-	void BackButtonReleasedHandle();
+	void MultiPlayerButtonReleasedHandle();
+
+	UFUNCTION()
+	void SettingButtonReleasedHandle();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UWidgetSwitcher> MainMenuWidgetSwitcher;
@@ -36,5 +44,20 @@ protected:
 	TObjectPtr<UButton> SinglePlayerButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+    TObjectPtr<UButton> MultiPlayerButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+    TObjectPtr<UButton> SettingButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+    TObjectPtr<UButton> GameOutButton;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<URCN_SinglePlayerMainMenuWidget> SinglePlayerMainMenuWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<URCN_MultiPlayerMainMenuWidget> MultiPlayerMainMenuWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<URCN_SettingWidget> SettingMainMenuWidget;
 };

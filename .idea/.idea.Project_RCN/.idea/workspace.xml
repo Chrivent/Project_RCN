@@ -14,21 +14,15 @@
   <component name="ChangeListManager">
     <list default="true" id="b078c60a-6a96-428f-8c99-2fc5af23aff2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_RCN/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_RCN/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Data/DA_UI.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/DA_UI.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Level/MainMenuLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Level/MainMenuLevel.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/UI/WBP_MainMenuWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/WBP_MainMenuWidget.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/UI/WBP_MultiPlayerMainMenuWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/WBP_MultiPlayerMainMenuWidget.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/UI/WBP_SettingWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/WBP_SettingWidget.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/UI/WBP_SinglePlayerMainMenuWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/WBP_SinglePlayerMainMenuWidget.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/Actor/RCN_PlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/Actor/RCN_PlayerController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/Game/RCN_MainMenuGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/Game/RCN_MainMenuModeBase.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_MainMenuWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_MainMenuWidget.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_TimerWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_TimerWidget.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/Actor/RCN_PlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/Actor/RCN_PlayerController.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/Data/RCN_UIDataAsset.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/Data/RCN_UIDataAsset.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/Game/RCN_MainMenuGameModeBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/Game/RCN_MainMenuModeBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/Game/RCN_SingleModeBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/Game/RCN_SingleModeBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_SettingWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_SettingWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_SinglePlayerMainMenuWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_SinglePlayerMainMenuWidget.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_MainMenuWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_MainMenuWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_SettingWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_SettingWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_SinglePlayerMainMenuWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_SinglePlayerMainMenuWidget.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +53,7 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/GameSession.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/PlayerController.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Public/Net/UnrealNetwork.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/UMG/Private/Components/WidgetSwitcher.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/UMG/Private/UserWidget.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/UMG/Public/Components/Button.h" root0="FORCE_HIGHLIGHTING" />
@@ -78,22 +73,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "C/C++ Project.Project_RCN.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "16-Main-UI-Production",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "RiderNuGetOptionsPageId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;C/C++ Project.Project_RCN.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;16-Main-UI-Production&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;RiderNuGetOptionsPageId&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="C/C++ Project.Project_RCN">
     <configuration name="Project_RCN" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
@@ -210,6 +205,7 @@
       <workItem from="1737055400636" duration="8443000" />
       <workItem from="1739537948221" duration="28000" />
       <workItem from="1739538140752" duration="15393000" />
+      <workItem from="1739643324800" duration="3978000" />
     </task>
     <servers />
   </component>

@@ -5,15 +5,26 @@
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "UI/RCN_MultiPlayerMainMenuWidget.h"
+#include "UI/RCN_SettingWidget.h"
 #include "UI/RCN_SinglePlayerMainMenuWidget.h"
 
 void URCN_MainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	SinglePlayerButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::SinglePlayerButtonReleasedHandle);
 	BackButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::BackButtonReleasedHandle);
+	SinglePlayerButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::SinglePlayerButtonReleasedHandle);
+	MultiPlayerButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::MultiPlayerButtonReleasedHandle);
+	SettingButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::SettingButtonReleasedHandle);
 	
+	BackButton->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void URCN_MainMenuWidget::BackButtonReleasedHandle()
+{
+	MainMenuWidgetSwitcher->SetActiveWidgetIndex(0);
+
 	BackButton->SetVisibility(ESlateVisibility::Hidden);
 }
 
@@ -24,9 +35,16 @@ void URCN_MainMenuWidget::SinglePlayerButtonReleasedHandle()
 	BackButton->SetVisibility(ESlateVisibility::Visible);
 }
 
-void URCN_MainMenuWidget::BackButtonReleasedHandle()
+void URCN_MainMenuWidget::MultiPlayerButtonReleasedHandle()
 {
-	MainMenuWidgetSwitcher->SetActiveWidgetIndex(0);
+	MainMenuWidgetSwitcher->SetActiveWidget(MultiPlayerMainMenuWidget);
 
-	BackButton->SetVisibility(ESlateVisibility::Hidden);
+	BackButton->SetVisibility(ESlateVisibility::Visible);
+}
+
+void URCN_MainMenuWidget::SettingButtonReleasedHandle()
+{
+	MainMenuWidgetSwitcher->SetActiveWidget(SettingMainMenuWidget);
+
+	BackButton->SetVisibility(ESlateVisibility::Visible);
 }
