@@ -59,5 +59,5 @@ protected:
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
-	void ClientCreateTimerWidget();
+	void ClientRPC_CreateTimerWidget();
 };

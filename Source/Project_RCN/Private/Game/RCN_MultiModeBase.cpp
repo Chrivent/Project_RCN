@@ -25,7 +25,7 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 		
 		if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 		{
-			RubikCube->SetReplicates(true);
+			RubikCube->SetOwner(NewPlayer->GetPawn());
 			
 			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 			{
@@ -85,6 +85,5 @@ AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player
 void ARCN_MultiModeBase::FinishScramble()
 {
 	Super::FinishScramble();
-
-	RCN_LOG(LogNetwork, Log, TEXT("Scramble"))
+	
 }

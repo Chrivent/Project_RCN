@@ -30,7 +30,7 @@ ARCN_Player::ARCN_Player()
 	}
 	else
 	{
-		RCN_LOG(LogNetwork, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(LogPlayer, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 
@@ -54,7 +54,7 @@ ARCN_Player::ARCN_Player()
 // Called when the game starts or when spawned
 void ARCN_Player::BeginPlay()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::BeginPlay();
 	
@@ -65,21 +65,21 @@ void ARCN_Player::BeginPlay()
 
 	SetControl();
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::PossessedBy(AController* NewController)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	AActor* OwnerActor = GetOwner();
 	if (IsValid(OwnerActor))
 	{
-		RCN_LOG(LogNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+		RCN_LOG(LogPlayer, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
 	}
 	else
 	{
-		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+		RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("오너가 없음."));
 	}
 
 	Super::PossessedBy(NewController);
@@ -87,42 +87,42 @@ void ARCN_Player::PossessedBy(AController* NewController)
 	OwnerActor = GetOwner();
 	if (IsValid(OwnerActor))
 	{
-		RCN_LOG(LogNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+		RCN_LOG(LogPlayer, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
 	}
 	else
 	{
-		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+		RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("오너가 없음."));
 	}
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::OnRep_Owner()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s %s"), *GetName(), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s %s"), *GetName(), TEXT("Begin"));
 
 	Super::OnRep_Owner();
 
 	AActor* OwnerActor = GetOwner();
 	if (IsValid(OwnerActor))
 	{
-		RCN_LOG(LogNetwork, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
+		RCN_LOG(LogPlayer, Log, TEXT("오너 : %s"), *OwnerActor->GetName());
 	}
 	else
 	{
-		RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("오너가 없음."));
+		RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("오너가 없음."));
 	}
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::PostNetInit()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s %s"), TEXT("Begin"), *GetName());
+	RCN_LOG(LogPlayer, Log, TEXT("%s %s"), TEXT("Begin"), *GetName());
 
 	Super::PostNetInit();
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 // Called every frame
@@ -158,8 +158,6 @@ void ARCN_Player::InitCube()
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
 	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
 
-	NetworkRubikCube->SpinStartDelegate.AddUObject(this, &ARCN_Player::SpinStartHandle);
-	NetworkRubikCube->SpinEndDelegate.AddUObject(this, &ARCN_Player::SpinEndHandle);
 	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
@@ -208,9 +206,8 @@ void ARCN_Player::RenewalCube()
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw;
 	
 	MulticastRPC_SetCubeRotation(Rotator);
-
-	NetworkPattern = NetworkRubikCube->GetPattern();
-	bNetworkPatternFlag = !bNetworkPatternFlag;
+	
+	NetworkRubikCube->ChangePattern(NetworkRubikCube->GetPattern());
 }
 
 void ARCN_Player::CreateRenderTarget(ARCN_Player* OtherPlayer)
@@ -256,8 +253,15 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 	
 	FVector2D RotateAxisVector = Value.Get<FVector2D>();
 	RotateAxisVector *= PlayerDataAsset->RotateSensitivity;
+
+	FRotator Rotator = FRotator::ZeroRotator;
+	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
+	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
 	
-	ServerRPC_RotateCube(RotateAxisVector);
+	PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
+	YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
+	
+	ServerRPC_RotateCube(Rotator);
 }
 
 void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
@@ -341,7 +345,7 @@ void ARCN_Player::SpinDragTriggered(const FInputActionValue& Value)
 	{
 		FVector DragDirection = (DragEndHitLocation - DragStartHitLocation).GetSafeNormal();
 		FVector SpinDirection = GetClosestSpinDirection(SelectedButtonPosition, DragDirection);
-		ServerRPC_SpinCube(SelectedButtonPosition, SpinDirection);
+		SpinCube(SelectedButtonPosition, SpinDirection);
 
 		SelectedButtonBoxComponent = nullptr;
 	}
@@ -409,20 +413,7 @@ void ARCN_Player::SpinInput(const FInputActionValue& Value)
 		}
 	}
 
-	ServerRPC_SpinCube(SelectedButtonPosition, SpinDirection);
-}
-
-void ARCN_Player::SpinInputNext()
-{
-	if (!SelectedButtonPositionQueue.IsEmpty() && !SpinDirectionQueue.IsEmpty())
-	{
-		FVector SelectedButtonPosition;
-		FVector SpinDirection;
-		SelectedButtonPositionQueue.Dequeue(SelectedButtonPosition);
-		SpinDirectionQueue.Dequeue(SpinDirection);
-	
-		SpinCube(SelectedButtonPosition, SpinDirection);
-	}
+	SpinCube(SelectedButtonPosition, SpinDirection);
 }
 
 FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const
@@ -520,23 +511,16 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 	NetworkRubikCube->Spin(Command);
 }
 
-void ARCN_Player::SpinStartHandle(const FString& Command)
-{
-	NetworkCommand = Command;
-	bNetworkCommandFlag = !bNetworkCommandFlag;
-}
-
-void ARCN_Player::SpinEndHandle(const FString& Pattern)
-{
-	NetworkPattern = Pattern;
-	bNetworkPatternFlag = !bNetworkPatternFlag;
-
-	SpinInputNext();
-}
-
 void ARCN_Player::FinishScrambleHandle()
 {
-	ServerRPC_FinishScramble();
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	
+	if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		GameModeBase->FinishScramble();
+	}
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -544,43 +528,15 @@ void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
-	DOREPLIFETIME(ARCN_Player, NetworkCommand)
-	DOREPLIFETIME(ARCN_Player, bNetworkCommandFlag)
-	DOREPLIFETIME(ARCN_Player, NetworkPattern)
-	DOREPLIFETIME(ARCN_Player, bNetworkPatternFlag)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::OnActorChannelOpen(InBunch, Connection);
 	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_Player::OnRep_Command() const
-{
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
-	if (IsValid(NetworkRubikCube))
-	{
-		NetworkRubikCube->Spin(NetworkCommand);
-	}
-	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_Player::OnRep_Pattern() const
-{
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-	
-	if (IsValid(NetworkRubikCube))
-	{
-		NetworkRubikCube->ChangePattern(NetworkPattern);
-	}
-
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::MulticastRPC_SetCubeLocation_Implementation(const FVector Location)
@@ -602,72 +558,49 @@ void ARCN_Player::MulticastRPC_SetCubeRotation_Implementation(const FRotator Rot
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::ServerRPC_RotateCube_Implementation(const FVector2D RotateAxisVector)
+void ARCN_Player::ServerRPC_RotateCube_Implementation(const FRotator Rotator)
 {
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
-	FRotator Rotator = FRotator::ZeroRotator;
-	Rotator.Pitch = FMath::Clamp(PitchComponent->GetRelativeRotation().Pitch + RotateAxisVector.Y, -89.0f, 89.0f);
-	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw + RotateAxisVector.X;
+	MulticastRPC_RotateCube(Rotator);
+	
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+}
 
-	MulticastRPC_SetCubeRotation(Rotator);
+void ARCN_Player::MulticastRPC_RotateCube_Implementation(const FRotator Rotator)
+{
+	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (!IsLocallyControlled())
+	{
+		PitchComponent->SetRelativeRotation(FRotator(Rotator.Pitch, 0.0f, 0.0f));
+		YawComponent->SetRelativeRotation(FRotator(0.0f, Rotator.Yaw, 0.0f));
+	}
 	
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::ServerRPC_ScrambleCube_Implementation()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	NetworkRubikCube->Scramble();
 	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::ServerRPC_SolveCube_Implementation()
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 	
 	NetworkRubikCube->Solve();
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_Player::ServerRPC_SpinCube_Implementation(const FVector& SelectedButtonPosition, const FVector& SpinDirection)
-{
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
-	if (SelectedButtonPositionQueue.IsEmpty() || SpinDirectionQueue.IsEmpty())
-	{
-		SelectedButtonPositionQueue.Enqueue(SelectedButtonPosition);
-		SpinDirectionQueue.Enqueue(SpinDirection);
-		
-		SpinInputNext();
-	}
-	else
-	{
-		SelectedButtonPositionQueue.Enqueue(SelectedButtonPosition);
-		SpinDirectionQueue.Enqueue(SpinDirection);
-	}
-	
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_Player::ServerRPC_FinishScramble_Implementation()
-{
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
-
-	if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		GameModeBase->FinishScramble();
-	}
-
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
 {
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	USceneCaptureComponent2D* NewSceneCaptureComponent = NewObject<USceneCaptureComponent2D>(this);
 	NewSceneCaptureComponent->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
@@ -686,6 +619,6 @@ void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Play
 		PlayerController->CreateOtherPlayerViewWidget(NewRenderTarget);
 	}
 
-	RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
