@@ -123,9 +123,6 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SolveCube();
 
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_FinishScramble();
-
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 

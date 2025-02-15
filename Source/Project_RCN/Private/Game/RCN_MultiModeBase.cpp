@@ -85,6 +85,5 @@ AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player
 void ARCN_MultiModeBase::FinishScramble()
 {
 	Super::FinishScramble();
-
-	RCN_LOG(LogPlayer, Log, TEXT("Scramble"))
+	
 }

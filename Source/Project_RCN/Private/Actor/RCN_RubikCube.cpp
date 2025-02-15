@@ -342,6 +342,7 @@ void ARCN_RubikCube::TurnNext()
 {
 	if (SignQueue.IsEmpty())
 	{
+		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
 		bIsTurning = false;
 
 		if (bIsScrambling)
@@ -350,7 +351,6 @@ void ARCN_RubikCube::TurnNext()
 			FinishScrambleDelegate.Broadcast();
 		}
 		
-		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
 		return;
 	}
 
@@ -623,6 +623,15 @@ void ARCN_RubikCube::MulticastRPC_ChangePattern_Implementation(const FString& Ne
 			}
 		}
 	}
+
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::ServerRPC_FinishScramble_Implementation()
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
+	
+	FinishScrambleDelegate.Broadcast();
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }

@@ -152,4 +152,7 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_ChangePattern(const FString& NewPattern);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_FinishScramble();
 };

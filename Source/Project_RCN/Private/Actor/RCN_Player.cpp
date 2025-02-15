@@ -513,7 +513,14 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 
 void ARCN_Player::FinishScrambleHandle()
 {
-	ServerRPC_FinishScramble();
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	
+	if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		GameModeBase->FinishScramble();
+	}
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -587,18 +594,6 @@ void ARCN_Player::ServerRPC_SolveCube_Implementation()
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 	
 	NetworkRubikCube->Solve();
-
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_Player::ServerRPC_FinishScramble_Implementation()
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-
-	if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		GameModeBase->FinishScramble();
-	}
 
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
