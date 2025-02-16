@@ -4,7 +4,7 @@
 #include "Game/RCN_MainMenuModeBase.h"
 
 #include "Actor/RCN_PlayerController.h"
-#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 void ARCN_MainMenuModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -14,4 +14,10 @@ void ARCN_MainMenuModeBase::PostLogin(APlayerController* NewPlayer)
 	{
 		NewPlayerController->CreateMainMenu();
 	}
+}
+
+void ARCN_MainMenuModeBase::StartLobby()
+{
+	UE_LOG(LogTemp, Log, TEXT("Starting Game..."));
+	UGameplayStatics::OpenLevel(this, "LobbyLevel", true, "listen");
 }

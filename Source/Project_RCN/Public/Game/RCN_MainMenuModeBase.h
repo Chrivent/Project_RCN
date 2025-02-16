@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Game/RCN_GameModeBase.h"
-#include "UI/RCN_MainMenuWidget.h"
 #include "RCN_MainMenuModeBase.generated.h"
 
 /**
@@ -17,4 +16,7 @@ class PROJECT_RCN_API ARCN_MainMenuModeBase : public ARCN_GameModeBase
 
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+public:
+	void StartLobby();
 };
