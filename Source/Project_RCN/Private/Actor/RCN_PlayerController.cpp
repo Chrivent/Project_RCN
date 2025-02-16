@@ -5,7 +5,6 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Data/RCN_UIDataAsset.h"
-#include "GameFramework/GameStateBase.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_TimerWidget.h"
