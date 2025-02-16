@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_SettingWidget.generated.h"
 
+class UComboBoxString;
 class UWidgetSwitcher;
 class UButton;
 /**
@@ -33,6 +34,15 @@ protected:
 	
 	UFUNCTION()
 	void SettingCategoryEtcButtonReleasedHandle();
+
+	UFUNCTION()
+	void AllGraphicSettingComboBoxSelectionChangedHandle(FString Resolution, ESelectInfo::Type SelectInfo);
+
+	UFUNCTION()
+	void GraphicSettingComboBoxSelectionChangedHandle(FString Resolution, ESelectInfo::Type SelectInfo);
+
+	UFUNCTION()
+	void ChangeScreenSize(FString Resolution, ESelectInfo::Type SelectInfo);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UWidgetSwitcher> SettingMenuWidgetSwitcher;
@@ -51,4 +61,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> SettingCategoryEtcButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UComboBoxString> AllGraphicSettingComboBox;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UComboBoxString> GraphicSettingComboBox;
 };
