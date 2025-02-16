@@ -56,6 +56,8 @@ protected:
 	
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category="GameUI")
 	TObjectPtr<URCN_OtherPlayerViewWidget> OtherPlayerViewWidget;
+
+	TArray<URCN_OtherPlayerViewWidget*> PlayerViewWidgets;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)

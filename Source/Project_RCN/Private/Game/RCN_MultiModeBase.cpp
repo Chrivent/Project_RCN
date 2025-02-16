@@ -9,12 +9,11 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "Project_RCN/Project_RCN.h"
 
 void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
+	
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
@@ -60,6 +59,8 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 				}
 			}
 		}
+
+		
 	}), 1.0f, false);
 }
 
