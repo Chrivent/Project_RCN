@@ -18,15 +18,7 @@ void URCN_GameInstance::Init()
 
 		if (SessionInterface.IsValid())
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					15.f,
-					FColor::Blue,
-					FString::Printf(TEXT("Found Subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString())
-				);
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Found Subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString()));
 
 			SessionInterface.Pin()->OnCreateSessionCompleteDelegates.AddUObject(this, &URCN_GameInstance::OnCreateSessionCompleteHandle);
 			SessionInterface.Pin()->OnDestroySessionCompleteDelegates.AddUObject(this, &URCN_GameInstance::OnDestroySessionCompleteHandle);
@@ -35,12 +27,12 @@ void URCN_GameInstance::Init()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to get OnlineSessionInterface"));
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to get OnlineSessionInterface")));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OnlineSubsystem not found"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("OnlineSubsystem not found")));
 	}
 }
 
@@ -48,7 +40,7 @@ void URCN_GameInstance::CreateSession(const int32 NumPlayers)
 {
 	if (!SessionInterface.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SessionInterface is invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
 		return;
 	}
 	
@@ -65,7 +57,7 @@ void URCN_GameInstance::FindSessions()
 {
 	if (!SessionInterface.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SessionInterface is invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
 		return;
 	}
 	
@@ -81,7 +73,7 @@ void URCN_GameInstance::JoinSession(const FOnlineSessionSearchResult& SearchResu
 {
 	if (!SessionInterface.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SessionInterface is invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
 		return;
 	}
 	
@@ -94,7 +86,7 @@ void URCN_GameInstance::DestroySession()
 {
 	if (!SessionInterface.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SessionInterface is invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
 		return;
 	}
 	
@@ -105,7 +97,7 @@ void URCN_GameInstance::OnCreateSessionCompleteHandle(FName SessionName, bool bW
 {
 	if (bWasSuccessful)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Session created successfully: %s"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session created successfully: %s"), *SessionName.ToString()));
 
 		// 세션을 성공적으로 생성하면 게임 시작
 		if (ARCN_MainMenuModeBase* MainMenuModeBase = Cast<ARCN_MainMenuModeBase>(GetWorld()->GetAuthGameMode()))
@@ -115,7 +107,7 @@ void URCN_GameInstance::OnCreateSessionCompleteHandle(FName SessionName, bool bW
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to create session: %s"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to create session: %s"), *SessionName.ToString()));
 	}
 }
 
@@ -123,36 +115,36 @@ void URCN_GameInstance::OnDestroySessionCompleteHandle(FName SessionName, bool b
 {
 	if (bWasSuccessful)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Session destroyed successfully: %s"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session destroyed successfully: %s"), *SessionName.ToString()));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session: %s"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to destroy session: %s"), *SessionName.ToString()));
 	}
 }
 
 void URCN_GameInstance::OnFindSessionsCompleteHandle(bool bWasSuccessful)
 {
-	if (!SessionSearch.IsValid() || !SessionInterface.IsValid())
+	if (!SessionInterface.IsValid() || !SessionSearch.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SessionSearch or SessionInterface is invalid"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface or SessionSearch is invalid")));
 		return;
 	}
 
 	if (bWasSuccessful && SessionSearch->SearchResults.Num() > 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Found %d sessions"), SessionSearch->SearchResults.Num());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Found %d sessions"), SessionSearch->SearchResults.Num()));
 
 		for (int32 Index = 0; Index < SessionSearch->SearchResults.Num(); ++Index)
 		{
 			const FOnlineSessionSearchResult& Result = SessionSearch->SearchResults[Index];
-			UE_LOG(LogTemp, Log, TEXT("Session %d: Owner=%s, Ping=%d"), 
-				Index, *Result.Session.OwningUserName, Result.PingInMs);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session %d: Owner=%s, Ping=%d"), 
+				Index, *Result.Session.OwningUserName, Result.PingInMs));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No sessions found"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("No sessions found")));
 	}
 }
 
@@ -160,23 +152,23 @@ void URCN_GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSe
 {
 	if (!SessionInterface.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SessionInterface is invalid in OnJoinSessionCompleteHandle"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
 		return;
 	}
 
 	switch (JoinResult)
 	{
 	case EOnJoinSessionCompleteResult::Success:
-		UE_LOG(LogTemp, Log, TEXT("Successfully joined session: %s"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Successfully joined session: %s"), *SessionName.ToString()));
 		break;
 	case EOnJoinSessionCompleteResult::SessionIsFull:
-		UE_LOG(LogTemp, Warning, TEXT("Failed to join session: %s (Session is full)"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to join session: %s (Session is full)"), *SessionName.ToString()));
 		return;
 	case EOnJoinSessionCompleteResult::SessionDoesNotExist:
-		UE_LOG(LogTemp, Warning, TEXT("Failed to join session: %s (Session does not exist)"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to join session: %s (Session does not exist)"), *SessionName.ToString()));
 		return;
 	default:
-		UE_LOG(LogTemp, Warning, TEXT("Failed to join session: %s (Unknown error)"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to join session: %s (Unknown error)"), *SessionName.ToString()));
 		return;
 	}
 
@@ -184,14 +176,14 @@ void URCN_GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSe
 	FString ConnectionInfo;
 	if (!SessionInterface.Pin()->GetResolvedConnectString(SessionName, ConnectionInfo))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to get connection info for session: %s"), *SessionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to get connection info for session: %s"), *SessionName.ToString()));
 		return;
 	}
 
 	// 클라이언트를 서버로 이동
 	if (APlayerController* PlayerController = GetFirstLocalPlayerController())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Client traveling to: %s"), *ConnectionInfo);
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Client traveling to: %s"), *ConnectionInfo));
 		PlayerController->ClientTravel(ConnectionInfo, ETravelType::TRAVEL_Absolute);
 	}
 }
