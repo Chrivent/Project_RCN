@@ -19,5 +19,5 @@ void ARCN_MainMenuModeBase::PostLogin(APlayerController* NewPlayer)
 void ARCN_MainMenuModeBase::StartLobby()
 {
 	UE_LOG(LogTemp, Log, TEXT("Starting Game..."));
-	UGameplayStatics::OpenLevel(this, "LobbyLevel", true, "listen");
+	UGameplayStatics::OpenLevel(this, "TestMultiLevel", true, "listen");
 }
