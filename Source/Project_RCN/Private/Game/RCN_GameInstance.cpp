@@ -36,7 +36,7 @@ void URCN_GameInstance::Init()
 	}
 }
 
-void URCN_GameInstance::CreateSession(const int32 NumPlayers)
+void URCN_GameInstance::CreateSession(const int32 NumPlayers) const
 {
 	if (!SessionInterface.IsValid())
 	{
@@ -69,7 +69,7 @@ void URCN_GameInstance::FindSessions()
 	SessionInterface.Pin()->FindSessions(0, SessionSearch.ToSharedRef());
 }
 
-void URCN_GameInstance::JoinSession(const FOnlineSessionSearchResult& SearchResult)
+void URCN_GameInstance::JoinSession(const FOnlineSessionSearchResult& SearchResult) const
 {
 	if (!SessionInterface.IsValid())
 	{
@@ -82,7 +82,7 @@ void URCN_GameInstance::JoinSession(const FOnlineSessionSearchResult& SearchResu
 	SessionInterface.Pin()->JoinSession(0, NAME_GameSession, SearchResult);
 }
 
-void URCN_GameInstance::DestroySession()
+void URCN_GameInstance::DestroySession() const
 {
 	if (!SessionInterface.IsValid())
 	{
@@ -93,7 +93,7 @@ void URCN_GameInstance::DestroySession()
 	SessionInterface.Pin()->DestroySession(NAME_GameSession);
 }
 
-void URCN_GameInstance::OnCreateSessionCompleteHandle(FName SessionName, bool bWasSuccessful)
+void URCN_GameInstance::OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
@@ -111,7 +111,7 @@ void URCN_GameInstance::OnCreateSessionCompleteHandle(FName SessionName, bool bW
 	}
 }
 
-void URCN_GameInstance::OnDestroySessionCompleteHandle(FName SessionName, bool bWasSuccessful)
+void URCN_GameInstance::OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
@@ -123,7 +123,7 @@ void URCN_GameInstance::OnDestroySessionCompleteHandle(FName SessionName, bool b
 	}
 }
 
-void URCN_GameInstance::OnFindSessionsCompleteHandle(bool bWasSuccessful)
+void URCN_GameInstance::OnFindSessionsCompleteHandle(const bool bWasSuccessful)
 {
 	if (!SessionInterface.IsValid() || !SessionSearch.IsValid())
 	{
@@ -135,11 +135,10 @@ void URCN_GameInstance::OnFindSessionsCompleteHandle(bool bWasSuccessful)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Found %d sessions"), SessionSearch->SearchResults.Num()));
 
-		for (int32 Index = 0; Index < SessionSearch->SearchResults.Num(); ++Index)
+		for (int32 i = 0; i < SessionSearch->SearchResults.Num(); i++)
 		{
-			const FOnlineSessionSearchResult& Result = SessionSearch->SearchResults[Index];
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session %d: Owner=%s, Ping=%d"), 
-				Index, *Result.Session.OwningUserName, Result.PingInMs));
+			const FOnlineSessionSearchResult& Result = SessionSearch->SearchResults[i];
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session %d: Owner=%s, Ping=%d"), i, *Result.Session.OwningUserName, Result.PingInMs));
 		}
 	}
 	else
@@ -148,7 +147,7 @@ void URCN_GameInstance::OnFindSessionsCompleteHandle(bool bWasSuccessful)
 	}
 }
 
-void URCN_GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type JoinResult)
+void URCN_GameInstance::OnJoinSessionCompleteHandle(const FName SessionName, const EOnJoinSessionCompleteResult::Type JoinResult)
 {
 	if (!SessionInterface.IsValid())
 	{
@@ -184,6 +183,6 @@ void URCN_GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSe
 	if (APlayerController* PlayerController = GetFirstLocalPlayerController())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Client traveling to: %s"), *ConnectionInfo));
-		PlayerController->ClientTravel(ConnectionInfo, ETravelType::TRAVEL_Absolute);
+		PlayerController->ClientTravel(ConnectionInfo, TRAVEL_Absolute);
 	}
 }

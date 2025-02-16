@@ -21,16 +21,16 @@ protected:
 	virtual void Init() override;
 
 public:
-	void CreateSession(int32 NumPlayers);
+	void CreateSession(const int32 NumPlayers) const;
 	void FindSessions();
-	void JoinSession(const FOnlineSessionSearchResult& SearchResult);
-	void DestroySession();
+	void JoinSession(const FOnlineSessionSearchResult& SearchResult) const;
+	void DestroySession() const;
 
 protected:
-	void OnCreateSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
-	void OnDestroySessionCompleteHandle(FName SessionName, bool bWasSuccessful);
-	void OnFindSessionsCompleteHandle(bool bWasSuccessful);
-	void OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type JoinResult);
+	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful);
+	void OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful);
+	void OnFindSessionsCompleteHandle(const bool bWasSuccessful);
+	void OnJoinSessionCompleteHandle(const FName SessionName, const EOnJoinSessionCompleteResult::Type JoinResult);
 	
 	TWeakPtr<IOnlineSession> SessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
