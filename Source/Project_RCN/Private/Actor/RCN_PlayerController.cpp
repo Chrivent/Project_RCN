@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Data/RCN_UIDataAsset.h"
+#include "GameFramework/GameStateBase.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_TimerWidget.h"
@@ -88,9 +89,33 @@ void ARCN_PlayerController::CreateTimerWidget()
 
 void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget)
 {
-	OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass);
+	if (!UIDataAsset || !UIDataAsset->OtherPlayerViewWidgetClass)
+	{
+		RCN_LOG(LogPlayer, Error, TEXT("UIDataAsset 또는 WidgetClass가 설정되지 않음"))
+		return;
+	}
+	
+	URCN_OtherPlayerViewWidget* NewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass);
+	if (!NewWidget)
+	{
+		RCN_LOG(LogPlayer, Error, TEXT("새로운 UI 위젯 생성 실패"))
+		return;
+	}
+
+	NewWidget->AddToViewport();
+	NewWidget->SetOtherPlayerView(RenderTarget);
+
+	int32 PlayerCount = PlayerViewWidgets.Num();
+	float NewYpos = 20 + (PlayerCount * 200);
+	NewWidget->SetRenderTranslation(FVector2D(0, NewYpos));
+
+	PlayerViewWidgets.Add(NewWidget);
+
+	/*
+	OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass); 
 	OtherPlayerViewWidget->AddToViewport();
 	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
+	*/
 }
 
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
