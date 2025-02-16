@@ -7,6 +7,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "Game/RCN_MainMenuModeBase.h"
+#include "Online/OnlineSessionNames.h"
 
 void URCN_GameInstance::Init()
 {
@@ -45,10 +46,12 @@ void URCN_GameInstance::CreateSession(const int32 NumPlayers) const
 	}
 	
 	FOnlineSessionSettings SessionSettings;
-	SessionSettings.bIsLANMatch = true; // LAN 게임 여부
 	SessionSettings.NumPublicConnections = NumPlayers; // 최대 플레이어 수
 	SessionSettings.bShouldAdvertise = true; // 세션을 찾을 수 있도록 광고 설정
 	SessionSettings.bUsesPresence = true; // 친구 목록에서 세션 표시 여부
+	SessionSettings.bAllowInvites = true;  // 초대 가능
+	SessionSettings.bAllowJoinViaPresence = true; // 친구 목록에서 "게임 참가" 버튼을 눌러 참가할 수 있도록 설정
+	SessionSettings.bAllowJoinViaPresenceFriendsOnly = true; // 친구만 bAllowJoinViaPresence 기능을 사용할 수 있도록 설정.
 
 	SessionInterface.Pin()->CreateSession(0, NAME_GameSession, SessionSettings);
 }
@@ -62,7 +65,6 @@ void URCN_GameInstance::FindSessions()
 	}
 	
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
-	SessionSearch->bIsLanQuery = true;
 	SessionSearch->MaxSearchResults = 10;
 	SessionSearch->PingBucketSize = 50;
 

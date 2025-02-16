@@ -20,7 +20,7 @@ void URCN_MultiPlayerMainMenuWidget::CreateSessionButtonReleasedHandle()
 {
 	if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
 	{
-		GameInstance->CreateSession(2); // 최대 2인 세션 생성
+		GameInstance->CreateSession(4); // 최대 2인 세션 생성
 	}
 }
 
@@ -39,6 +39,10 @@ void URCN_MultiPlayerMainMenuWidget::JoinSessionButtonReleasedHandle()
 		if (GameInstance->GetSessionSearch().IsValid() && GameInstance->GetSessionSearch()->SearchResults.Num() > 0)
 		{
 			GameInstance->JoinSession(GameInstance->GetSessionSearch()->SearchResults[0]); // 첫 번째 세션 참가
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("No available sessions to join"));
 		}
 	}
 }
