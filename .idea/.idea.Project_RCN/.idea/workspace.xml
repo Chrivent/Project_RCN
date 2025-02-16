@@ -15,10 +15,10 @@
     <list default="true" id="b078c60a-6a96-428f-8c99-2fc5af23aff2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_RCN/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_RCN/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/UI/WBP_OtherPlayerViewWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/WBP_OtherPlayerViewWidget.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Level/LobbyLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Level/LobbyLevel.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/Actor/RCN_PlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/Actor/RCN_PlayerController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/Game/RCN_MultiModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/Game/RCN_MultiModeBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/Actor/RCN_PlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/Actor/RCN_PlayerController.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_MainMenuWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Private/UI/RCN_MainMenuWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_MainMenuWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_RCN/Public/UI/RCN_MainMenuWidget.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +59,7 @@
     <setting file="file://$PROJECT_DIR$/Source/Project_RCN/Public/Game/RCN_MainMenuModeBase.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="Toolset" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,

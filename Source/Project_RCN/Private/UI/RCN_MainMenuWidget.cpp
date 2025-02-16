@@ -8,6 +8,7 @@
 #include "UI/RCN_MultiPlayerMainMenuWidget.h"
 #include "UI/RCN_SettingWidget.h"
 #include "UI/RCN_SinglePlayerMainMenuWidget.h"
+#include "Kismet\KismetSystemLibrary.h"
 
 void URCN_MainMenuWidget::NativeConstruct()
 {
@@ -17,6 +18,7 @@ void URCN_MainMenuWidget::NativeConstruct()
 	SinglePlayerButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::SinglePlayerButtonReleasedHandle);
 	MultiPlayerButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::MultiPlayerButtonReleasedHandle);
 	SettingButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::SettingButtonReleasedHandle);
+	GameOutButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::GameOutButtonReleasedHandle);
 	
 	BackButton->SetVisibility(ESlateVisibility::Hidden);
 }
@@ -47,4 +49,9 @@ void URCN_MainMenuWidget::SettingButtonReleasedHandle()
 	MainMenuWidgetSwitcher->SetActiveWidget(SettingMainMenuWidget);
 
 	BackButton->SetVisibility(ESlateVisibility::Visible);
+}
+
+void URCN_MainMenuWidget::GameOutButtonReleasedHandle()
+{
+	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 }
