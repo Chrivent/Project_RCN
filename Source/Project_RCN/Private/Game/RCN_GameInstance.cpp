@@ -52,6 +52,7 @@ void URCN_GameInstance::CreateSession(const int32 NumPlayers) const
 	SessionSettings.bAllowInvites = true;  // 초대 가능
 	SessionSettings.bAllowJoinViaPresence = true; // 친구 목록에서 "게임 참가" 버튼을 눌러 참가할 수 있도록 설정
 	SessionSettings.bAllowJoinViaPresenceFriendsOnly = true; // 친구만 bAllowJoinViaPresence 기능을 사용할 수 있도록 설정.
+	SessionSettings.bUseLobbiesIfAvailable = true; // 로비 시스템 우선 사용
 
 	SessionInterface.Pin()->CreateSession(0, NAME_GameSession, SessionSettings);
 }
@@ -80,7 +81,7 @@ void URCN_GameInstance::JoinSession(const FOnlineSessionSearchResult& SearchResu
 	}
 	
 	// 세션 참가 요청
-	UE_LOG(LogTemp, Log, TEXT("Attempting to join session: %s"), *SearchResult.Session.OwningUserName);
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Attempting to join session: %s"), *SearchResult.Session.OwningUserName));
 	SessionInterface.Pin()->JoinSession(0, NAME_GameSession, SearchResult);
 }
 
