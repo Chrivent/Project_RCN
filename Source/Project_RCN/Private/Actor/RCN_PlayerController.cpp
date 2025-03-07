@@ -104,17 +104,12 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 	NewWidget->AddToViewport();
 	NewWidget->SetOtherPlayerView(RenderTarget);
 
-	int32 PlayerCount = PlayerViewWidgets.Num();
-	float NewYpos = 20 + (PlayerCount * 200);
+	const int32 PlayerCount = PlayerViewWidgets.Num();
+	// Todo: 상수 제거 필요
+	float NewYpos = 20 + PlayerCount * 200;
 	NewWidget->SetRenderTranslation(FVector2D(0, NewYpos));
 
 	PlayerViewWidgets.Add(NewWidget);
-
-	/*
-	OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass); 
-	OtherPlayerViewWidget->AddToViewport();
-	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
-	*/
 }
 
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()

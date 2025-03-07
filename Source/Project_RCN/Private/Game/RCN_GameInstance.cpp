@@ -169,6 +169,12 @@ void URCN_GameInstance::OnJoinSessionCompleteHandle(const FName SessionName, con
 	case EOnJoinSessionCompleteResult::SessionDoesNotExist:
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to join session: %s (Session does not exist)"), *SessionName.ToString()));
 		return;
+	case EOnJoinSessionCompleteResult::CouldNotRetrieveAddress:
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to join session: %s (Could Not Retrieve Address)"), *SessionName.ToString()));
+		return;
+	case EOnJoinSessionCompleteResult::AlreadyInSession:
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to join session: %s (Already In Session)"), *SessionName.ToString()));
+		return;
 	default:
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to join session: %s (Unknown error)"), *SessionName.ToString()));
 		return;
