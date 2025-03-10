@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class UImage;
 class URCN_MainMenuWidget;
 class URCN_OtherPlayerViewWidget;
 class ARCN_Player;
@@ -38,7 +39,6 @@ protected:
 
 public:
 	void CreateMainMenu();
-	
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
@@ -49,6 +49,9 @@ public:
 	int32 GetPlayerUniqueID() const { return PlayerUniqueID; }
 
 protected:
+	void UpdateMoveImage(UImage* Image, FVector2D TargetTranslation);
+	void UpdateScaleImage(UImage* Image, FVector2D TargetScale);
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 	
@@ -60,7 +63,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GameUI")
 	TObjectPtr<URCN_TimerWidget> TimerWidget;
 
-	TArray<URCN_OtherPlayerViewWidget*> PlayerViewWidgets;
+	UPROPERTY(VisibleAnywhere, Category="GameUI")
+	TArray<URCN_OtherPlayerViewWidget*> OtherPlayerViewWidgets;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
