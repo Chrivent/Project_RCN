@@ -24,7 +24,7 @@ ARCN_PlayerController::ARCN_PlayerController()
 		return;
 	}
 
-	PlayerUniqueID = -1;
+	PlayerNumber = -1;
 }
 
 void ARCN_PlayerController::PostInitializeComponents()
@@ -157,11 +157,6 @@ void ARCN_PlayerController::UpdateScaleImage(UImage* Image, const FVector2D Targ
 	{
 		UpdateScaleImage(Image, TargetScale);
 	}));
-}
-
-void ARCN_PlayerController::SetPlayerUniqueID(int32 NewID)
-{
-	PlayerUniqueID = NewID;
 }
 
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()

@@ -7,6 +7,7 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
+#include "Project_RCN/Project_RCN.h"
 
 
 void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
@@ -27,21 +28,14 @@ void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 
 				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
 				{
-					int32 NewID = GetAvailableID();
-					if (NewID != -1)
+					int32 PlayerNumber = GetAvailablePlayerNumber();
+					if (PlayerNumber != -1)
 					{
-						PlayerController->SetPlayerUniqueID(NewID);
-						PlayerIDMap.Add(PlayerController, NewID);
+						PlayerController->SetPlayerNumber(PlayerNumber);
+						PlayerNumberMap.Add(PlayerController, PlayerNumber);
 					}
 					
-					/*FString PlayerControllerName = PlayerController->GetFName().ToString();
-
-					FString TempPlayerStringID;
-					PlayerControllerName.Split(TEXT("_"), nullptr, &TempPlayerStringID);
-					
-					int32 PlayerID = FCString::Atoi(*TempPlayerStringID);*/
-					
-					Player->UpdateCubeLocation(CubeSpawnPosition[PlayerController->GetPlayerUniqueID()]);
+					Player->UpdateCubeLocation(CubeSpawnPosition[PlayerController->GetPlayerNumber()]);
 					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 				}
 			}
@@ -78,34 +72,34 @@ void ARCN_LobbyModeBase::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
 
-	if (ARCN_Player* Player = Cast<ARCN_Player>(Exiting->GetPawn()))
+	if (const ARCN_Player* Player = Cast<ARCN_Player>(Exiting->GetPawn()))
 	{
 		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
 		{
-			int32 ExitingID = PlayerController->GetPlayerUniqueID();
-			if (ExitingID != -1)
+			const int32 ExitingPlayerNumber = PlayerController->GetPlayerNumber();
+			if (ExitingPlayerNumber != -1)
 			{
-				ReleaseID(ExitingID);
-				PlayerIDMap.Remove(PlayerController);
+				ReleasePlayerNumber(ExitingPlayerNumber);
+				PlayerNumberMap.Remove(PlayerController);
 			}
 		}
 	}
 }
 
-int32 ARCN_LobbyModeBase::GetAvailableID()
+int32 ARCN_LobbyModeBase::GetAvailablePlayerNumber()
 {
-	if (AvailableIDs.Num() > 0)
+	if (AvailablePlayerNumbers.Num() > 0)
 	{
-		int32 AssignedID = AvailableIDs[0];
-		AvailableIDs.RemoveAt(0);
-		return AssignedID;
+		const int32 AssignedPlayerNumber = AvailablePlayerNumbers[0];
+		AvailablePlayerNumbers.RemoveAt(0);
+		return AssignedPlayerNumber;
 	}
 
 	return -1;
 }
 
-void ARCN_LobbyModeBase::ReleaseID(int32 ID)
+void ARCN_LobbyModeBase::ReleasePlayerNumber(int32 PlayerNumber)
 {
-	AvailableIDs.Add(ID);
-	AvailableIDs.Sort();
+	AvailablePlayerNumbers.Add(PlayerNumber);
+	AvailablePlayerNumbers.Sort();
 }

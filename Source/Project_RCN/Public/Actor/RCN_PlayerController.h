@@ -25,6 +25,9 @@ public:
 	
 	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
 	
+	FORCEINLINE void SetPlayerNumber(const int32 InPlayerNumber) { PlayerNumber = InPlayerNumber; }
+	FORCEINLINE int32 GetPlayerNumber() const { return PlayerNumber; }
+	
 protected:
 	// 게임과 무관한 액터 초기화
 	virtual void PostInitializeComponents() override;
@@ -43,11 +46,9 @@ public:
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player Info")
-	int32 PlayerUniqueID;
+	int32 PlayerNumber;
 
-	void SetPlayerUniqueID(int32 NewID);
-	int32 GetPlayerUniqueID() const { return PlayerUniqueID; }
-
+	
 protected:
 	void UpdateMoveImage(UImage* Image, FVector2D TargetTranslation);
 	void UpdateScaleImage(UImage* Image, FVector2D TargetScale);
