@@ -23,7 +23,7 @@ public:
 	ARCN_PlayerController();
 	
 	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
-
+	
 protected:
 	// 게임과 무관한 액터 초기화
 	virtual void PostInitializeComponents() override;
@@ -41,7 +41,13 @@ public:
 	
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player Info")
+	int32 PlayerUniqueID;
+
+	void SetPlayerUniqueID(int32 NewID);
+	int32 GetPlayerUniqueID() const { return PlayerUniqueID; }
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;

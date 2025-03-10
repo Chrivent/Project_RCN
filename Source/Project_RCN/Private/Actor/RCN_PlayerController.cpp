@@ -23,6 +23,8 @@ ARCN_PlayerController::ARCN_PlayerController()
 		RCN_LOG(LogPlayer, Error, TEXT("UI 데이터 에셋 로드 실패"))
 		return;
 	}
+
+	PlayerUniqueID = -1;
 }
 
 void ARCN_PlayerController::PostInitializeComponents()
@@ -104,6 +106,11 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 	OtherPlayerViewWidget->SetRenderTranslation(FVector2D(0, Y));
 
 	PlayerViewWidgets.Add(OtherPlayerViewWidget);
+}
+
+void ARCN_PlayerController::SetPlayerUniqueID(int32 NewID)
+{
+	PlayerUniqueID = NewID;
 }
 
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
