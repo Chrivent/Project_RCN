@@ -45,7 +45,7 @@ public:
 	void UpdateCubeLocation(const FVector& TargetLocation);
 	void UpdateCubeRotation(const FRotator& TargetRotation);
 	void RenewalCube();
-	void CreateRenderTarget(ARCN_Player* OtherPlayer);
+	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	
 protected:
 	void SetControl() const;

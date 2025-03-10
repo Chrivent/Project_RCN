@@ -47,24 +47,7 @@ void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 			{
 				MultiPlayer->RenewalCube();
 			}
-
-			if (Iterator->Get() != NewPlayer)
-			{
-				const ARCN_PlayerController* OtherPlayerController = Cast<ARCN_PlayerController>(Iterator->Get());
-				const ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(NewPlayer);
-				if (IsValid(OtherPlayerController) && IsValid(NewPlayerController))
-				{
-					ARCN_Player* OtherPlayer = Cast<ARCN_Player>(OtherPlayerController->GetPawn());
-					ARCN_Player* Player = Cast<ARCN_Player>(NewPlayerController->GetPawn());
-					if (IsValid(OtherPlayer) && IsValid(Player))
-					{
-						OtherPlayer->CreateRenderTarget(Player);
-						Player->CreateRenderTarget(OtherPlayer);
-					}
-				}
-			}
 		}
-		
 	}), 1.0f, false);
 }
 

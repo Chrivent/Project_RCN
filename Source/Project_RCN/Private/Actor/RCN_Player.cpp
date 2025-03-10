@@ -207,7 +207,7 @@ void ARCN_Player::RenewalCube()
 	NetworkRubikCube->ChangePattern(NetworkRubikCube->GetPattern());
 }
 
-void ARCN_Player::CreateRenderTarget(ARCN_Player* OtherPlayer)
+void ARCN_Player::CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer)
 {
 	ClientRPC_CreateOtherPlayerViewWidget(OtherPlayer);
 }

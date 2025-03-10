@@ -52,8 +52,8 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 						ARCN_Player* Player = Cast<ARCN_Player>(NewPlayerController->GetPawn());
 						if (IsValid(OtherPlayer) && IsValid(Player))
 						{
-							OtherPlayer->CreateRenderTarget(Player);
-							Player->CreateRenderTarget(OtherPlayer);
+							OtherPlayer->CreateOtherPlayerViewWidget(Player);
+							Player->CreateOtherPlayerViewWidget(OtherPlayer);
 						}
 					}
 				}
