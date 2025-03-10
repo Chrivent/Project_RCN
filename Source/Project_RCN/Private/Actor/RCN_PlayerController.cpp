@@ -98,12 +98,63 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 
 	OtherPlayerViewWidget->AddToViewport();
 	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
+	FVector2D CurrentTranslation = OtherPlayerViewWidget->GetOtherPlayerView()->GetRenderTransform().Translation;
+	// Todo: 상수 데이터화 필요
+	CurrentTranslation.X += 500.0f;
+	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderTranslation(CurrentTranslation);
+	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderScale(FVector2D::ZeroVector);
 
-	const int32 PlayerCount = PlayerViewWidgets.Num();
-	const float Y = PlayerCount * (180 + 20) + 20;
-	OtherPlayerViewWidget->SetRenderTranslation(FVector2D(0, Y));
+	for (const auto ExistingOtherPlayerViewWidget : OtherPlayerViewWidgets)
+	{
+		FVector2D ExistingCurrentTranslation = OtherPlayerViewWidget->GetOtherPlayerView()->GetRenderTransform().Translation;
+		// Todo: 상수 데이터화 필요
+		ExistingCurrentTranslation.Y += 200.0f;
+		UpdateMoveImage(ExistingOtherPlayerViewWidget->GetOtherPlayerView(), ExistingCurrentTranslation);
+	}
 
-	PlayerViewWidgets.Add(OtherPlayerViewWidget);
+	// Todo: 상수 데이터화 필요
+	CurrentTranslation.X -= 500.0f;
+	UpdateMoveImage(OtherPlayerViewWidget->GetOtherPlayerView(), CurrentTranslation);
+	UpdateScaleImage(OtherPlayerViewWidget->GetOtherPlayerView(), FVector2D(1.0f, 1.0f));
+	
+	OtherPlayerViewWidgets.Add(OtherPlayerViewWidget);
+}
+
+void ARCN_PlayerController::UpdateMoveImage(UImage* Image, const FVector2D TargetTranslation)
+{
+	const FVector2D CurrentTranslation = Image->GetRenderTransform().Translation;
+	const FVector2D NewTranslation = FMath::Lerp(CurrentTranslation, TargetTranslation, 0.5f);
+	Image->SetRenderTranslation(NewTranslation);
+
+	if (NewTranslation.Equals(TargetTranslation, 0.01f))
+	{
+		Image->SetRenderTranslation(TargetTranslation);
+		return;
+	}
+	
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		UpdateMoveImage(Image, TargetTranslation);
+	}));
+}
+
+void ARCN_PlayerController::UpdateScaleImage(UImage* Image, const FVector2D TargetScale)
+{
+	const FVector2D CurrentScale = Image->GetRenderTransform().Scale;
+	const FVector2D NewScale = FMath::Lerp(CurrentScale, TargetScale, 0.5f);
+	Image->SetRenderScale(NewScale);
+
+	if (NewScale.Equals(TargetScale, 0.01f))
+	{
+		Image->SetRenderScale(TargetScale);
+		return;
+	}
+
+	// 다음 프레임에 계속 업데이트
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		UpdateScaleImage(Image, TargetScale);
+	}));
 }
 
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()

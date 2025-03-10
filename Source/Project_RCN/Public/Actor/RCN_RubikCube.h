@@ -14,6 +14,7 @@ class USpringArmComponent;
 class URCN_RubikCubeDataAsset;
 
 DECLARE_MULTICAST_DELEGATE(FFinishScramble)
+DECLARE_MULTICAST_DELEGATE(FFinishSolve)
 
 UENUM(BlueprintType)
 enum class EAxisType : uint8
@@ -90,6 +91,7 @@ public:
 	FVector GetButtonPosition(UBoxComponent* ButtonBoxComponent);
 
 	FFinishScramble FinishScrambleDelegate;
+	FFinishSolve FinishSolveDelegate;
 
 protected:
 	void CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType);
@@ -150,6 +152,12 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_Spin(const FString& Command);
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Scramble();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Solve();
+
+	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_ChangePattern(const FString& NewPattern);
 };

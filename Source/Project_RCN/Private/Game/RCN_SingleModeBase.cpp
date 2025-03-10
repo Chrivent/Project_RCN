@@ -30,13 +30,13 @@ void ARCN_SingleModeBase::PostLogin(APlayerController* NewPlayer)
 			Player->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
 			Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 		}
+
+		RubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_SingleModeBase::FinishScramble);
 	}
 }
 
-void ARCN_SingleModeBase::FinishScramble()
+void ARCN_SingleModeBase::FinishScramble() const
 {
-	Super::FinishScramble();
-
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
 		PlayerController->GetTimerWidget()->StartTimer();

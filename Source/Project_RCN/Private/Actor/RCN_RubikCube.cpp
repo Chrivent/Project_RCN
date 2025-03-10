@@ -201,66 +201,16 @@ void ARCN_RubikCube::Spin(const FString& Command)
 
 void ARCN_RubikCube::Scramble()
 {
-	if (bIsTurning)
-	{
-		return;
-	}
+	RCN_LOG(LogRubikCube, Log, TEXT("큐브 섞기"))
 	
-	FString Command = TEXT("");
-
-	FString LastSign = TEXT(" ");
-	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
-	{
-		FString CurrentSign;
-		do
-		{
-			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
-		} while (LastSign[0] == CurrentSign[0]);
-		LastSign = CurrentSign;
-
-		Command += CurrentSign + TEXT(" ");
-	}
-
-	Command.RemoveAt(Command.Len() - 1);
-	
-	Spin(Command);
-
-	bIsScrambling = true;
+	ServerRPC_Scramble();
 }
 
 void ARCN_RubikCube::Solve()
 {
-	if (bIsTurning)
-	{
-		return;
-	}
+	RCN_LOG(LogRubikCube, Log, TEXT("큐브 풀기"))
 	
-	FString Command = TEXT("");
-
-	TMap<TCHAR, TCHAR> ReplacementInfo = {
-		{ Pattern[4], TEXT('U') },
-		{ Pattern[13], TEXT('R') },
-		{ Pattern[22], TEXT('F') },
-		{ Pattern[31], TEXT('D') },
-		{ Pattern[40], TEXT('L') },
-		{ Pattern[49], TEXT('B') }
-	};
-
-	FString Facelet = Pattern;
-	for (auto& FaceletChar : Facelet)
-	{
-		FaceletChar = ReplacementInfo[FaceletChar];
-	}
-
-	Command = solution(
-		TCHAR_TO_ANSI(*Facelet),
-		24,
-		1000,
-		0,
-		"cache"
-	);
-
-	Spin(Command);
+	ServerRPC_Solve();
 }
 
 void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
@@ -345,10 +295,42 @@ void ARCN_RubikCube::TurnNext()
 		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
 		bIsTurning = false;
 
-		if (bIsScrambling)
+		if (HasAuthority())
 		{
-			bIsScrambling = false;
-			FinishScrambleDelegate.Broadcast();
+			if (bIsScrambling)
+			{
+				RCN_LOG(LogRubikCube, Log, TEXT("섞기 완료"))
+				bIsScrambling = false;
+				FinishScrambleDelegate.Broadcast();
+			}
+
+			TArray FacesPatterns = {
+				Pattern.Mid(0, 9),
+				Pattern.Mid(9, 9),
+				Pattern.Mid(18, 9),
+				Pattern.Mid(27, 9),
+				Pattern.Mid(36, 9),
+				Pattern.Mid(45, 9)
+			};
+
+			bool bIsSolved = true;
+			for (auto FacesPattern : FacesPatterns)
+			{
+				const TCHAR FirstStickerColor = FacesPattern[0];
+				for (const auto StickerColor : FacesPattern)
+				{
+					if (StickerColor != FirstStickerColor)
+					{
+						bIsSolved = false;
+					}
+				}
+			}
+
+			if (bIsSolved)
+			{
+				RCN_LOG(LogRubikCube, Log, TEXT("풀기 완료"))
+				FinishSolveDelegate.Broadcast();
+			}
 		}
 		
 		return;
@@ -571,6 +553,80 @@ void ARCN_RubikCube::MulticastRPC_Spin_Implementation(const FString& Command)
 
 		TurnNext();
 	}
+
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::ServerRPC_Scramble_Implementation()
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (bIsTurning)
+	{
+		RCN_LOG(LogRubikCube, Warning, TEXT("%s"), TEXT("큐브가 회전 중입니다. 회전이 끝날 때까지 기다려주세요."));
+		return;
+	}
+	
+	FString Command = TEXT("");
+
+	FString LastSign = TEXT(" ");
+	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
+	{
+		FString CurrentSign;
+		do
+		{
+			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
+		} while (LastSign[0] == CurrentSign[0]);
+		LastSign = CurrentSign;
+
+		Command += CurrentSign + TEXT(" ");
+	}
+
+	Command.RemoveAt(Command.Len() - 1);
+	
+	ServerRPC_Spin(Command);
+
+	bIsScrambling = true;
+
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::ServerRPC_Solve_Implementation()
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (bIsTurning)
+	{
+		RCN_LOG(LogRubikCube, Warning, TEXT("%s"), TEXT("큐브가 회전 중입니다. 회전이 끝날 때까지 기다려주세요."));
+		return;
+	}
+	
+	FString Command = TEXT("");
+
+	TMap<TCHAR, TCHAR> ReplacementInfo = {
+		{ Pattern[4], TEXT('U') },
+		{ Pattern[13], TEXT('R') },
+		{ Pattern[22], TEXT('F') },
+		{ Pattern[31], TEXT('D') },
+		{ Pattern[40], TEXT('L') },
+		{ Pattern[49], TEXT('B') }
+	};
+
+	FString Facelet = Pattern;
+	for (auto& FaceletChar : Facelet)
+	{
+		FaceletChar = ReplacementInfo[FaceletChar];
+	}
+
+	Command = solution(
+		TCHAR_TO_ANSI(*Facelet),
+		24,
+		1000,
+		0,
+		"cache"
+	);
+
+	ServerRPC_Spin(Command);
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }

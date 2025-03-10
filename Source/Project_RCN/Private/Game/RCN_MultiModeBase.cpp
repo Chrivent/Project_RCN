@@ -58,9 +58,9 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 					}
 				}
 			}
-		}
 
-		
+			// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
+		}
 	}), 1.0f, false);
 }
 
@@ -81,10 +81,4 @@ AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player
 	}
 
 	return Super::ChoosePlayerStart_Implementation(Player);
-}
-
-void ARCN_MultiModeBase::FinishScramble()
-{
-	Super::FinishScramble();
-	
 }

@@ -19,6 +19,6 @@ class PROJECT_RCN_API ARCN_SingleModeBase : public ARCN_GameModeBase
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
-public:
-	virtual void FinishScramble() override;
+	UFUNCTION()
+	void FinishScramble() const;
 };
