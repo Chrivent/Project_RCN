@@ -25,5 +25,5 @@ void ARCN_MainMenuModeBase::StartSingle() const
 void ARCN_MainMenuModeBase::StartLobby() const
 {
 	RCN_LOG(LogTemp, Log, TEXT("Starting Game..."));
-	UGameplayStatics::OpenLevel(this, "MultiLevel", true, "listen");
+	UGameplayStatics::OpenLevel(this, "LobbyLevel", true, "listen");
 }

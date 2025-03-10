@@ -69,8 +69,11 @@ void URCN_GameInstance::FindSessions()
 	}
 	
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
-	SessionSearch->MaxSearchResults = 10;
-	SessionSearch->PingBucketSize = 50;
+	SessionSearch->MaxSearchResults = 1000;
+	SessionSearch->PingBucketSize = 1000;
+
+	// Todo: 임시로 랜매치. 나중에 지워야함
+	SessionSearch->bIsLanQuery = true;
 
 	SessionInterface.Pin()->FindSessions(0, SessionSearch.ToSharedRef());
 }
