@@ -17,6 +17,11 @@ void ARCN_MainMenuModeBase::PostLogin(APlayerController* NewPlayer)
 	}
 }
 
+void ARCN_MainMenuModeBase::StartSingle() const
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName("SingleLevel"));
+}
+
 void ARCN_MainMenuModeBase::StartLobby() const
 {
 	RCN_LOG(LogTemp, Log, TEXT("Starting Game..."));

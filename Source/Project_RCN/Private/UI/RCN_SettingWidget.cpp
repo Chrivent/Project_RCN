@@ -19,7 +19,7 @@ void URCN_SettingWidget::NativeConstruct()
 	SettingCategoryEtcButton->OnReleased.AddDynamic(this, &URCN_SettingWidget::SettingCategoryEtcButtonReleasedHandle);
 
 	GraphicSettingFullScreenCheckBox->OnCheckStateChanged.AddDynamic(this, &URCN_SettingWidget::GraphicSettingFullScreenCheckBoxCheckStateChangedHandle);
-	GraphicSettingComboBox->OnSelectionChanged.AddDynamic(this, &URCN_SettingWidget::ChangeScreenSize);
+	GraphicSettingComboBox->OnSelectionChanged.AddDynamic(this, &URCN_SettingWidget::GraphicSettingComboBoxSelectionChangedHandle);
 }
 
 void URCN_SettingWidget::SettingCategorySoundButtonReleasedHandle()
@@ -45,55 +45,33 @@ void URCN_SettingWidget::SettingCategoryEtcButtonReleasedHandle()
 void URCN_SettingWidget::GraphicSettingFullScreenCheckBoxCheckStateChangedHandle(bool bIsChecked)
 {
 	UGameUserSettings* Settings = UGameUserSettings::GetGameUserSettings();
-	if (!Settings)
-	{
-		return;
-	}
-
 	EWindowMode::Type NewWindowMode = bIsChecked ? EWindowMode::Type::WindowedFullscreen : EWindowMode::Type::Windowed;
-
 	if (Settings->GetFullscreenMode() != NewWindowMode)
 	{
 		Settings->SetFullscreenMode(NewWindowMode);
 		Settings->ApplySettings(false);
 
-		ChangeScreenSize(GraphicSettingComboBox->GetSelectedOption(), ESelectInfo::Type::OnMouseClick);
+		ChangeScreenSize(GraphicSettingComboBox->GetSelectedOption());
 		
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Changed Window Mode : %s"), bIsChecked ? TEXT("true") : TEXT("false")));
 	}
 }
 
-void URCN_SettingWidget::GraphicSettingComboBoxSelectionChangedHandle(FString Resolution, ESelectInfo::Type SelectInfo)
+void URCN_SettingWidget::GraphicSettingComboBoxSelectionChangedHandle(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
-	
+	ChangeScreenSize(SelectedItem);
 }
 
-void URCN_SettingWidget::ChangeScreenSize(FString Resolution, ESelectInfo::Type SelectInfo)
+void URCN_SettingWidget::ChangeScreenSize(FString SelectedItem)
 {
 	FString WidthStr, HeightStr;
-	if (!Resolution.Split(TEXT("x"), &WidthStr, &HeightStr))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Wrong Resolution: %s"), *Resolution));
-		return;
-	}
+	SelectedItem.Split(TEXT("x"), &WidthStr, &HeightStr);
 
-	if (!WidthStr.IsNumeric() || !HeightStr.IsNumeric())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("Resolution must be numeric!"));
-		return;
-	}
-	
-	int32 Width = FCString::Atoi(*WidthStr);
-	int32 Height = FCString::Atoi(*HeightStr);
+	const int32 Width = FCString::Atoi(*WidthStr);
+	const int32 Height = FCString::Atoi(*HeightStr);
 
 	UGameUserSettings* Settings = UGameUserSettings::GetGameUserSettings();
-	if (!Settings)
-	{
-		return;
-	}
-
 	EWindowMode::Type CurrentWindowMode = Settings->GetFullscreenMode();
-
 	if (CurrentWindowMode == EWindowMode::Type::Fullscreen || CurrentWindowMode == EWindowMode::Type::WindowedFullscreen)
 	{
 		Settings->RequestResolutionChange(Width, Height, CurrentWindowMode, false);
@@ -106,5 +84,5 @@ void URCN_SettingWidget::ChangeScreenSize(FString Resolution, ESelectInfo::Type 
 	Settings->ApplySettings(false);
 	Settings->ConfirmVideoMode();
 	
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Setting Complete Resolution: %s"), *Resolution));
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Setting Complete Resolution: %s"), *SelectedItem));
 }

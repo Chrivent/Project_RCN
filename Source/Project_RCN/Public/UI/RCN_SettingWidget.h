@@ -19,6 +19,7 @@ class PROJECT_RCN_API URCN_SettingWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
+	UFUNCTION()
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
@@ -37,10 +38,9 @@ protected:
 	void GraphicSettingFullScreenCheckBoxCheckStateChangedHandle(bool bIsChecked);
 	
 	UFUNCTION()
-	void GraphicSettingComboBoxSelectionChangedHandle(FString Resolution, ESelectInfo::Type SelectInfo);
-
-	UFUNCTION()
-	void ChangeScreenSize(FString Resolution, ESelectInfo::Type SelectInfo);
+	void GraphicSettingComboBoxSelectionChangedHandle(FString SelectedItem, ESelectInfo::Type SelectionType);
+	
+	void ChangeScreenSize(FString Resolution);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UWidgetSwitcher> SettingMenuWidgetSwitcher;

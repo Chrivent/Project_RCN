@@ -18,5 +18,6 @@ protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 public:
+	void StartSingle() const;
 	void StartLobby() const;
 };

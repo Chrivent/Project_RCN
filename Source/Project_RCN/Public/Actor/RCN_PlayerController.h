@@ -53,9 +53,6 @@ protected:
 	// Game UI Section
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GameUI")
 	TObjectPtr<URCN_TimerWidget> TimerWidget;
-	
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category="GameUI")
-	TObjectPtr<URCN_OtherPlayerViewWidget> OtherPlayerViewWidget;
 
 	TArray<URCN_OtherPlayerViewWidget*> PlayerViewWidgets;
 	
