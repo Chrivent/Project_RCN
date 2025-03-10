@@ -19,12 +19,16 @@ protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
-	TArray<int32> AvailablePlayerNumbers = { 0, 1, 2, 3 };
-	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
-
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
 	
+	UPROPERTY(VisibleAnywhere)
+	TArray<int32> AvailablePlayerNumbers = { 0, 1, 2, 3 };
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
+
+	// Todo: 상수 데이터화 필요
 	TArray<FVector> CubeSpawnPosition = {
 		FVector(1730.0f, -1000.0f, 0.0f),
 		FVector(1730.0f, -300.0f, 0.0f),
