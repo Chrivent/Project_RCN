@@ -618,8 +618,16 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 		FaceletChar = ReplacementInfo[FaceletChar];
 	}
 
-	Command = UCubeSolver::SolveCube(
+	/*Command = UCubeSolver::SolveCube(
 		Facelet,
+		24,
+		1000,
+		0,
+		"cache"
+	);*/
+
+	Command = Solution(
+		TCHAR_TO_ANSI(*Facelet),
 		24,
 		1000,
 		0,

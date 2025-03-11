@@ -1,12 +1,12 @@
 #include "KociembaAlgorithm/CoordCube.h"
 
-short TwistMove[N_TWIST][N_MOVE] = {0};
-short FlipMove[N_FLIP][N_MOVE] = {0};
+short TwistMove[N_TWIST][N_MOVE];
+short FlipMove[N_FLIP][N_MOVE];
 short ParityMove[2][18] = {
     { 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1 },
     { 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 }
 };
-short FRtoBR_Move[N_FRtoBR][N_MOVE] = {0};
+short FRtoBR_Move[N_FRtoBR][N_MOVE];
 short URFtoDLF_Move[N_URFtoDLF][N_MOVE] = {{0}};
 short URtoDF_Move[N_URtoDF][N_MOVE] = {{0}};
 short URtoUL_Move[N_URtoUL][N_MOVE] = {{0}};

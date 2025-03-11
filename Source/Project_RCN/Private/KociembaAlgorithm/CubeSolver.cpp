@@ -279,18 +279,139 @@ int UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth)
     return DepthPhase1 + DepthPhase2;
 }
 
-void UCubeSolver::Patternize(const FString& Facelets, const FString& Pattern, FString& Patternized)
+FString Solution(char* Facelets, int MaxDepth, long TimeOut, bool bUseSeparator, const char* CacheDir)
 {
-    TUniquePtr<FFaceCube> StartFaceCube(GetFaceCubeFromString(TCHAR_TO_UTF8(*Facelets)));
-    TUniquePtr<FFaceCube> PatternFaceCube(GetFaceCubeFromString(TCHAR_TO_UTF8(*Pattern)));
+    FSearch* search = new FSearch();
+    FFaceCube* fc;
+    FCubieCube* cc;
+    FCoordCube* c;
 
-    TUniquePtr<FCubieCube> StartCubieCube(ToCubieCube(StartFaceCube.Get()));
-    TUniquePtr<FCubieCube> PatternCubieCube(ToCubieCube(PatternFaceCube.Get()));
+    int s, i;
+    int mv, n;
+    int busy;
+    int depthPhase1;
+    time_t tStart;
+    // +++++++++++++++++++++check for wrong input +++++++++++++++++++++++++++++
+    int count[6] = {0};
 
-    TUniquePtr<FCubieCube> InversePatternCube(GetCubieCube());
-    InvCubieCube(PatternCubieCube.Get(), InversePatternCube.Get());
-    Multiply(InversePatternCube.Get(), StartCubieCube.Get());
-    
-    TUniquePtr<FFaceCube> FinalFaceCube(ToFaceCube(InversePatternCube.Get()));
-    Patternized = UTF8_TO_TCHAR(FinalFaceCube.Get());
+    if (PRUNING_INITED == 0) {
+        InitPruning(CacheDir);
+    }
+
+    for (i = 0; i < 54; i++)
+        switch(Facelets[i]) {
+    case 'U': count[static_cast<int32>(EColorType::U)]++; break;
+    case 'R': count[static_cast<int32>(EColorType::R)]++; break;
+    case 'F': count[static_cast<int32>(EColorType::F)]++; break;
+    case 'D': count[static_cast<int32>(EColorType::D)]++; break;
+    case 'L': count[static_cast<int32>(EColorType::L)]++; break;
+    case 'B': count[static_cast<int32>(EColorType::B)]++; break;
+        }
+
+    for (i = 0; i < 6; i++)
+        if (count[i] != 9) {
+            free(search);
+            return FString();
+        }
+
+    fc = GetFaceCubeFromString(Facelets);
+    cc = ToCubieCube(fc);
+    if ((s = Verify(cc)) != 0) {
+        free(search);
+        return FString();
+    }
+
+    // +++++++++++++++++++++++ initialization +++++++++++++++++++++++++++++++++
+    c = GetCoordCube(cc);
+
+    search->Po[0] = 0;
+    search->Ax[0] = 0;
+    search->Flip[0] = c->Flip;
+    search->Twist[0] = c->Twist;
+    search->Parity[0] = c->Parity;
+    search->Slice[0] = c->FRtoBR / 24;
+    search->URFtoDLF[0] = c->URFtoDLF;
+    search->FRtoBR[0] = c->FRtoBR;
+    search->URtoUL[0] = c->URtoUL;
+    search->UBtoDF[0] = c->UBtoDF;
+
+    search->MinDistPhase1[1] = 1;// else failure for depth=1, n=0
+    mv = 0;
+    n = 0;
+    busy = 0;
+    depthPhase1 = 1;
+
+    tStart = time(NULL);
+
+    // +++++++++++++++++++ Main loop ++++++++++++++++++++++++++++++++++++++++++
+    do {
+        do {
+            if ((depthPhase1 - n > search->MinDistPhase1[n + 1]) && !busy) {
+
+                if (search->Ax[n] == 0 || search->Ax[n] == 3)// Initialize next move
+                    search->Ax[++n] = 1;
+                else
+                    search->Ax[++n] = 0;
+                search->Po[n] = 1;
+            } else if (++search->Po[n] > 3) {
+                do {// increment axis
+                    if (++search->Ax[n] > 5) {
+
+                        if (time(NULL) - tStart > TimeOut)
+                            return FString();
+
+                        if (n == 0) {
+                            if (depthPhase1 >= MaxDepth)
+                                return FString();
+                            else {
+                                depthPhase1++;
+                                search->Ax[n] = 0;
+                                search->Po[n] = 1;
+                                busy = 0;
+                                break;
+                            }
+                        } else {
+                            n--;
+                            busy = 1;
+                            break;
+                        }
+
+                    } else {
+                        search->Po[n] = 1;
+                        busy = 0;
+                    }
+                } while (n != 0 && (search->Ax[n - 1] == search->Ax[n] || search->Ax[n - 1] - 3 == search->Ax[n]));
+            } else
+                busy = 0;
+        } while (busy);
+
+        // +++++++++++++ compute new coordinates and new minDistPhase1 ++++++++++
+        // if minDistPhase1 =0, the H subgroup is reached
+        mv = 3 * search->Ax[n] + search->Po[n] - 1;
+        search->Flip[n + 1] = FlipMove[search->Flip[n]][mv];
+        search->Twist[n + 1] = TwistMove[search->Twist[n]][mv];
+        search->Slice[n + 1] = FRtoBR_Move[search->Slice[n] * 24][mv] / 24;
+        search->MinDistPhase1[n + 1] = FMath::Max(
+            GetPruning(Slice_Flip_Prun, N_SLICE1 * search->Flip[n + 1] + search->Slice[n + 1]),
+            GetPruning(Slice_Twist_Prun, N_SLICE1 * search->Twist[n + 1] + search->Slice[n + 1])
+        );
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // System.out.format("%d %d\n", n, depthPhase1);
+        if (search->MinDistPhase1[n + 1] == 0 && n >= depthPhase1 - 5) {
+            search->MinDistPhase1[n + 1] = 10;// instead of 10 any value >5 is possible
+            if (n == depthPhase1 - 1 && (s = UCubeSolver::TotalDepth(*search, depthPhase1, MaxDepth)) >= 0) {
+                if (s == depthPhase1
+                        || (search->Ax[depthPhase1 - 1] != search->Ax[depthPhase1] && search->Ax[depthPhase1 - 1] != search->Ax[depthPhase1] + 3)) {
+                    FString res;
+                    if (bUseSeparator) {
+                        res = UCubeSolver::SolutionToString(search, s, depthPhase1);
+                    } else {
+                        res = UCubeSolver::SolutionToString(search, s, -1);
+                    }
+                    return res;
+                }
+            }
+
+        }
+    } while (1);
 }

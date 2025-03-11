@@ -73,9 +73,6 @@ public:
      * In phase2, only moves U, D, R2, F2, L2, B2 are allowed.
      */
     static int32 TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth);
-
-    /**
-     * Add a pattern to the cube state, so that solving `NewFacelets` applied to `Facelets` results in `Pattern`
-     */
-    static void Patternize(const FString& Facelets, const FString& Pattern, FString& Patternized);
 };
+
+FString Solution(char* Facelets, int MaxDepth, long TimeOut, bool bUseSeparator, const char* CacheDir);
