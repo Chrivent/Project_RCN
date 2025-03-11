@@ -707,7 +707,7 @@ int getURtoDF_standalone(short idx1, short idx2)
         }
     }
     res = getURtoDF(b);
-    free(a);
-    free(b);
+    //free(a);
+    //free(b);
     return res;
 }

@@ -1,77 +1,64 @@
 #include "KociembaAlgorithm/prunetable_helpers.h"
 
-char * join_path(const char *dir, const char *filename)
+FString FPruneTableHelpers::JoinPath(const FString& Dir, const FString& Filename)
 {
-    size_t path_len = strnlen(dir, 500);
-    char *fpath = (char*)calloc(path_len + 32, 1);
-    if (path_len == 500) {
-        return NULL;
-    }
-
-    if (fpath != 0)
-    {
-        strcpy_s(fpath, path_len + 32, dir);
-        strcat_s(fpath, path_len + 32, "/");
-        strncat_s(fpath, path_len + 32, filename, 30);
-    }
-    
-    return fpath;
+	return FPaths::Combine(Dir, Filename);
 }
 
-int check_cached_table(const char* name, void* ptr, int len, const char *cache_dir)
+bool FPruneTableHelpers::CheckCachedTable(const FString& Name, void* Ptr, int32 Len, const FString& CacheDir)
 {
-    int res = 0;
-    char *fname = join_path(cache_dir, name);
-    if (fname == NULL) {
-        fprintf(stderr, "Path to cache tables is too long\n");
-        return -1;
-    }
+	FString FilePath = JoinPath(CacheDir, Name);
 
-    if (access(fname, F_OK | R_OK) != -1) {
-        // fprintf(stderr, "Found cache for %s. Loading...", name);
-        read_from_file(ptr, len, fname);
-        // fprintf(stderr, "done.\n");
-        res = 0;
-    } else {
-        fprintf(stderr, "Cache table %s was not found. Recalculating.\n", fname);
-        res = 1;
-    }
-    free(fname);
-    return res;
+	if (FPaths::FileExists(FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Found cache for %s. Loading..."), *Name);
+		ReadFromFile(Ptr, Len, FilePath);
+		UE_LOG(LogTemp, Log, TEXT("Done."));
+		return true;
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("Cache table %s was not found. Recalculating."), *FilePath);
+	return false;
 }
 
-void read_from_file(void* ptr, int len, const char* name)
+void FPruneTableHelpers::ReadFromFile(void* Ptr, int32 Len, const FString& FilePath)
 {
-    FILE* f = fopen(name, "rb");
-    if (!fread(ptr, len, 1, f))
-        ((void)0); // suppress -Wunused-result warning
-    fclose(f);
+	TArray<uint8> FileData;
+	if (FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		FMemory::Memcpy(Ptr, FileData.GetData(), FMath::Min(FileData.Num(), Len));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to read file: %s"), *FilePath);
+	}
 }
 
-int make_dir(const char *cache_dir)
+bool FPruneTableHelpers::MakeDir(const FString& CacheDir)
 {
-#if defined(_WIN32)
-    return _mkdir(cache_dir);
-#else
-    return mkdir(cache_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-#endif
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	return PlatformFile.CreateDirectoryTree(*CacheDir);
 }
 
-void dump_to_file(void* ptr, int len, const char* name, const char *cache_dir)
+void FPruneTableHelpers::DumpToFile(void* Ptr, int32 Len, const FString& Name, const FString& CacheDir)
 {
-    int status;
-    status = make_dir(cache_dir);
-    if (status == 0 || errno == EEXIST) {
-        char *fname = join_path(cache_dir, name);
-        if (fname == NULL) {
-            fprintf(stderr, "Path to cache tables is too long\n");
-        } else {
-            FILE* f = fopen(fname, "wb");
-            fwrite(ptr, len, 1, f);
-            free(fname);
-            fclose(f);
-        }
-    } else {
-        fprintf(stderr, "cannot create cache tables directory\n");
-    }
+	if (MakeDir(CacheDir))
+	{
+		FString FilePath = JoinPath(CacheDir, Name);
+		TArray<uint8> FileData;
+		FileData.Append(static_cast<uint8*>(Ptr), Len);
+
+		if (FFileHelper::SaveArrayToFile(FileData, *FilePath))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Successfully wrote cache table: %s"), *FilePath);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to write cache table: %s"), *FilePath);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cannot create cache tables directory: %s"), *CacheDir);
+	}
 }
