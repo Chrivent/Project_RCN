@@ -32,7 +32,7 @@ public:
     /**
      * Generate the solution string from the array data including a separator between phase1 and phase2 moves
      */
-    static FString SolutionToString(const FSearch* Search, int32 Length, int32 DepthPhase1);
+    static FString SolutionToString(const FSearch& Search, int32 Length, int32 DepthPhase1);
 
     /**
      * Computes the solver string for a given cube.
@@ -74,5 +74,3 @@ public:
      */
     static int32 TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth);
 };
-
-FString Solution(char* Facelets, int MaxDepth, long TimeOut, bool bUseSeparator, const char* CacheDir);
