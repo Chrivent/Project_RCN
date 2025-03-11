@@ -1,6 +1,7 @@
 #include "KociembaAlgorithm/CubeSolver.h"
+
 #include "KociembaAlgorithm/facecube.h"
-#include "KociembaAlgorithm/coordcube.h"
+#include "KociembaAlgorithm/CoordCube.h"
 
 FString UCubeSolver::SolutionToString(const FSearch* Search, const int32 Length, const int32 DepthPhase1)
 {
@@ -31,7 +32,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
 
     if (PRUNING_INITED == 0)
     {
-        initPruning(TCHAR_TO_UTF8(*CacheDir));
+        InitPruning(TCHAR_TO_UTF8(*CacheDir));
     }
     
     for (const TCHAR& Facelet : Facelets)
@@ -54,14 +55,14 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
         return FString("ERROR: Invalid cube state");
     }
     
-    FFaceCube* Fc = get_facecube_fromstring(TCHAR_TO_UTF8(*Facelets));
-    FCubieCube* Cc = toCubieCube(Fc);
+    FFaceCube* Fc = GetFaceCubeFromString(TCHAR_TO_UTF8(*Facelets));
+    FCubieCube* Cc = ToCubieCube(Fc);
     if (Verify(Cc) != 0)
     {
         return FString("ERROR: Unsolvable cube");
     }
 
-    FCoordCube* C = get_coordcube(Cc);
+    FCoordCube* C = GetCoordCube(Cc);
 
     Search->Po[0] = 0;
     Search->Ax[0] = 0;
@@ -85,7 +86,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
         {
             if (DepthPhase1 - N > Search->MinDistPhase1[N + 1] && !Busy)
             {
-                Search->Ax[++N] = (Search->Ax[N - 1] == 0 || Search->Ax[N - 1] == 3) ? 1 : 0;
+                Search->Ax[++N] = Search->Ax[N - 1] == 0 || Search->Ax[N - 1] == 3 ? 1 : 0;
                 Search->Po[N] = 1;
             }
             else if (++Search->Po[N] > 3)
@@ -144,8 +145,8 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
         Search->Slice[N + 1] = FRtoBR_Move[Search->Slice[N] * 24][Mv] / 24;
     
         Search->MinDistPhase1[N + 1] = FMath::Max(
-            getPruning(Slice_Flip_Prun, N_SLICE1 * Search->Flip[N + 1] + Search->Slice[N + 1]),
-            getPruning(Slice_Twist_Prun, N_SLICE1 * Search->Twist[N + 1] + Search->Slice[N + 1])
+            GetPruning(Slice_Flip_Prun, N_SLICE1 * Search->Flip[N + 1] + Search->Slice[N + 1]),
+            GetPruning(Slice_Twist_Prun, N_SLICE1 * Search->Twist[N + 1] + Search->Slice[N + 1])
         );
 
         if (Search->MinDistPhase1[N + 1] == 0 && N >= DepthPhase1 - 5)
@@ -180,7 +181,7 @@ int UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth)
         Search.Parity[i + 1] = ParityMove[Search.Parity[i]][Move];
     }
 
-    int32 D1 = getPruning(Slice_URFtoDLF_Parity_Prun,
+    int32 D1 = GetPruning(Slice_URFtoDLF_Parity_Prun,
         (N_SLICE2 * Search.URFtoDLF[DepthPhase1] + Search.FRtoBR[DepthPhase1]) * 2 + Search.Parity[DepthPhase1]);
     
     if (D1 > MaxDepthPhase2)
@@ -197,7 +198,7 @@ int UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth)
 
     Search.URtoDF[DepthPhase1] = MergeURtoULandUBtoDF[Search.URtoUL[DepthPhase1]][Search.UBtoDF[DepthPhase1]];
 
-    int32 D2 = getPruning(Slice_URtoDF_Parity_Prun,
+    int32 D2 = GetPruning(Slice_URtoDF_Parity_Prun,
         (N_SLICE2 * Search.URtoDF[DepthPhase1] + Search.FRtoBR[DepthPhase1]) * 2 + Search.Parity[DepthPhase1]);
 
     if (D2 > MaxDepthPhase2)
@@ -221,8 +222,8 @@ int UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth)
         {
             if (DepthPhase1 + DepthPhase2 - N > Search.MinDistPhase2[N + 1] && !Busy)
             {
-                Search.Ax[++N] = (Search.Ax[N - 1] == 0 || Search.Ax[N - 1] == 3) ? 1 : 0;
-                Search.Po[N] = (Search.Ax[N] == 0 || Search.Ax[N] == 3) ? 1 : 2;
+                Search.Ax[++N] = Search.Ax[N - 1] == 0 || Search.Ax[N - 1] == 3 ? 1 : 0;
+                Search.Po[N] = Search.Ax[N] == 0 || Search.Ax[N] == 3 ? 1 : 2;
             }
             else if (Search.Ax[N] == 0 || Search.Ax[N] == 3 ? ++Search.Po[N] > 3 : (Search.Po[N] += 2) > 3)
             {
@@ -267,9 +268,9 @@ int UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth)
         Search.URtoDF[N + 1] = URtoDF_Move[Search.URtoDF[N]][Move];
 
         Search.MinDistPhase2[N + 1] = FMath::Max(
-            getPruning(Slice_URtoDF_Parity_Prun,
+            GetPruning(Slice_URtoDF_Parity_Prun,
                 (N_SLICE2 * Search.URtoDF[N + 1] + Search.FRtoBR[N + 1]) * 2 + Search.Parity[N + 1]),
-            getPruning(Slice_URFtoDLF_Parity_Prun,
+            GetPruning(Slice_URFtoDLF_Parity_Prun,
                 (N_SLICE2 * Search.URFtoDLF[N + 1] + Search.FRtoBR[N + 1]) * 2 + Search.Parity[N + 1])
         );
 
@@ -280,16 +281,16 @@ int UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth)
 
 void UCubeSolver::Patternize(const FString& Facelets, const FString& Pattern, FString& Patternized)
 {
-    TUniquePtr<FFaceCube> StartFaceCube(get_facecube_fromstring(TCHAR_TO_UTF8(*Facelets)));
-    TUniquePtr<FFaceCube> PatternFaceCube(get_facecube_fromstring(TCHAR_TO_UTF8(*Pattern)));
+    TUniquePtr<FFaceCube> StartFaceCube(GetFaceCubeFromString(TCHAR_TO_UTF8(*Facelets)));
+    TUniquePtr<FFaceCube> PatternFaceCube(GetFaceCubeFromString(TCHAR_TO_UTF8(*Pattern)));
 
-    TUniquePtr<FCubieCube> StartCubieCube(toCubieCube(StartFaceCube.Get()));
-    TUniquePtr<FCubieCube> PatternCubieCube(toCubieCube(PatternFaceCube.Get()));
+    TUniquePtr<FCubieCube> StartCubieCube(ToCubieCube(StartFaceCube.Get()));
+    TUniquePtr<FCubieCube> PatternCubieCube(ToCubieCube(PatternFaceCube.Get()));
 
-    TUniquePtr<FCubieCube> InversePatternCube(get_cubiecube());
-    invCubieCube(PatternCubieCube.Get(), InversePatternCube.Get());
-    multiply(InversePatternCube.Get(), StartCubieCube.Get());
+    TUniquePtr<FCubieCube> InversePatternCube(GetCubieCube());
+    InvCubieCube(PatternCubieCube.Get(), InversePatternCube.Get());
+    Multiply(InversePatternCube.Get(), StartCubieCube.Get());
     
-    TUniquePtr<FFaceCube> FinalFaceCube(toFaceCube(InversePatternCube.Get()));
+    TUniquePtr<FFaceCube> FinalFaceCube(ToFaceCube(InversePatternCube.Get()));
     Patternized = UTF8_TO_TCHAR(FinalFaceCube.Get());
 }

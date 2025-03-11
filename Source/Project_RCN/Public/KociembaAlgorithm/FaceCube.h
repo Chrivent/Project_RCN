@@ -87,8 +87,8 @@ extern EColorType CornerColor[8][3];
 // Map the edge positions to facelet colors.
 extern EColorType EdgeColor[12][2];
 
-FFaceCube* get_facecube();
-FFaceCube* get_facecube_fromstring(char* cubeString);
+FFaceCube* GetFaceCube();
+FFaceCube* GetFaceCubeFromString(const char* CubeString);
 
-void to_String(FFaceCube* FaceCube, char* res);
-struct FCubieCube* toCubieCube(FFaceCube* FaceCube);
+void ToString(FFaceCube* FaceCube, char* res);
+struct FCubieCube* ToCubieCube(FFaceCube* FaceCube);

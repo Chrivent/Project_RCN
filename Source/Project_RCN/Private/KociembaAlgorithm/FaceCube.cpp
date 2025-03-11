@@ -1,5 +1,6 @@
 #include "KociembaAlgorithm/facecube.h"
-#include "KociembaAlgorithm/cubiecube.h"
+
+#include "KociembaAlgorithm/CubieCube.h"
 
 
 EFaceletType CornerFacelet[8][3] = {
@@ -55,10 +56,10 @@ EColorType EdgeColor[12][2] = {
 };
 
 
-FFaceCube* get_facecube()
+FFaceCube* GetFaceCube()
 {
     FFaceCube* res = new FFaceCube();
-    static const EColorType f[54] = {
+    static constexpr EColorType ColorTypes[54] = {
         EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U,
         EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R,
         EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F,
@@ -66,16 +67,16 @@ FFaceCube* get_facecube()
         EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L,
         EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B
     };
-    res->Facelets = TArray(f, UE_ARRAY_COUNT(f));
+    res->Facelets = TArray(ColorTypes, UE_ARRAY_COUNT(ColorTypes));
     return res;
 }
 
-FFaceCube* get_facecube_fromstring(char* cubeString)
+FFaceCube* GetFaceCubeFromString(const char* CubeString)
 {
     FFaceCube* res = new FFaceCube();
     for (int32 i = 0; i < 54; i++)
     {
-        switch(cubeString[i])
+        switch(CubeString[i])
         {
         case 'U':
             res->Facelets[i] = EColorType::U;
@@ -102,7 +103,7 @@ FFaceCube* get_facecube_fromstring(char* cubeString)
     return res;
 }
 
-void to_String(FFaceCube* FaceCube, char* res)
+void ToString(FFaceCube* FaceCube, char* res)
 {
     for (int32 i = 0; i < 54; i++)
     {
@@ -131,29 +132,26 @@ void to_String(FFaceCube* FaceCube, char* res)
     res[54] = 0;
 }
 
-FCubieCube* toCubieCube(FFaceCube* FaceCube)
+FCubieCube* ToCubieCube(FFaceCube* FaceCube)
 {
     int i, j;
     signed char ori;
-    EColorType col1, col2;
     FCubieCube* ccRet = new FCubieCube();
     for (i = 0; i < 8; i++)
-        ccRet->Cp[i] = ECornerType::URF;// invalidate corners
+        ccRet->Cp[i] = ECornerType::URF;
     for (i = 0; i < 12; i++)
-        ccRet->Ep[i] = EEdgeType::UR;// and edges
+        ccRet->Ep[i] = EEdgeType::UR;
 
     for(i = 0; i < CORNER_COUNT; i++) {
-        // get the colors of the cubie at corner i, starting with U/D
         for (ori = 0; ori < 3; ori++)
             if (FaceCube->Facelets[static_cast<int32>(CornerFacelet[i][ori])] == EColorType::U || FaceCube->Facelets[static_cast<int32>(CornerFacelet[i][ori])] == EColorType::D)
                 break;
-        col1 = FaceCube->Facelets[static_cast<int32>(CornerFacelet[i][(ori + 1) % 3])];
-        col2 = FaceCube->Facelets[static_cast<int32>(CornerFacelet[i][(ori + 2) % 3])];
+        EColorType col1 = FaceCube->Facelets[static_cast<int32>(CornerFacelet[i][(ori + 1) % 3])];
+        EColorType col2 = FaceCube->Facelets[static_cast<int32>(CornerFacelet[i][(ori + 2) % 3])];
 
         for (j = 0; j < CORNER_COUNT; j++) {
             if (col1 == CornerColor[j][1] && col2 == CornerColor[j][2]) {
-                // in cornerposition i we have cornercubie j
-                ccRet->Cp[i] = (ECornerType)j;
+                ccRet->Cp[i] = static_cast<ECornerType>(j);
                 ccRet->Co[i] = ori % 3;
                 break;
             }
@@ -164,13 +162,13 @@ FCubieCube* toCubieCube(FFaceCube* FaceCube)
         for (j = 0; j < EDGE_COUNT; j++) {
             if (FaceCube->Facelets[static_cast<int32>(EdgeFacelet[i][0])] == EdgeColor[j][0]
                     && FaceCube->Facelets[static_cast<int32>(EdgeFacelet[i][1])] == EdgeColor[j][1]) {
-                ccRet->Ep[i] = (EEdgeType)j;
+                ccRet->Ep[i] = static_cast<EEdgeType>(j);
                 ccRet->Eo[i] = 0;
                 break;
             }
             if (FaceCube->Facelets[static_cast<int32>(EdgeFacelet[i][0])] == EdgeColor[j][1]
                     && FaceCube->Facelets[static_cast<int32>(EdgeFacelet[i][1])] == EdgeColor[j][0]) {
-                ccRet->Ep[i] = (EEdgeType)j;
+                ccRet->Ep[i] = static_cast<EEdgeType>(j);
                 ccRet->Eo[i] = 1;
                 break;
             }

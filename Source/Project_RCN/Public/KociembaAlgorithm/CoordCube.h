@@ -1,9 +1,7 @@
 #pragma once
 
-#include "cubiecube.h"
-#include "coordcube.generated.h"
-
-// Representation of the cube on the coordinate level
+#include "CubieCube.h"
+#include "CoordCube.generated.h"
 
 #define N_TWIST     2187
 #define N_FLIP      2048
@@ -101,13 +99,16 @@ extern signed char Slice_Twist_Prun[N_SLICE1 * N_TWIST / 2 + 1];
 extern signed char Slice_Flip_Prun[N_SLICE1 * N_FLIP / 2];
 
 extern int PRUNING_INITED;
-void initPruning(const char *cache_dir);
+void InitPruning(const FString& CacheDir);
 
 // Set pruning value in table. Two values are stored in one char.
-void setPruning(signed char *table, int index, signed char value);
+void SetPruning(signed char *table, int index, signed char value);
 
 // Extract pruning value
-signed char getPruning(const signed char *table, int index);
+signed char GetPruning(const signed char *table, int index);
 
-FCoordCube* get_coordcube(FCubieCube* CubieCube);
-void move(FCoordCube* CoordCube, int m, const char *cache_dir);
+FCoordCube* GetCoordCube(FCubieCube* CubieCube);
+void Move(FCoordCube* CoordCube, int32 MoveIndex, const FString& CacheDir);
+
+static bool CheckCachedTable(const FString& Name, void* Ptr, int32 Len, const FString& CacheDir);
+static void DumpToFile(void* Ptr, int32 Len, const FString& Name, const FString& CacheDir);
