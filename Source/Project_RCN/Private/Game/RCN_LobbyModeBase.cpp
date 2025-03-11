@@ -7,8 +7,6 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
-#include "Project_RCN/Project_RCN.h"
-
 
 void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 {

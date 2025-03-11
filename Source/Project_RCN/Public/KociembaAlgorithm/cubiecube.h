@@ -1,68 +1,97 @@
-#ifndef CUBIECUBE_H
-#define CUBIECUBE_H
+#pragma once
 
-#include <string.h>
-#include <stdlib.h>
+#include "cubiecube.generated.h"
 
-#include "corner.h" 
-#include "edge.h"
-
-//Cube on the cubie level
-struct cubiecube {
-    // initialize to Id-Cube
-    // corner permutation
-    corner_t cp[8];
-    // corner orientation
-    signed char co[8];
-    // edge permutation
-    edge_t ep[12];
-    // edge orientation
-    signed char eo[12];
+UENUM(BlueprintType)
+enum class ECornerType : uint8
+{
+    URF,
+    UFL,
+    ULB,
+    UBR,
+    DFR,
+    DLF,
+    DBL,
+    DRB
 };
-typedef struct cubiecube cubiecube_t;
 
-// forward declaration
-struct facecube;
+#define CORNER_COUNT 8
+
+UENUM(BlueprintType)
+enum class EEdgeType : uint8
+{
+    UR,
+    UF,
+    UL,
+    UB,
+    DR,
+    DF,
+    DL,
+    DB,
+    FR,
+    FL,
+    BL,
+    BR
+};
+
+#define EDGE_COUNT 12
+
+USTRUCT(BlueprintType)
+struct FCubieCube
+{
+    GENERATED_BODY()
+
+    TArray<ECornerType> Cp;
+    TArray<int8> Co;
+    TArray<EEdgeType> Ep;
+    TArray<int8> Eo;
+
+    FCubieCube()
+    {
+        Cp.Init(ECornerType::URF, 8);
+        Co.Init(0, 8);
+        Ep.Init(EEdgeType::UR, 12);
+        Eo.Init(0, 12);
+    }
+};
 
 // this CubieCube array represents the 6 basic cube moves
-cubiecube_t* get_moveCube(void);
-cubiecube_t* get_cubiecube(void);
+FCubieCube* get_moveCube(void);
+FCubieCube* get_cubiecube(void);
 
 // n choose k
 int Cnk(int n, int k);
-void rotateLeft_corner(corner_t* arr, int l, int r);
-void rotateRight_corner(corner_t* arr, int l, int r);
-void rotateLeft_edge(edge_t* arr, int l, int r);
-void rotateRight_edge(edge_t* arr, int l, int r);
-struct facecube* toFaceCube(cubiecube_t* cubiecube);
-void cornerMultiply(cubiecube_t* cubiecube, cubiecube_t* b);
-void edgeMultiply(cubiecube_t* cubiecube, cubiecube_t* b);
-void multiply(cubiecube_t* cubiecube, cubiecube_t* b);
-void invCubieCube(cubiecube_t* cubiecube, cubiecube_t* c);
-short getTwist(cubiecube_t* cubiecube);
-void setTwist(cubiecube_t* cubiecube, short twist);
-short getFlip(cubiecube_t* cubiecube);
-void setFlip(cubiecube_t* cubiecube, short flip);
-short cornerParity(cubiecube_t* cubiecube);
-short edgeParity(cubiecube_t* cubiecube);
-short getFRtoBR(cubiecube_t* cubiecube);
-void setFRtoBR(cubiecube_t* cubiecube, short idx);
-short getURFtoDLF(cubiecube_t* cubiecube);
-void setURFtoDLF(cubiecube_t* cubiecube, short idx);
-int getURtoDF(cubiecube_t* cubiecube);
-void setURtoDF(cubiecube_t* cubiecube, int idx);
+void rotateLeft_corner(ECornerType* arr, int l, int r);
+void rotateRight_corner(ECornerType* arr, int l, int r);
+void rotateLeft_edge(EEdgeType* arr, int l, int r);
+void rotateRight_edge(EEdgeType* arr, int l, int r);
+struct FFaceCube* toFaceCube(FCubieCube* cubiecube);
+void cornerMultiply(FCubieCube* cubiecube, FCubieCube* b);
+void edgeMultiply(FCubieCube* cubiecube, FCubieCube* b);
+void multiply(FCubieCube* cubiecube, FCubieCube* b);
+void invCubieCube(FCubieCube* cubiecube, FCubieCube* c);
+short getTwist(FCubieCube* cubiecube);
+void setTwist(FCubieCube* cubiecube, short twist);
+short getFlip(FCubieCube* cubiecube);
+void setFlip(FCubieCube* cubiecube, short flip);
+short cornerParity(FCubieCube* cubiecube);
+short edgeParity(FCubieCube* cubiecube);
+short getFRtoBR(FCubieCube* cubiecube);
+void setFRtoBR(FCubieCube* cubiecube, short idx);
+short getURFtoDLF(FCubieCube* cubiecube);
+void setURFtoDLF(FCubieCube* cubiecube, short idx);
+int getURtoDF(FCubieCube* cubiecube);
+void setURtoDF(FCubieCube* cubiecube, int idx);
 
-short getURtoUL(cubiecube_t* cubiecube);
-void setURtoUL(cubiecube_t* cubiecube, short idx);
-short getUBtoDF(cubiecube_t* cubiecube);
-void setUBtoDF(cubiecube_t* cubiecube, short idx);
-int getURFtoDLB(cubiecube_t* cubiecube);
-void setURFtoDLB(cubiecube_t* cubiecube, int idx);
-int getURtoBR(cubiecube_t* cubiecube);
-void setURtoBR(cubiecube_t* cubiecube, int idx);
+short getURtoUL(FCubieCube* cubiecube);
+void setURtoUL(FCubieCube* cubiecube, short idx);
+short getUBtoDF(FCubieCube* cubiecube);
+void setUBtoDF(FCubieCube* cubiecube, short idx);
+int getURFtoDLB(FCubieCube* cubiecube);
+void setURFtoDLB(FCubieCube* cubiecube, int idx);
+int getURtoBR(FCubieCube* cubiecube);
+void setURtoBR(FCubieCube* cubiecube, int idx);
 
-int Verify(cubiecube_t* cubiecube);
+int Verify(FCubieCube* cubiecube);
 
 int getURtoDF_standalone(short idx1, short idx2);
-
-#endif

@@ -1,6 +1,3 @@
-#ifndef PRUNETABLE_HELPERS_H
-#define PRUNETABLE_HELPERS_H
-
 #if defined(_WIN32)
 #include <io.h>
 #include "direct.h"
@@ -17,5 +14,3 @@ int make_dir(const char *cache_dir);
 int check_cached_table(const char* name, void* ptr, int len, const char *cache_dir);
 void dump_to_file(void* ptr, int len, const char* name, const char *cache_dir);
 void read_from_file(void* ptr, int len, const char* name);
-
-#endif

@@ -5,7 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
-#include "KociembaAlgorithm/search.h"
+#include "KociembaAlgorithm/CubeSolver.h"
 #include "Project_RCN/Project_RCN.h"
 
 // Sets default values
@@ -618,8 +618,8 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 		FaceletChar = ReplacementInfo[FaceletChar];
 	}
 
-	Command = solution(
-		TCHAR_TO_ANSI(*Facelet),
+	Command = UCubeSolver::SolveCube(
+		Facelet,
 		24,
 		1000,
 		0,

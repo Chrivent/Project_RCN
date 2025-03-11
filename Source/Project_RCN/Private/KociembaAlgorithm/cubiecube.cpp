@@ -1,78 +1,100 @@
 #include "KociembaAlgorithm/cubiecube.h"
 #include "KociembaAlgorithm/facecube.h"
 
-cubiecube_t * get_moveCube()
+FCubieCube * get_moveCube()
 {
-    static cubiecube_t moveCube[6];
-    static int moveCube_initialized = 0;
-    static const corner_t     cpU[8]  = { UBR, URF, UFL, ULB, DFR, DLF, DBL, DRB };
-    static const signed char  coU[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const edge_t       epU[12] = { UB, UR, UF_, UL, DR, DF, DL, DB, FR, FL, BL, BR };
-    static const signed char  eoU[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const corner_t     cpR[8]  = { DFR, UFL, ULB, URF, DRB, DLF, DBL, UBR };
-    static const signed char  coR[8]  = { 2, 0, 0, 1, 1, 0, 0, 2 };
-    static const edge_t       epR[12] = { FR, UF_, UL, UB, BR, DF, DL, DB, DR, FL, BL, UR };
-    static const signed char  eoR[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const corner_t     cpF[8]  = { UFL, DLF, ULB, UBR, URF, DFR, DBL, DRB };
-    static const signed char  coF[8]  = { 1, 2, 0, 0, 2, 1, 0, 0 };
-    static const edge_t       epF[12] = { UR, FL, UL, UB, DR, FR, DL, DB, UF_, DF, BL, BR };
-    static const signed char  eoF[12] = { 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 };
-    static const corner_t     cpD[8]  = { URF, UFL, ULB, UBR, DLF, DBL, DRB, DFR };
-    static const signed char  coD[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const edge_t       epD[12] = { UR, UF_, UL, UB, DF, DL, DB, DR, FR, FL, BL, BR };
-    static const signed char  eoD[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const corner_t     cpL[8]  = { URF, ULB, DBL, UBR, DFR, UFL, DLF, DRB };
-    static const signed char  coL[8]  = { 0, 1, 2, 0, 0, 2, 1, 0 };
-    static const edge_t       epL[12] = { UR, UF_, BL, UB, DR, DF, FL, DB, FR, UL, DL, BR };
-    static const signed char  eoL[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const corner_t     cpB[8]  = { URF, UFL, UBR, DRB, DFR, DLF, ULB, DBL };
-    static const signed char  coB[8]  = { 0, 0, 1, 2, 0, 0, 2, 1 };
-    static const edge_t       epB[12] = { UR, UF_, UL, BR, DR, DF, DL, BL, FR, FL, UB, DB };
-    static const signed char  eoB[12] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1 };
+    static FCubieCube MoveCube[6];
+    static bool MoveCubeInitialized = false;
+    
+    static const ECornerType cpU[8]  = { ECornerType::UBR, ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB };
+    static const signed char coU[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    static const EEdgeType epU[12] = { EEdgeType::UB, EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
+    static const signed char eoU[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    if (!moveCube_initialized) {
-        memcpy(moveCube[0].cp, cpU, sizeof(cpU));
-        memcpy(moveCube[0].co, coU, sizeof(coU));
-        memcpy(moveCube[0].ep, epU, sizeof(epU));
-        memcpy(moveCube[0].eo, eoU, sizeof(eoU));
-        memcpy(moveCube[1].cp, cpR, sizeof(cpR));
-        memcpy(moveCube[1].co, coR, sizeof(coR));
-        memcpy(moveCube[1].ep, epR, sizeof(epR));
-        memcpy(moveCube[1].eo, eoR, sizeof(eoR));
-        memcpy(moveCube[2].cp, cpF, sizeof(cpF));
-        memcpy(moveCube[2].co, coF, sizeof(coF));
-        memcpy(moveCube[2].ep, epF, sizeof(epF));
-        memcpy(moveCube[2].eo, eoF, sizeof(eoF));
-        memcpy(moveCube[3].cp, cpD, sizeof(cpD));
-        memcpy(moveCube[3].co, coD, sizeof(coD));
-        memcpy(moveCube[3].ep, epD, sizeof(epD));
-        memcpy(moveCube[3].eo, eoD, sizeof(eoD));
-        memcpy(moveCube[4].cp, cpL, sizeof(cpL));
-        memcpy(moveCube[4].co, coL, sizeof(coL));
-        memcpy(moveCube[4].ep, epL, sizeof(epL));
-        memcpy(moveCube[4].eo, eoL, sizeof(eoL));
-        memcpy(moveCube[5].cp, cpB, sizeof(cpB));
-        memcpy(moveCube[5].co, coB, sizeof(coB));
-        memcpy(moveCube[5].ep, epB, sizeof(epB));
-        memcpy(moveCube[5].eo, eoB, sizeof(eoB));
+    static const ECornerType cpR[8]  = { ECornerType::DFR, ECornerType::UFL, ECornerType::ULB, ECornerType::URF, ECornerType::DRB, ECornerType::DLF, ECornerType::DBL, ECornerType::UBR };
+    static const signed char coR[8]  = { 2, 0, 0, 1, 1, 0, 0, 2 };
+    static const EEdgeType epR[12] = { EEdgeType::FR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::BR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::DR, EEdgeType::FL, EEdgeType::BL, EEdgeType::UR };
+    static const signed char eoR[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    static const ECornerType cpF[8]  = { ECornerType::UFL, ECornerType::DLF, ECornerType::ULB, ECornerType::UBR, ECornerType::URF, ECornerType::DFR, ECornerType::DBL, ECornerType::DRB };
+    static const signed char coF[8]  = { 1, 2, 0, 0, 2, 1, 0, 0 };
+    static const EEdgeType epF[12] = { EEdgeType::UR, EEdgeType::FL, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::FR, EEdgeType::DL, EEdgeType::DB, EEdgeType::UF, EEdgeType::DF, EEdgeType::BL, EEdgeType::BR };
+    static const signed char eoF[12] = { 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 };
+
+    static const ECornerType cpD[8]  = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB, ECornerType::DFR };
+    static const signed char coD[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    static const EEdgeType epD[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::DR, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
+    static const signed char eoD[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    static const ECornerType cpL[8]  = { ECornerType::URF, ECornerType::ULB, ECornerType::DBL, ECornerType::UBR, ECornerType::DFR, ECornerType::UFL, ECornerType::DLF, ECornerType::DRB };
+    static const signed char coL[8]  = { 0, 1, 2, 0, 0, 2, 1, 0 };
+    static const EEdgeType epL[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::BL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::FL, EEdgeType::DB, EEdgeType::FR, EEdgeType::UL, EEdgeType::DL, EEdgeType::BR };
+    static const signed char eoL[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    static const ECornerType cpB[8]  = { ECornerType::URF, ECornerType::UFL, ECornerType::UBR, ECornerType::DRB, ECornerType::DFR, ECornerType::DLF, ECornerType::ULB, ECornerType::DBL };
+    static const signed char coB[8]  = { 0, 0, 1, 2, 0, 0, 2, 1 };
+    static const EEdgeType epB[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::BR, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::BL, EEdgeType::FR, EEdgeType::FL, EEdgeType::UB, EEdgeType::DB };
+    static const signed char eoB[12] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1 };
+
+    if (!MoveCubeInitialized)
+    {
+        MoveCube[0].Cp = TArray(cpU, UE_ARRAY_COUNT(cpU));
+        MoveCube[0].Co = TArray(coU, UE_ARRAY_COUNT(coU));
+        MoveCube[0].Ep = TArray(epU, UE_ARRAY_COUNT(epU));
+        MoveCube[0].Eo = TArray(eoU, UE_ARRAY_COUNT(eoU));
+
+        MoveCube[1].Cp = TArray(cpR, UE_ARRAY_COUNT(cpR));
+        MoveCube[1].Co = TArray(coR, UE_ARRAY_COUNT(coR));
+        MoveCube[1].Ep = TArray(epR, UE_ARRAY_COUNT(epR));
+        MoveCube[1].Eo = TArray(eoR, UE_ARRAY_COUNT(eoR));
+
+        MoveCube[2].Cp = TArray(cpF, UE_ARRAY_COUNT(cpF));
+        MoveCube[2].Co = TArray(coF, UE_ARRAY_COUNT(coF));
+        MoveCube[2].Ep = TArray(epF, UE_ARRAY_COUNT(epF));
+        MoveCube[2].Eo = TArray(eoF, UE_ARRAY_COUNT(eoF));
+
+        MoveCube[3].Cp = TArray(cpD, UE_ARRAY_COUNT(cpD));
+        MoveCube[3].Co = TArray(coD, UE_ARRAY_COUNT(coD));
+        MoveCube[3].Ep = TArray(epD, UE_ARRAY_COUNT(epD));
+        MoveCube[3].Eo = TArray(eoD, UE_ARRAY_COUNT(eoD));
+
+        MoveCube[4].Cp = TArray(cpL, UE_ARRAY_COUNT(cpL));
+        MoveCube[4].Co = TArray(coL, UE_ARRAY_COUNT(coL));
+        MoveCube[4].Ep = TArray(epL, UE_ARRAY_COUNT(epL));
+        MoveCube[4].Eo = TArray(eoL, UE_ARRAY_COUNT(eoL));
+
+        MoveCube[5].Cp = TArray(cpB, UE_ARRAY_COUNT(cpB));
+        MoveCube[5].Co = TArray(coB, UE_ARRAY_COUNT(coB));
+        MoveCube[5].Ep = TArray(epB, UE_ARRAY_COUNT(epB));
+        MoveCube[5].Eo = TArray(eoB, UE_ARRAY_COUNT(eoB));
     }
 
-    return moveCube;
+    return MoveCube;
 }
 
-cubiecube_t* get_cubiecube()
+FCubieCube* get_cubiecube()
 {
-    cubiecube_t* result = (cubiecube_t *) calloc(1, sizeof(cubiecube_t));
+    FCubieCube* result = new FCubieCube();
 
-    static const corner_t   cp[8]   = { URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB };
-    static const signed char       co[8]   = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static const edge_t     ep[12]  = { UR, UF_, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR };
-    static const signed char       eo[12]  = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    static const ECornerType  cp[8]  = { 
+        ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, 
+        ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB 
+    };
 
-    memcpy(result->cp, cp, sizeof(cp));
-    memcpy(result->co, co, sizeof(co));
-    memcpy(result->ep, ep, sizeof(ep));
-    memcpy(result->eo, eo, sizeof(eo));
+    static const int8         co[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    static const EEdgeType    ep[12] = { 
+        EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, 
+        EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, 
+        EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR 
+    };
+
+    static const int8         eo[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    result->Cp = TArray(cp, UE_ARRAY_COUNT(cp));
+    result->Co = TArray(co, UE_ARRAY_COUNT(co));
+    result->Ep = TArray(ep, UE_ARRAY_COUNT(ep));
+    result->Eo = TArray(eo, UE_ARRAY_COUNT(eo));
 
     return result;
 }
@@ -90,81 +112,79 @@ int Cnk(int n, int k) {
     return s;
 }
 
-void rotateLeft_corner(corner_t* arr, int l, int r)
+void rotateLeft_corner(ECornerType* arr, int l, int r)
 // Left rotation of all array elements between l and r
 {
     int i;
-    corner_t temp = arr[l];
+    ECornerType temp = arr[l];
     for (i = l; i < r; i++)
         arr[i] = arr[i + 1];
     arr[r] = temp;
 }
 
-void rotateRight_corner(corner_t* arr, int l, int r)
+void rotateRight_corner(ECornerType* arr, int l, int r)
 // Right rotation of all array elements between l and r
 {
     int i;
-    corner_t temp = arr[r];
+    ECornerType temp = arr[r];
     for (i = r; i > l; i--)
         arr[i] = arr[i - 1];
     arr[l] = temp;
 }
 
 
-void rotateLeft_edge(edge_t* arr, int l, int r)
+void rotateLeft_edge(EEdgeType* arr, int l, int r)
 // Left rotation of all array elements between l and r
 {
     int i;
-    edge_t temp = arr[l];
+    EEdgeType temp = arr[l];
     for (i = l; i < r; i++)
         arr[i] = arr[i + 1];
     arr[r] = temp;
 }
 
-void rotateRight_edge(edge_t* arr, int l, int r)
+void rotateRight_edge(EEdgeType* arr, int l, int r)
 // Right rotation of all array elements between l and r
 {
     int i;
-    edge_t temp = arr[r];
+    EEdgeType temp = arr[r];
     for (i = r; i > l; i--)
         arr[i] = arr[i - 1];
     arr[l] = temp;
 }
 
-facecube_t* toFaceCube(cubiecube_t* cubiecube)
+FFaceCube* toFaceCube(FCubieCube* cubiecube)
 {
     int i, j, n;
     signed char ori;
-    facecube_t* fcRet = get_facecube();
+    FFaceCube* fcRet = get_facecube();
     for(i = 0; i < CORNER_COUNT; i++) {
-        j = cubiecube->cp[i];// cornercubie with index j is at
-        // cornerposition with index i
-        ori = cubiecube->co[i];// Orientation of this cubie
+        j = static_cast<int32>(cubiecube->Cp[i]);
+        ori = cubiecube->Co[i];
         for (n = 0; n < 3; n++)
-            fcRet->f[cornerFacelet[i][(n + ori) % 3]] = cornerColor[j][n];
+            fcRet->Facelets[static_cast<int32>(CornerFacelet[i][(n + ori) % 3])] = CornerColor[j][n];
     }
     for(i = 0; i < EDGE_COUNT; i++)
     {
-        j = cubiecube->ep[i];// edgecubie with index j is at edgeposition
-        // with index i
-        ori = cubiecube->eo[i];// Orientation of this cubie
+        j = static_cast<int32>(cubiecube->Ep[i]);
+        ori = cubiecube->Eo[i];
         for (n = 0; n < 2; n++)
-            fcRet->f[edgeFacelet[i][(n + ori) % 2]] = edgeColor[j][n];
+            fcRet->Facelets[static_cast<int32>(EdgeFacelet[i][(n + ori) % 2])] = EdgeColor[j][n];
     }
     return fcRet;
 }
 
-void cornerMultiply(cubiecube_t* cubiecube, cubiecube_t* b)
+void cornerMultiply(FCubieCube* cubiecube, FCubieCube* b)
 {
     int corn;
     signed char oriA, oriB, ori;
-    corner_t cPerm[8] = {(corner_t)0};
+    ECornerType cPerm[8] = {(ECornerType)0};
     signed char cOri[8] = {0};
     for (corn = 0; corn < CORNER_COUNT; corn++) {
-        cPerm[corn] = cubiecube->cp[b->cp[corn]];
+        cPerm[corn] = cubiecube->Cp[static_cast<int32>(b->Cp[corn])];
 
-        oriA = cubiecube->co[b->cp[corn]];
-        oriB = b->co[corn];
+        oriA = cubiecube->Co[static_cast<int32>(b->Cp[corn])];
+        oriB = b->Co[corn];
         ori = 0;
 
         if (oriA < 3 && oriB < 3) // if both cubes are regular cubes...
@@ -197,134 +217,134 @@ void cornerMultiply(cubiecube_t* cubiecube, cubiecube_t* b)
         cOri[corn] = ori;
     }
     for(corn = 0; corn < CORNER_COUNT; corn++) {
-        cubiecube->cp[corn] = cPerm[corn];
-        cubiecube->co[corn] = cOri[corn];
+        cubiecube->Cp[corn] = cPerm[corn];
+        cubiecube->Co[corn] = cOri[corn];
     }
 }
 
-void edgeMultiply(cubiecube_t* cubiecube, cubiecube_t* b)
+void edgeMultiply(FCubieCube* cubiecube, FCubieCube* b)
 {
     int edge;
-    edge_t ePerm[12] = {(edge_t)0};
+    EEdgeType ePerm[12] = {(EEdgeType)0};
     signed char eOri[12] = {0};
 
     for(edge = 0; edge < EDGE_COUNT; edge++) {
-        ePerm[edge] = cubiecube->ep[b->ep[edge]];
-        eOri[edge] = (b->eo[edge] + cubiecube->eo[b->ep[edge]]) % 2;
+        ePerm[edge] = cubiecube->Ep[static_cast<int32>(b->Ep[edge])];
+        eOri[edge] = (b->Eo[edge] + cubiecube->Eo[static_cast<int32>(b->Ep[edge])]) % 2;
     }
     for(edge = 0; edge < EDGE_COUNT; edge++) {
-        cubiecube->ep[edge] = ePerm[edge];
-        cubiecube->eo[edge] = eOri[edge];
+        cubiecube->Ep[edge] = ePerm[edge];
+        cubiecube->Eo[edge] = eOri[edge];
     }
 }
 
-void multiply(cubiecube_t* cubiecube, cubiecube_t* b)
+void multiply(FCubieCube* cubiecube, FCubieCube* b)
 {
     cornerMultiply(cubiecube, b);
     edgeMultiply(cubiecube, b);
 }
 
-void invCubieCube(cubiecube_t* cubiecube, cubiecube_t* c)
+void invCubieCube(FCubieCube* cubiecube, FCubieCube* c)
 {
     int edge, corn;
     for (edge = 0; edge < EDGE_COUNT; edge++)
-        c->ep[cubiecube->ep[edge]] = (edge_t)edge;
+        c->Ep[static_cast<int32>(cubiecube->Ep[edge])] = (EEdgeType)edge;
     for (edge = 0; edge < EDGE_COUNT; edge++)
-        c->eo[edge] = cubiecube->eo[c->ep[edge]];
+        c->Eo[edge] = cubiecube->Eo[static_cast<int32>(c->Ep[edge])];
     for (corn = 0; corn < CORNER_COUNT; corn++)
-        c->cp[cubiecube->cp[corn]] = (corner_t)corn;
+        c->Cp[static_cast<int32>(cubiecube->Cp[corn])] = (ECornerType)corn;
     for (corn = 0; corn < CORNER_COUNT; corn++) {
-        signed char ori = cubiecube->co[c->cp[corn]];
+        signed char ori = cubiecube->Co[static_cast<int32>(c->Cp[corn])];
         if (ori >= 3)// Just for completeness. We do not invert mirrored
             // cubes in the program.
-            c->co[corn] = ori;
+            c->Co[corn] = ori;
         else {// the standard case
-            c->co[corn] = -ori;
-            if (c->co[corn] < 0)
-                c->co[corn] += 3;
+            c->Co[corn] = -ori;
+            if (c->Co[corn] < 0)
+                c->Co[corn] += 3;
         }
     }
 }
 
-short getTwist(cubiecube_t* cubiecube)
+short getTwist(FCubieCube* cubiecube)
 {
     short ret = 0;
     int i;
-    for (i = URF; i < DRB; i++)
-        ret = (short) (3 * ret + cubiecube->co[i]);
+    for (i = static_cast<int32>(ECornerType::URF); i < static_cast<int32>(ECornerType::DRB); i++)
+        ret = (short) (3 * ret + cubiecube->Co[i]);
     return ret;
 }
 
-void setTwist(cubiecube_t* cubiecube, short twist)
+void setTwist(FCubieCube* cubiecube, short twist)
 {
     int twistParity = 0;
     int i;
-    for (i = DRB - 1; i >= URF; i--) {
-        twistParity += cubiecube->co[i] = (signed char) (twist % 3);
+    for (i = static_cast<int32>(ECornerType::DRB) - 1; i >= static_cast<int32>(ECornerType::URF); i--) {
+        twistParity += cubiecube->Co[i] = (signed char) (twist % 3);
         twist /= 3;
     }
-    cubiecube->co[DRB] = (signed char) ((3 - twistParity % 3) % 3);
+    cubiecube->Co[static_cast<int32>(ECornerType::DRB)] = (signed char) ((3 - twistParity % 3) % 3);
 }
 
-short getFlip(cubiecube_t* cubiecube)
+short getFlip(FCubieCube* cubiecube)
 {
     int i;
     short ret = 0;
-    for (i = UR; i < BR; i++)
-        ret = (short) (2 * ret + cubiecube->eo[i]);
+    for (i = static_cast<int32>(EEdgeType::UR); i < static_cast<int32>(EEdgeType::BR); i++)
+        ret = (short) (2 * ret + cubiecube->Eo[i]);
     return ret;
 }
 
-void setFlip(cubiecube_t* cubiecube, short flip)
+void setFlip(FCubieCube* cubiecube, short flip)
 {
     int i;
     int flipParity = 0;
-    for (i = BR - 1; i >= UR; i--) {
-        flipParity += cubiecube->eo[i] = (signed char) (flip % 2);
+    for (i = static_cast<int32>(EEdgeType::BR) - 1; i >= static_cast<int32>(EEdgeType::UR); i--) {
+        flipParity += cubiecube->Eo[i] = (signed char) (flip % 2);
         flip /= 2;
     }
-    cubiecube->eo[BR] = (signed char) ((2 - flipParity % 2) % 2);
+    cubiecube->Eo[static_cast<int32>(EEdgeType::BR)] = (signed char) ((2 - flipParity % 2) % 2);
 }
 
-short cornerParity(cubiecube_t* cubiecube)
+short cornerParity(FCubieCube* cubiecube)
 {
     int i, j;
     int s = 0;
-    for (i = DRB; i >= URF + 1; i--)
-        for (j = i - 1; j >= URF; j--)
-            if (cubiecube->cp[j] > cubiecube->cp[i])
+    for (i = static_cast<int32>(ECornerType::DRB); i >= static_cast<int32>(ECornerType::URF) + 1; i--)
+        for (j = i - 1; j >= static_cast<int32>(ECornerType::URF); j--)
+            if (cubiecube->Cp[j] > cubiecube->Cp[i])
                 s++;
     return (short) (s % 2);
 }
 
-short edgeParity(cubiecube_t* cubiecube)
+short edgeParity(FCubieCube* cubiecube)
 {
     int i, j;
     int s = 0;
-    for (i = BR; i >= UR + 1; i--)
-        for (j = i - 1; j >= UR; j--)
-            if (cubiecube->ep[j] > cubiecube->ep[i])
+    for (i = static_cast<int32>(EEdgeType::BR); i >= static_cast<int32>(EEdgeType::UR) + 1; i--)
+        for (j = i - 1; j >= static_cast<int32>(EEdgeType::UR); j--)
+            if (cubiecube->Ep[j] > cubiecube->Ep[i])
                 s++;
     return (short) (s % 2);
 }
 
-short getFRtoBR(cubiecube_t* cubiecube)
+short getFRtoBR(FCubieCube* cubiecube)
 {
     int a = 0, x = 0, j;
     int b = 0;
-    edge_t edge4[4] = {(edge_t)0};
+    EEdgeType edge4[4] = {(EEdgeType)0};
     // compute the index a < (12 choose 4) and the permutation array perm.
-    for (j = BR; j >= UR; j--)
-        if (FR <= cubiecube->ep[j] && cubiecube->ep[j] <= BR) {
+    for (j = static_cast<int32>(EEdgeType::BR); j >= static_cast<int32>(EEdgeType::UR); j--)
+        if (EEdgeType::FR <= cubiecube->Ep[j] && cubiecube->Ep[j] <= EEdgeType::BR) {
             a += Cnk(11 - j, x + 1);
-            edge4[3 - x++] = cubiecube->ep[j];
+            edge4[3 - x++] = cubiecube->Ep[j];
         }
 
     for (j = 3; j > 0; j--)// compute the index b < 4! for the
     // permutation in perm
     {
         int k = 0;
-        while (edge4[j] != j + 8) {
+        while (static_cast<int32>(edge4[j]) != j + 8) {
             rotateLeft_edge(edge4, 0, j);
             k++;
         }
@@ -332,15 +352,15 @@ short getFRtoBR(cubiecube_t* cubiecube)
     }
     return (short) (24 * a + b);
 }
-void setFRtoBR(cubiecube_t* cubiecube, short idx)
+void setFRtoBR(FCubieCube* cubiecube, short idx)
 {
     int x, j, k, e;
-    edge_t sliceEdge[4] = { FR, FL, BL, BR };
-    edge_t otherEdge[8] = { UR, UF_, UL, UB, DR, DF, DL, DB };
+    EEdgeType sliceEdge[4] = { EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
+    EEdgeType otherEdge[8] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB };
     int b = idx % 24; // Permutation
     int a = idx / 24; // Combination
     for (e = 0; e < EDGE_COUNT; e++)
-        cubiecube->ep[e] = DB;// Use UR to invalidate all edges
+        cubiecube->Ep[e] = EEdgeType::DB;// Use UR to invalidate all edges
 
     for (j = 1; j < 4; j++)// generate permutation from index b
     {
@@ -351,33 +371,33 @@ void setFRtoBR(cubiecube_t* cubiecube, short idx)
     }
 
     x = 3;// generate combination and set slice edges
-    for (j = UR; j <= BR; j++)
+    for (j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
         if (a - Cnk(11 - j, x + 1) >= 0) {
-            cubiecube->ep[j] = sliceEdge[3 - x];
+            cubiecube->Ep[j] = sliceEdge[3 - x];
             a -= Cnk(11 - j, x-- + 1);
         }
     x = 0; // set the remaining edges UR..DB
-    for (j = UR; j <= BR; j++)
-        if (cubiecube->ep[j] == DB)
-            cubiecube->ep[j] = otherEdge[x++];
+    for (j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
+        if (cubiecube->Ep[j] == EEdgeType::DB)
+            cubiecube->Ep[j] = otherEdge[x++];
 }
 
-short getURFtoDLF(cubiecube_t* cubiecube)
+short getURFtoDLF(FCubieCube* cubiecube)
 {
     int a = 0, x = 0, j, b = 0;
-    corner_t corner6[6] = {(corner_t)0};
+    ECornerType corner6[6] = {(ECornerType)0};
     // compute the index a < (8 choose 6) and the corner permutation.
-    for (j = URF; j <= DRB; j++)
-        if (cubiecube->cp[j] <= DLF) {
+    for (j = static_cast<int32>(ECornerType::URF); j <= static_cast<int32>(ECornerType::DRB); j++)
+        if (cubiecube->Cp[j] <= ECornerType::DLF) {
             a += Cnk(j, x + 1);
-            corner6[x++] = cubiecube->cp[j];
+            corner6[x++] = cubiecube->Cp[j];
         }
 
     for (j = 5; j > 0; j--)// compute the index b < 6! for the
     // permutation in corner6
     {
         int k = 0;
-        while (corner6[j] != j) {
+        while (static_cast<int32>(corner6[j]) != j) {
             rotateLeft_corner(corner6, 0, j);
             k++;
         }
@@ -386,16 +406,16 @@ short getURFtoDLF(cubiecube_t* cubiecube)
     return (short) (720 * a + b);
 }
 
-void setURFtoDLF(cubiecube_t* cubiecube, short idx)
+void setURFtoDLF(FCubieCube* cubiecube, short idx)
 {
     int x;
-    corner_t corner6[6] = { URF, UFL, ULB, UBR, DFR, DLF };
-    corner_t otherCorner[2] = { DBL, DRB };
+    ECornerType corner6[6] = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DFR, ECornerType::DLF };
+    ECornerType otherCorner[2] = { ECornerType::DBL, ECornerType::DRB };
     int b = idx % 720; // Permutation
     int a = idx / 720; // Combination
     int c, j, k;
     for(c = 0; c < CORNER_COUNT; c++)
-        cubiecube->cp[c] = DRB;// Use DRB to invalidate all corners
+        cubiecube->Cp[c] = ECornerType::DRB;// Use DRB to invalidate all corners
 
     for (j = 1; j < 6; j++)// generate permutation from index b
     {
@@ -405,34 +425,34 @@ void setURFtoDLF(cubiecube_t* cubiecube, short idx)
             rotateRight_corner(corner6, 0, j);
     }
     x = 5;// generate combination and set corners
-    for (j = DRB; j >= 0; j--)
+    for (j = static_cast<int32>(ECornerType::DRB); j >= 0; j--)
         if (a - Cnk(j, x + 1) >= 0) {
-            cubiecube->cp[j] = corner6[x];
+            cubiecube->Cp[j] = corner6[x];
             a -= Cnk(j, x-- + 1);
         }
     x = 0;
-    for (j = URF; j <= DRB; j++)
-        if (cubiecube->cp[j] == DRB)
-            cubiecube->cp[j] = otherCorner[x++];
+    for (j = static_cast<int32>(ECornerType::URF); j <= static_cast<int32>(ECornerType::DRB); j++)
+        if (cubiecube->Cp[j] == ECornerType::DRB)
+            cubiecube->Cp[j] = otherCorner[x++];
 }
 
-int getURtoDF(cubiecube_t* cubiecube)
+int getURtoDF(FCubieCube* cubiecube)
 {
     int a = 0, x = 0;
     int b = 0, j;
-    edge_t edge6[6] = {(edge_t)0};
+    EEdgeType edge6[6] = {(EEdgeType)0};
     // compute the index a < (12 choose 6) and the edge permutation.
-    for (j = UR; j <= BR; j++)
-        if (cubiecube->ep[j] <= DF) {
+    for (j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
+        if (cubiecube->Ep[j] <= EEdgeType::DF) {
             a += Cnk(j, x + 1);
-            edge6[x++] = cubiecube->ep[j];
+            edge6[x++] = cubiecube->Ep[j];
         }
 
     for (j = 5; j > 0; j--)// compute the index b < 6! for the
     // permutation in edge6
     {
         int k = 0;
-        while (edge6[j] != j) {
+        while (static_cast<int32>(edge6[j]) != j) {
             rotateLeft_edge(edge6, 0, j);
             k++;
         }
@@ -441,16 +461,16 @@ int getURtoDF(cubiecube_t* cubiecube)
     return 720 * a + b;
 }
 
-void setURtoDF(cubiecube_t* cubiecube, int idx)
+void setURtoDF(FCubieCube* cubiecube, int idx)
 {
     int x, e, j, k;
-    edge_t edge6[6] = { UR, UF_, UL, UB, DR, DF };
-    edge_t otherEdge[6] = { DL, DB, FR, FL, BL, BR };
+    EEdgeType edge6[6] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
+    EEdgeType otherEdge[6] = { EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
     int b = idx % 720; // Permutation
     int a = idx / 720; // Combination
 
     for(e = 0; e < EDGE_COUNT; e++)
-        cubiecube->ep[e] = BR;// Use BR to invalidate all edges
+        cubiecube->Ep[e] = EEdgeType::BR;// Use BR to invalidate all edges
 
     for (j = 1; j < 6; j++)// generate permutation from index b
     {
@@ -460,33 +480,33 @@ void setURtoDF(cubiecube_t* cubiecube, int idx)
             rotateRight_edge(edge6, 0, j);
     }
     x = 5;// generate combination and set edges
-    for (j = BR; j >= 0; j--)
+    for (j = static_cast<int32>(EEdgeType::BR); j >= 0; j--)
         if (a - Cnk(j, x + 1) >= 0) {
-            cubiecube->ep[j] = edge6[x];
+            cubiecube->Ep[j] = edge6[x];
             a -= Cnk(j, x-- + 1);
         }
     x = 0; // set the remaining edges DL..BR
-    for (j = UR; j <= BR; j++)
-        if (cubiecube->ep[j] == BR)
-            cubiecube->ep[j] = otherEdge[x++];
+    for (j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
+        if (cubiecube->Ep[j] == EEdgeType::BR)
+            cubiecube->Ep[j] = otherEdge[x++];
 }
 
-short getURtoUL(cubiecube_t* cubiecube)
+short getURtoUL(FCubieCube* cubiecube)
 {
     int a = 0, b = 0, x = 0, j;
-    edge_t edge3[3] = {(edge_t)0};
+    EEdgeType edge3[3] = {(EEdgeType)0};
     // compute the index a < (12 choose 3) and the edge permutation.
-    for (j = UR; j <= BR; j++)
-        if (cubiecube->ep[j] <= UL) {
+    for (j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
+        if (cubiecube->Ep[j] <= EEdgeType::UL) {
             a += Cnk(j, x + 1);
-            edge3[x++] = cubiecube->ep[j];
+            edge3[x++] = cubiecube->Ep[j];
         }
 
     for (j = 2; j > 0; j--)// compute the index b < 3! for the
     // permutation in edge3
     {
         int k = 0;
-        while (edge3[j] != j) {
+        while (static_cast<int32>(edge3[j]) != j) {
             rotateLeft_edge(edge3, 0, j);
             k++;
         }
@@ -495,14 +515,14 @@ short getURtoUL(cubiecube_t* cubiecube)
     return (short) (6 * a + b);
 }
 
-void setURtoUL(cubiecube_t* cubiecube, short idx)
+void setURtoUL(FCubieCube* cubiecube, short idx)
 {
     int x, e, j, k;
-    edge_t edge3[3] = { UR, UF_, UL };
+    EEdgeType edge3[3] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL };
     int b = idx % 6; // Permutation
     int a = idx / 6; // Combination
     for(e = 0; e < EDGE_COUNT; e++) {
-        cubiecube->ep[e] = BR;// Use BR to invalidate all edges
+        cubiecube->Ep[e] = EEdgeType::BR;// Use BR to invalidate all edges
     }
 
     for (j = 1; j < 3; j++) {// generate permutation from index b
@@ -512,30 +532,30 @@ void setURtoUL(cubiecube_t* cubiecube, short idx)
             rotateRight_edge(edge3, 0, j);
     }
     x = 2;// generate combination and set edges
-    for (j = BR; j >= 0; j--) {
+    for (j = static_cast<int32>(EEdgeType::BR); j >= 0; j--) {
         if (a - Cnk(j, x + 1) >= 0) {
-            cubiecube->ep[j] = edge3[x];
+            cubiecube->Ep[j] = edge3[x];
             a -= Cnk(j, x-- + 1);
         }
     }
 }
 
-short getUBtoDF(cubiecube_t* cubiecube)
+short getUBtoDF(FCubieCube* cubiecube)
 {
     int a = 0, x = 0, b = 0, j;
-    edge_t edge3[3] = {(edge_t)0};
+    EEdgeType edge3[3] = {(EEdgeType)0};
     // compute the index a < (12 choose 3) and the edge permutation.
-    for (j = UR; j <= BR; j++)
-        if (UB <= cubiecube->ep[j] && cubiecube->ep[j] <= DF) {
+    for (j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
+        if (EEdgeType::UB <= cubiecube->Ep[j] && cubiecube->Ep[j] <= EEdgeType::DF) {
             a += Cnk(j, x + 1);
-            edge3[x++] = cubiecube->ep[j];
+            edge3[x++] = cubiecube->Ep[j];
         }
 
     for (j = 2; j > 0; j--)// compute the index b < 3! for the
     // permutation in edge3
     {
         int k = 0;
-        while (edge3[j] != UB + j) {
+        while (static_cast<int32>(edge3[j]) != static_cast<int32>(EEdgeType::UB) + j) {
             rotateLeft_edge(edge3, 0, j);
             k++;
         }
@@ -544,14 +564,14 @@ short getUBtoDF(cubiecube_t* cubiecube)
     return (short) (6 * a + b);
 }
 
-void setUBtoDF(cubiecube_t* cubiecube, short idx)
+void setUBtoDF(FCubieCube* cubiecube, short idx)
 {
     int x, e, j, k;
-    edge_t edge3[3] = { UB, DR, DF };
+    EEdgeType edge3[3] = { EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
     int b = idx % 6; // Permutation
     int a = idx / 6; // Combination
     for (e = 0; e < EDGE_COUNT; e++)
-        cubiecube->ep[e] = BR;// Use BR to invalidate all edges
+        cubiecube->Ep[e] = EEdgeType::BR;// Use BR to invalidate all edges
 
     for (j = 1; j < 3; j++)// generate permutation from index b
     {
@@ -561,23 +581,23 @@ void setUBtoDF(cubiecube_t* cubiecube, short idx)
             rotateRight_edge(edge3, 0, j);
     }
     x = 2;// generate combination and set edges
-    for (j = BR; j >= 0; j--)
+    for (j = static_cast<int32>(EEdgeType::BR); j >= 0; j--)
         if (a - Cnk(j, x + 1) >= 0) {
-            cubiecube->ep[j] = edge3[x];
+            cubiecube->Ep[j] = edge3[x];
             a -= Cnk(j, x-- + 1);
         }
 }
 
-int getURFtoDLB(cubiecube_t* cubiecube)
+int getURFtoDLB(FCubieCube* cubiecube)
 {
-    corner_t perm[8] = {(corner_t)0};
+    ECornerType perm[8] = {(ECornerType)0};
     int b = 0, i, j;
     for (i = 0; i < 8; i++)
-        perm[i] = cubiecube->cp[i];
+        perm[i] = cubiecube->Cp[i];
     for (j = 7; j > 0; j--)// compute the index b < 8! for the permutation in perm
     {
         int k = 0;
-        while (perm[j] != j) {
+        while (static_cast<int32>(perm[j]) != j) {
             rotateLeft_corner(perm, 0, j);
             k++;
         }
@@ -586,9 +606,9 @@ int getURFtoDLB(cubiecube_t* cubiecube)
     return b;
 }
 
-void setURFtoDLB(cubiecube_t* cubiecube, int idx)
+void setURFtoDLB(FCubieCube* cubiecube, int idx)
 {
-    corner_t perm[8] = { URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB };
+    ECornerType perm[8] = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB };
     int k, j;
     int x = 7;// set corners
     for (j = 1; j < 8; j++) {
@@ -599,19 +619,19 @@ void setURFtoDLB(cubiecube_t* cubiecube, int idx)
     }
 
     for (j = 7; j >= 0; j--)
-        cubiecube->cp[j] = perm[x--];
+        cubiecube->Cp[j] = perm[x--];
 }
 
-int getURtoBR(cubiecube_t* cubiecube)
+int getURtoBR(FCubieCube* cubiecube)
 {
-    edge_t perm[12] = {(edge_t)0};
+    EEdgeType perm[12] = {(EEdgeType)0};
     int b = 0, i, j;
     for (i = 0; i < 12; i++)
-        perm[i] = cubiecube->ep[i];
+        perm[i] = cubiecube->Ep[i];
     for (j = 11; j > 0; j--)// compute the index b < 12! for the permutation in perm
     {
         int k = 0;
-        while (perm[j] != j) {
+        while (static_cast<int32>(perm[j]) != j) {
             rotateLeft_edge(perm, 0, j);
             k++;
         }
@@ -620,9 +640,9 @@ int getURtoBR(cubiecube_t* cubiecube)
     return b;
 }
 
-void setURtoBR(cubiecube_t* cubiecube, int idx)
+void setURtoBR(FCubieCube* cubiecube, int idx)
 {
-    edge_t perm[12] = { UR, UF_, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR };
+    EEdgeType perm[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
     int k, j;
     int x = 11;// set edges
     for (j = 1; j < 12; j++) {
@@ -632,35 +652,35 @@ void setURtoBR(cubiecube_t* cubiecube, int idx)
             rotateRight_edge(perm, 0, j);
     }
     for (j = 11; j >= 0; j--)
-        cubiecube->ep[j] = perm[x--];
+        cubiecube->Ep[j] = perm[x--];
 }
 
-int Verify(cubiecube_t* cubiecube)
+int Verify(FCubieCube* cubiecube)
 {
     int sum = 0, e, i, c;
     int edgeCount[12] = {0};
     int cornerCount[8] = {0};
 
     for(e = 0; e < EDGE_COUNT; e++)
-        edgeCount[cubiecube->ep[e]]++;
+        edgeCount[static_cast<int32>(cubiecube->Ep[e])]++;
     for (i = 0; i < 12; i++)
         if (edgeCount[i] != 1)
             return -2;
 
     for (i = 0; i < 12; i++)
-        sum += cubiecube->eo[i];
+        sum += cubiecube->Eo[i];
     if (sum % 2 != 0)
         return -3;
 
     for(c = 0; c < CORNER_COUNT; c++)
-        cornerCount[cubiecube->cp[c]]++;
+        cornerCount[static_cast<int32>(cubiecube->Cp[c])]++;
     for (i = 0; i < 8; i++)
         if (cornerCount[i] != 1)
             return -4;// missing corners
 
     sum = 0;
     for (i = 0; i < 8; i++)
-        sum += cubiecube->co[i];
+        sum += cubiecube->Co[i];
     if (sum % 3 != 0)
         return -5;// twisted corner
 
@@ -673,16 +693,16 @@ int Verify(cubiecube_t* cubiecube)
 int getURtoDF_standalone(short idx1, short idx2)
 {
     int res, i;
-    cubiecube_t *a = get_cubiecube();
-    cubiecube_t *b = get_cubiecube();
+    FCubieCube *a = get_cubiecube();
+    FCubieCube *b = get_cubiecube();
     setURtoUL(a, idx1);
     setUBtoDF(b, idx2);
     for (i = 0; i < 8; i++) {
-        if (a->ep[i] != BR) {
-            if (b->ep[i] != BR) {// collision
+        if (a->Ep[i] != EEdgeType::BR) {
+            if (b->Ep[i] != EEdgeType::BR) {// collision
                 return -1;
             } else {
-                b->ep[i] = a->ep[i];
+                b->Ep[i] = a->Ep[i];
             }
         }
     }

@@ -1,7 +1,7 @@
-#ifndef COORDCUBE_H
-#define COORDCUBE_H
+#pragma once
 
 #include "cubiecube.h"
+#include "coordcube.generated.h"
 
 // Representation of the cube on the coordinate level
 
@@ -19,34 +19,36 @@
 #define N_URtoBR    479001600
 #define N_MOVE      18
 
-typedef struct {
+USTRUCT(BlueprintType)
+struct FCoordCube
+{
+    GENERATED_BODY()
 
-    // All coordinates are 0 for a solved cube except for UBtoDF, which is 114
-    short twist;
-    short flip;
-    short parity;
-    short FRtoBR;
-    short URFtoDLF;
-    short URtoUL;
-    short UBtoDF;
-    int URtoDF;
-} coordcube_t;
+    int16 Twist;
+    int16 Flip;
+    int16 Parity;
+    int16 FRtoBR;
+    int16 URFtoDLF;
+    int16 URtoUL;
+    int16 UBtoDF;
+    int32 URtoDF;
+};
 
 // ******************************************Phase 1 move tables*****************************************************
 
 // Move table for the twists of the corners
 // twist < 2187 in phase 2.
 // twist = 0 in phase 2.
-extern short twistMove[N_TWIST][N_MOVE];
+extern short TwistMove[N_TWIST][N_MOVE];
 
 // Move table for the flips of the edges
 // flip < 2048 in phase 1
 // flip = 0 in phase 2.
-extern short flipMove[N_FLIP][N_MOVE];
+extern short FlipMove[N_FLIP][N_MOVE];
 
 // Parity of the corner permutation. This is the same as the parity for the edge permutation of a valid cube.
 // parity has values 0 and 1
-extern short parityMove[2][18];
+extern short ParityMove[2][18];
 
 // ***********************************Phase 1 and 2 movetable********************************************************
 
@@ -105,9 +107,7 @@ void initPruning(const char *cache_dir);
 void setPruning(signed char *table, int index, signed char value);
 
 // Extract pruning value
-signed char getPruning(signed char *table, int index);
+signed char getPruning(const signed char *table, int index);
 
-coordcube_t* get_coordcube(cubiecube_t* cubiecube);
-void move(coordcube_t* coordcube, int m, const char *cache_dir);
-
-#endif
+FCoordCube* get_coordcube(FCubieCube* CubieCube);
+void move(FCoordCube* CoordCube, int m, const char *cache_dir);
