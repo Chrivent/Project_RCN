@@ -26,9 +26,10 @@ FString UCubeSolver::SolutionToString(const FSearch& Search, const int32 Length,
 
 FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double TimeOut, bool bUseSeparator, const FString& CacheDir)
 {
-    FSearch Search;// = new FSearch();
-
-    TArray<int32, TInlineAllocator<6>> Count = { 0, 0, 0, 0, 0, 0 };
+    FSearch Search;
+    
+    TArray<int32> Count;
+    Count.Init(0, 6);
 
     if (PRUNING_INITED == 0)
     {
