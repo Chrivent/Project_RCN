@@ -51,11 +51,9 @@ struct FCubieCube
 
     static int32 Cnk(const int32 N, int32 K);
 
-    static void RotateLeftCorner(TArray<ECornerType>& Arr, const int32 L, const int32 R);
-    static void RotateRightCorner(TArray<ECornerType>& Arr, const int32 L, const int32 R);
-    static void RotateLeftEdge(TArray<EEdgeType>& Arr, const int32 L, const int32 R);
-    static void RotateRightEdge(TArray<EEdgeType>& Arr, const int32 L, const int32 R);
-    
+    template <typename T>
+    void Rotate(TArray<T>& Arr, const int32 L, const int32 R);
+
     void CornerMultiply(int32 MoveCubeIdx);
     void EdgeMultiply(int32 MoveCubeIdx);
     

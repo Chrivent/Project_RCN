@@ -3,28 +3,28 @@
 #include "KociembaAlgorithm/facecube.h"
 #include "KociembaAlgorithm/CoordCube.h"
 
-FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double TimeOut, bool bUseSeparator, const FString& CacheDir)
+FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const bool bUseSeparator, const FString& CacheDir)
 {
     FSearch Search;
     
     TArray<int32> Count;
-    Count.Init(0, 6);
+    Count.SetNum(6);
 
     if (PRUNING_INITED == 0)
     {
         InitPruning(CacheDir);
     }
     
-    for (const TCHAR& Facelet : Facelets)
+    for (const auto Facelet : Facelets)
     {
         switch (Facelet)
         {
-        case 'U': Count[static_cast<int32>(EColorType::U)]++; break;
-        case 'R': Count[static_cast<int32>(EColorType::R)]++; break;
-        case 'F': Count[static_cast<int32>(EColorType::F)]++; break;
-        case 'D': Count[static_cast<int32>(EColorType::D)]++; break;
-        case 'L': Count[static_cast<int32>(EColorType::L)]++; break;
-        case 'B': Count[static_cast<int32>(EColorType::B)]++; break;
+        case 'U': Count[0]++; break;
+        case 'R': Count[1]++; break;
+        case 'F': Count[2]++; break;
+        case 'D': Count[3]++; break;
+        case 'L': Count[4]++; break;
+        case 'B': Count[5]++; break;
         default:
             return FString("ERROR: Invalid facelet input");
         }

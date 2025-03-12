@@ -56,7 +56,7 @@ const TArray<TArray<EColorType>> FFaceCube::EdgeColor = {
 
 FFaceCube::FFaceCube(FString CubeString)
 {
-    Facelets.Init(EColorType::U, 54);
+    Facelets.SetNum(54);
     
     for (int32 i = 0; i < 54; i++)
     {
