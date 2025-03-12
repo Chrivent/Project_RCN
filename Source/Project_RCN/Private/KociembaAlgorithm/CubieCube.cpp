@@ -67,7 +67,7 @@ FCubieCube::FCubieCube()
     Eo = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 }
 
-int32 FCubieCube::Cnk(int32 N, int32 K)
+int32 FCubieCube::Cnk(const int32 N, int32 K)
 {
     if (N < K)
     {
@@ -88,37 +88,32 @@ int32 FCubieCube::Cnk(int32 N, int32 K)
     return Result;
 }
 
-void FCubieCube::RotateLeftCorner(ECornerType* arr, int32 l, int32 r)
+void FCubieCube::RotateLeftCorner(TArray<ECornerType>& Arr, const int32 L, const int32 R)
 {
-    ECornerType temp = arr[l];
-    for (int32 i = l; i < r; i++)
-        arr[i] = arr[i + 1];
-    arr[r] = temp;
+    const ECornerType Temp = Arr[L];
+    Arr.RemoveAt(L);
+    Arr.Insert(Temp, R);
 }
 
-void FCubieCube::RotateRightCorner(ECornerType* arr, int32 l, int32 r)
+void FCubieCube::RotateRightCorner(TArray<ECornerType>& Arr, const int32 L, const int32 R)
 {
-    ECornerType temp = arr[r];
-    for (int32 i = r; i > l; i--)
-        arr[i] = arr[i - 1];
-    arr[l] = temp;
+    const ECornerType Temp = Arr[R];
+    Arr.RemoveAt(R);
+    Arr.Insert(Temp, L);
 }
 
-
-void FCubieCube::RotateLeftEdge(EEdgeType* arr, int32 l, int32 r)
+void FCubieCube::RotateLeftEdge(TArray<EEdgeType>& Arr, const int32 L, const int32 R)
 {
-    EEdgeType temp = arr[l];
-    for (int32 i = l; i < r; i++)
-        arr[i] = arr[i + 1];
-    arr[r] = temp;
+    const EEdgeType Temp = Arr[L];
+    Arr.RemoveAt(L);
+    Arr.Insert(Temp, R);
 }
 
-void FCubieCube::RotateRightEdge(EEdgeType* arr, int32 l, int32 r)
+void FCubieCube::RotateRightEdge(TArray<EEdgeType>& Arr, const int32 L, const int32 R)
 {
-    EEdgeType temp = arr[r];
-    for (int32 i = r; i > l; i--)
-        arr[i] = arr[i - 1];
-    arr[l] = temp;
+    const EEdgeType Temp = Arr[R];
+    Arr.RemoveAt(R);
+    Arr.Insert(Temp, L);
 }
 
 void FCubieCube::CornerMultiply(int32 MoveCubeIdx)
@@ -238,7 +233,8 @@ int16 FCubieCube::GetFRtoBR()
 {
     int32 a = 0, x = 0;
     int32 b = 0;
-    EEdgeType edge4[4] = { static_cast<EEdgeType>(0) };
+    TArray<EEdgeType> edge4;
+    edge4.Init(static_cast<EEdgeType>(0), 4);
     for (int32 j = static_cast<int32>(EEdgeType::BR); j >= static_cast<int32>(EEdgeType::UR); j--)
         if (EEdgeType::FR <= Ep[j] && Ep[j] <= EEdgeType::BR) {
             a += Cnk(11 - j, x + 1);
@@ -258,8 +254,8 @@ int16 FCubieCube::GetFRtoBR()
 }
 void FCubieCube::SetFRtoBR(int16 Idx)
 {
-    EEdgeType sliceEdge[4] = { EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
-    EEdgeType otherEdge[8] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB };
+    TArray sliceEdge = { EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
+    TArray otherEdge = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB };
     int32 b = Idx % 24;
     int32 a = Idx / 24;
     for (int32 e = 0; e < EDGE_COUNT; e++)
@@ -288,7 +284,8 @@ void FCubieCube::SetFRtoBR(int16 Idx)
 int16 FCubieCube::GetURFtoDLF()
 {
     int32 a = 0, x = 0, b = 0;
-    ECornerType corner6[6] = { static_cast<ECornerType>(0) };
+    TArray<ECornerType> corner6;
+    corner6.Init(static_cast<ECornerType>(0), 6);
     for (int32 j = static_cast<int32>(ECornerType::URF); j <= static_cast<int32>(ECornerType::DRB); j++)
         if (Cp[j] <= ECornerType::DLF) {
             a += Cnk(j, x + 1);
@@ -309,8 +306,8 @@ int16 FCubieCube::GetURFtoDLF()
 
 void FCubieCube::SetURFtoDLF(int16 Idx)
 {
-    ECornerType corner6[6] = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DFR, ECornerType::DLF };
-    ECornerType otherCorner[2] = { ECornerType::DBL, ECornerType::DRB };
+    TArray corner6 = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DFR, ECornerType::DLF };
+    TArray otherCorner = { ECornerType::DBL, ECornerType::DRB };
     int32 b = Idx % 720;
     int32 a = Idx / 720;
     for (int32 c = 0; c < CORNER_COUNT; c++)
@@ -339,7 +336,8 @@ int32 FCubieCube::GetURtoDF()
 {
     int32 a = 0, x = 0;
     int32 b = 0;
-    EEdgeType edge6[6] = { static_cast<EEdgeType>(0) };
+    TArray<EEdgeType> edge6;
+    edge6.Init(static_cast<EEdgeType>(0), 6);
     for (int32 j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
         if (Ep[j] <= EEdgeType::DF) {
             a += Cnk(j, x + 1);
@@ -360,8 +358,8 @@ int32 FCubieCube::GetURtoDF()
 
 void FCubieCube::SetURtoDF(int32 Idx)
 {
-    EEdgeType edge6[6] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
-    EEdgeType otherEdge[6] = { EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
+    TArray edge6 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
+    TArray otherEdge = { EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
     int32 b = Idx % 720;
     int32 a = Idx / 720;
 
@@ -390,7 +388,8 @@ void FCubieCube::SetURtoDF(int32 Idx)
 int16 FCubieCube::GetURtoUL()
 {
     int32 a = 0, b = 0, x = 0;
-    EEdgeType edge3[3] = { static_cast<EEdgeType>(0) };
+    TArray<EEdgeType> edge3;
+    edge3.Init(static_cast<EEdgeType>(0), 3);
     for (int32 j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
         if (Ep[j] <= EEdgeType::UL) {
             a += Cnk(j, x + 1);
@@ -411,7 +410,7 @@ int16 FCubieCube::GetURtoUL()
 
 void FCubieCube::SetURtoUL(int16 Idx)
 {
-    EEdgeType edge3[3] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL };
+    TArray edge3 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL };
     int32 b = Idx % 6;
     int32 a = Idx / 6;
     for(int32 e = 0; e < EDGE_COUNT; e++) {
@@ -436,7 +435,8 @@ void FCubieCube::SetURtoUL(int16 Idx)
 int16 FCubieCube::GetUBtoDF()
 {
     int32 a = 0, x = 0, b = 0;
-    EEdgeType edge3[3] = { static_cast<EEdgeType>(0) };
+    TArray<EEdgeType> edge3;
+    edge3.Init(static_cast<EEdgeType>(0), 3);
     for (int32 j = static_cast<int32>(EEdgeType::UR); j <= static_cast<int32>(EEdgeType::BR); j++)
         if (EEdgeType::UB <= Ep[j] && Ep[j] <= EEdgeType::DF) {
             a += Cnk(j, x + 1);
@@ -457,7 +457,7 @@ int16 FCubieCube::GetUBtoDF()
 
 void FCubieCube::SetUBtoDF(int16 Idx)
 {
-    EEdgeType edge3[3] = { EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
+    TArray edge3 = { EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
     int32 b = Idx % 6;
     int32 a = Idx / 6;
     for (int32 e = 0; e < EDGE_COUNT; e++)

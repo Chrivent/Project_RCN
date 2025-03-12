@@ -40,21 +40,21 @@ struct FCubieCube
 {
     GENERATED_BODY()
     
+    FCubieCube();
+    
     TArray<ECornerType> Cp;
     TArray<int8> Co;
     TArray<EEdgeType> Ep;
     TArray<int8> Eo;
 
     static const TArray<FCubieCube> MoveCube;
-    
-    FCubieCube();
 
-    static int32 Cnk(int32 N, int32 K);
+    static int32 Cnk(const int32 N, int32 K);
 
-    static void RotateLeftCorner(ECornerType* arr, int32 l, int32 r);
-    static void RotateRightCorner(ECornerType* arr, int32 l, int32 r);
-    static void RotateLeftEdge(EEdgeType* arr, int32 l, int32 r);
-    static void RotateRightEdge(EEdgeType* arr, int32 l, int32 r);
+    static void RotateLeftCorner(TArray<ECornerType>& Arr, const int32 L, const int32 R);
+    static void RotateRightCorner(TArray<ECornerType>& Arr, const int32 L, const int32 R);
+    static void RotateLeftEdge(TArray<EEdgeType>& Arr, const int32 L, const int32 R);
+    static void RotateRightEdge(TArray<EEdgeType>& Arr, const int32 L, const int32 R);
     
     void CornerMultiply(int32 MoveCubeIdx);
     void EdgeMultiply(int32 MoveCubeIdx);

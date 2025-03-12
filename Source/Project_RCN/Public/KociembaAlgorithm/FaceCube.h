@@ -67,10 +67,10 @@ struct FFaceCube
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cube")
     TArray<EColorType> Facelets;
     
-    static const TArray<TArray<EFaceletType>>& CornerFacelet();
-    static const TArray<TArray<EFaceletType>>& EdgeFacelet();
-    static const TArray<TArray<EColorType>>& CornerColor();
-    static const TArray<TArray<EColorType>>& EdgeColor();
+    static const TArray<TArray<EFaceletType>> CornerFacelet;
+    static const TArray<TArray<EFaceletType>> EdgeFacelet;
+    static const TArray<TArray<EColorType>> CornerColor;
+    static const TArray<TArray<EColorType>> EdgeColor;
 
     FCubieCube ToCubieCube();
 };
