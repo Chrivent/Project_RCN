@@ -19,24 +19,22 @@ int8 Slice_Flip_Prun[N_SLICE1 * N_FLIP / 2] = {0};
 
 int32 PRUNING_INITED = 0;
 
-FCoordCube GetCoordCube(FCubieCube& CubieCube)
+FCoordCube::FCoordCube(FCubieCube& CubieCube)
 {
-    return FCoordCube{
-        GetTwist(CubieCube),
-        GetFlip(CubieCube),
-        CornerParity(CubieCube),
-        GetFRtoBR(CubieCube),
-        GetURFtoDLF(CubieCube),
-        GetURtoUL(CubieCube),
-        GetUBtoDF(CubieCube),
-        GetURtoDF(CubieCube)
-    };
+    Twist = GetTwist(CubieCube);
+    Flip = GetFlip(CubieCube);
+    Parity = CornerParity(CubieCube);
+    FRtoBR = GetFRtoBR(CubieCube);
+    URFtoDLF = GetURFtoDLF(CubieCube);
+    URtoUL = GetURtoUL(CubieCube);
+    UBtoDF = GetUBtoDF(CubieCube);
+    URtoDF = GetURtoDF(CubieCube);
 }
 
 void InitPruning(const FString& CacheDir)
 {
     FCubieCube CubieCube;
-    FCubieCube* MoveCube = GetMoveCube();
+    TArray<FCubieCube> MoveCube = FCubieCube::GetMoveCube();
 
     if (CheckCachedTable("twistMove", TwistMove, sizeof(TwistMove), CacheDir) != 0) {
         CubieCube = GetCubieCube();

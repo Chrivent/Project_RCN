@@ -52,9 +52,10 @@ struct FCubieCube
         Ep.Init(EEdgeType::UR, 12);
         Eo.Init(0, 12);
     }
+
+    static const TArray<FCubieCube>& GetMoveCube();
 };
 
-FCubieCube* GetMoveCube();
 FCubieCube GetCubieCube();
 
 int32 Cnk(int32 N, int32 K);

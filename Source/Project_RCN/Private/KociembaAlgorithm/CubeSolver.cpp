@@ -37,13 +37,12 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
     
     FFaceCube Fc(Facelets);
     FCubieCube Cc = Fc.ToCubieCube();
-    int32 S = Verify(Cc);
-    if (S != 0)
+    if (Verify(Cc))
     {
         return FString("ERROR: Unsolvable cube");
     }
 
-    FCoordCube C = GetCoordCube(Cc);
+    FCoordCube C(Cc);
 
     Search.Po[0] = 0;
     Search.Ax[0] = 0;
@@ -129,11 +128,13 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
         if (Search.MinDistPhase1[N + 1] == 0 && N >= DepthPhase1 - 5)
         {
             Search.MinDistPhase1[N + 1] = 10;
-        
-            if (N == DepthPhase1 - 1 && (S = TotalDepth(Search, DepthPhase1, MaxDepth)) >= 0)
+
+            if (N == DepthPhase1 - 1)
             {
-                if (S == DepthPhase1 || 
-                    (Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] && Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] + 3))
+                int32 S = TotalDepth(Search, DepthPhase1, MaxDepth);
+                if (S >= 0 && 
+                    (S == DepthPhase1 || 
+                    (Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] && Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] + 3)))
                 {
                     return SolutionToString(Search, S, bUseSeparator ? DepthPhase1 : -1);
                 }

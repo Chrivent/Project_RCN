@@ -2,69 +2,59 @@
 
 #include "KociembaAlgorithm/facecube.h"
 
-FCubieCube* GetMoveCube()
+const TArray<FCubieCube>& FCubieCube::GetMoveCube()
 {
-    static FCubieCube MoveCube[6] = {};
-    
-    static constexpr ECornerType cpU[8]  = { ECornerType::UBR, ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB };
-    static const int8 coU[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static constexpr EEdgeType epU[12] = { EEdgeType::UB, EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
-    static const int8 eoU[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    static const TArray<FCubieCube> MoveCube = []
+    {
+        TArray<FCubieCube> TempMoveCube;
+        TempMoveCube.SetNum(6);
 
-    static constexpr ECornerType cpR[8]  = { ECornerType::DFR, ECornerType::UFL, ECornerType::ULB, ECornerType::URF, ECornerType::DRB, ECornerType::DLF, ECornerType::DBL, ECornerType::UBR };
-    static const int8 coR[8]  = { 2, 0, 0, 1, 1, 0, 0, 2 };
-    static constexpr EEdgeType epR[12] = { EEdgeType::FR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::BR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::DR, EEdgeType::FL, EEdgeType::BL, EEdgeType::UR };
-    static const int8 eoR[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        constexpr ECornerType cp[6][8] = {
+            { ECornerType::UBR, ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB },
+            { ECornerType::DFR, ECornerType::UFL, ECornerType::ULB, ECornerType::URF, ECornerType::DRB, ECornerType::DLF, ECornerType::DBL, ECornerType::UBR },
+            { ECornerType::UFL, ECornerType::DLF, ECornerType::ULB, ECornerType::UBR, ECornerType::URF, ECornerType::DFR, ECornerType::DBL, ECornerType::DRB },
+            { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB, ECornerType::DFR },
+            { ECornerType::URF, ECornerType::ULB, ECornerType::DBL, ECornerType::UBR, ECornerType::DFR, ECornerType::UFL, ECornerType::DLF, ECornerType::DRB },
+            { ECornerType::URF, ECornerType::UFL, ECornerType::UBR, ECornerType::DRB, ECornerType::DFR, ECornerType::DLF, ECornerType::ULB, ECornerType::DBL }
+        };
 
-    static constexpr ECornerType cpF[8]  = { ECornerType::UFL, ECornerType::DLF, ECornerType::ULB, ECornerType::UBR, ECornerType::URF, ECornerType::DFR, ECornerType::DBL, ECornerType::DRB };
-    static const int8 coF[8]  = { 1, 2, 0, 0, 2, 1, 0, 0 };
-    static constexpr EEdgeType epF[12] = { EEdgeType::UR, EEdgeType::FL, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::FR, EEdgeType::DL, EEdgeType::DB, EEdgeType::UF, EEdgeType::DF, EEdgeType::BL, EEdgeType::BR };
-    static const int8 eoF[12] = { 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 };
+        constexpr int8 co[6][8] = {
+            { 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 2, 0, 0, 1, 1, 0, 0, 2 },
+            { 1, 2, 0, 0, 2, 1, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 2, 0, 0, 2, 1, 0 },
+            { 0, 0, 1, 2, 0, 0, 2, 1 }
+        };
 
-    static constexpr ECornerType cpD[8]  = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB, ECornerType::DFR };
-    static const int8 coD[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    static constexpr EEdgeType epD[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::DR, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
-    static const int8 eoD[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        constexpr EEdgeType ep[6][12] = {
+            { EEdgeType::UB, EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR },
+            { EEdgeType::FR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::BR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::DR, EEdgeType::FL, EEdgeType::BL, EEdgeType::UR },
+            { EEdgeType::UR, EEdgeType::FL, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::FR, EEdgeType::DL, EEdgeType::DB, EEdgeType::UF, EEdgeType::DF, EEdgeType::BL, EEdgeType::BR },
+            { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::DR, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR },
+            { EEdgeType::UR, EEdgeType::UF, EEdgeType::BL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::FL, EEdgeType::DB, EEdgeType::FR, EEdgeType::UL, EEdgeType::DL, EEdgeType::BR },
+            { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::BR, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::BL, EEdgeType::FR, EEdgeType::FL, EEdgeType::UB, EEdgeType::DB }
+        };
 
-    static constexpr ECornerType cpL[8]  = { ECornerType::URF, ECornerType::ULB, ECornerType::DBL, ECornerType::UBR, ECornerType::DFR, ECornerType::UFL, ECornerType::DLF, ECornerType::DRB };
-    static const int8 coL[8]  = { 0, 1, 2, 0, 0, 2, 1, 0 };
-    static constexpr EEdgeType epL[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::BL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::FL, EEdgeType::DB, EEdgeType::FR, EEdgeType::UL, EEdgeType::DL, EEdgeType::BR };
-    static const int8 eoL[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        constexpr int8 eo[6][12] = {
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1 }
+        };
 
-    static constexpr ECornerType cpB[8]  = { ECornerType::URF, ECornerType::UFL, ECornerType::UBR, ECornerType::DRB, ECornerType::DFR, ECornerType::DLF, ECornerType::ULB, ECornerType::DBL };
-    static const int8 coB[8]  = { 0, 0, 1, 2, 0, 0, 2, 1 };
-    static constexpr EEdgeType epB[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::BR, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::BL, EEdgeType::FR, EEdgeType::FL, EEdgeType::UB, EEdgeType::DB };
-    static const int8 eoB[12] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1 };
+        for (int32 i = 0; i < 6; i++)
+        {
+            TempMoveCube[i].Cp = TArray<ECornerType>(cp[i], UE_ARRAY_COUNT(cp[i]));
+            TempMoveCube[i].Co = TArray<int8>(co[i], UE_ARRAY_COUNT(co[i]));
+            TempMoveCube[i].Ep = TArray<EEdgeType>(ep[i], UE_ARRAY_COUNT(ep[i]));
+            TempMoveCube[i].Eo = TArray<int8>(eo[i], UE_ARRAY_COUNT(eo[i]));
+        }
 
-    MoveCube[0].Cp = TArray(cpU, UE_ARRAY_COUNT(cpU));
-    MoveCube[0].Co = TArray(coU, UE_ARRAY_COUNT(coU));
-    MoveCube[0].Ep = TArray(epU, UE_ARRAY_COUNT(epU));
-    MoveCube[0].Eo = TArray(eoU, UE_ARRAY_COUNT(eoU));
-
-    MoveCube[1].Cp = TArray(cpR, UE_ARRAY_COUNT(cpR));
-    MoveCube[1].Co = TArray(coR, UE_ARRAY_COUNT(coR));
-    MoveCube[1].Ep = TArray(epR, UE_ARRAY_COUNT(epR));
-    MoveCube[1].Eo = TArray(eoR, UE_ARRAY_COUNT(eoR));
-
-    MoveCube[2].Cp = TArray(cpF, UE_ARRAY_COUNT(cpF));
-    MoveCube[2].Co = TArray(coF, UE_ARRAY_COUNT(coF));
-    MoveCube[2].Ep = TArray(epF, UE_ARRAY_COUNT(epF));
-    MoveCube[2].Eo = TArray(eoF, UE_ARRAY_COUNT(eoF));
-
-    MoveCube[3].Cp = TArray(cpD, UE_ARRAY_COUNT(cpD));
-    MoveCube[3].Co = TArray(coD, UE_ARRAY_COUNT(coD));
-    MoveCube[3].Ep = TArray(epD, UE_ARRAY_COUNT(epD));
-    MoveCube[3].Eo = TArray(eoD, UE_ARRAY_COUNT(eoD));
-
-    MoveCube[4].Cp = TArray(cpL, UE_ARRAY_COUNT(cpL));
-    MoveCube[4].Co = TArray(coL, UE_ARRAY_COUNT(coL));
-    MoveCube[4].Ep = TArray(epL, UE_ARRAY_COUNT(epL));
-    MoveCube[4].Eo = TArray(eoL, UE_ARRAY_COUNT(eoL));
-
-    MoveCube[5].Cp = TArray(cpB, UE_ARRAY_COUNT(cpB));
-    MoveCube[5].Co = TArray(coB, UE_ARRAY_COUNT(coB));
-    MoveCube[5].Ep = TArray(epB, UE_ARRAY_COUNT(epB));
-    MoveCube[5].Eo = TArray(eoB, UE_ARRAY_COUNT(eoB));
+        return TempMoveCube;
+    }();
 
     return MoveCube;
 }
@@ -73,20 +63,20 @@ FCubieCube GetCubieCube()
 {
     FCubieCube result;
 
-    static constexpr ECornerType  cp[8]  = { 
+    static constexpr ECornerType cp[8]  = { 
         ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, 
         ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB 
     };
 
-    static const int8         co[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    static const int8 co[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    static constexpr EEdgeType    ep[12] = { 
+    static constexpr EEdgeType ep[12] = { 
         EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, 
         EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, 
         EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR 
     };
 
-    static const int8         eo[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    static const int8 eo[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     result.Cp = TArray(cp, UE_ARRAY_COUNT(cp));
     result.Co = TArray(co, UE_ARRAY_COUNT(co));

@@ -22,6 +22,9 @@ struct FCoordCube
 {
     GENERATED_BODY()
 
+    FCoordCube() = default;
+    FCoordCube(FCubieCube& CubieCube);
+
     int16 Twist;
     int16 Flip;
     int16 Parity;
@@ -53,8 +56,6 @@ extern int32 PRUNING_INITED;
 void InitPruning(const FString& CacheDir);
 void SetPruning(int8* table, int32 index, int8 value);
 int8 GetPruning(const int8* table, int32 index);
-
-FCoordCube GetCoordCube(FCubieCube& CubieCube);
 
 static bool CheckCachedTable(const FString& Name, void* Ptr, int32 Len, const FString& CacheDir);
 static void DumpToFile(void* Ptr, int32 Len, const FString& Name, const FString& CacheDir);
