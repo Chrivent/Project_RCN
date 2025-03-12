@@ -30,11 +30,6 @@ class PROJECT_RCN_API UCubeSolver : public UObject
 
 public:
     /**
-     * Generate the solution string from the array data including a separator between phase1 and phase2 moves
-     */
-    static FString SolutionToString(const FSearch& Search, int32 Length, int32 DepthPhase1);
-
-    /**
      * Computes the solver string for a given cube.
      * 
      * @param Facelets
@@ -68,9 +63,7 @@ public:
      */
     static FString SolveCube(const FString& Facelets, int32 MaxDepth, double TimeOut, bool bUseSeparator, const FString& CacheDir);
 
-    /**
-     * Apply phase2 of algorithm and return the combined phase1 and phase2 depth.
-     * In phase2, only moves U, D, R2, F2, L2, B2 are allowed.
-     */
+protected:
     static int32 TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth);
+    static FString SolutionToString(const FSearch& Search, int32 Length, int32 DepthPhase1);
 };

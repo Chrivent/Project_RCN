@@ -37,16 +37,16 @@ struct FCoordCube
 // Move table for the twists of the corners
 // twist < 2187 in phase 2.
 // twist = 0 in phase 2.
-extern short TwistMove[N_TWIST][N_MOVE];
+extern int16 TwistMove[N_TWIST][N_MOVE];
 
 // Move table for the flips of the edges
 // flip < 2048 in phase 1
 // flip = 0 in phase 2.
-extern short FlipMove[N_FLIP][N_MOVE];
+extern int16 FlipMove[N_FLIP][N_MOVE];
 
 // Parity of the corner permutation. This is the same as the parity for the edge permutation of a valid cube.
 // parity has values 0 and 1
-extern short ParityMove[2][18];
+extern int16 ParityMove[2][18];
 
 // ***********************************Phase 1 and 2 movetable********************************************************
 
@@ -54,61 +54,60 @@ extern short ParityMove[2][18];
 // FRtoBRMove < 11880 in phase 1
 // FRtoBRMove < 24 in phase 2
 // FRtoBRMove = 0 for solved cube
-extern short FRtoBR_Move[N_FRtoBR][N_MOVE];
+extern int16 FRtoBR_Move[N_FRtoBR][N_MOVE];
 
 // Move table for permutation of six corners. The positions of the DBL and DRB corners are determined by the parity.
 // URFtoDLF < 20160 in phase 1
 // URFtoDLF < 20160 in phase 2
 // URFtoDLF = 0 for solved cube.
-extern short URFtoDLF_Move[N_URFtoDLF][N_MOVE];
+extern int16 URFtoDLF_Move[N_URFtoDLF][N_MOVE];
 
 // Move table for the permutation of six U-face and D-face edges in phase2. The positions of the DL and DB edges are
 // determined by the parity.
 // URtoDF < 665280 in phase 1
 // URtoDF < 20160 in phase 2
 // URtoDF = 0 for solved cube.
-extern short URtoDF_Move[N_URtoDF][N_MOVE];
+extern int16 URtoDF_Move[N_URtoDF][N_MOVE];
 
 // **************************helper move tables to compute URtoDF for the beginning of phase2************************
 
 // Move table for the three edges UR,UF and UL in phase1.
-extern short URtoUL_Move[N_URtoUL][N_MOVE];
+extern int16 URtoUL_Move[N_URtoUL][N_MOVE];
 
 // Move table for the three edges UB,DR and DF in phase1.
-extern short UBtoDF_Move[N_UBtoDF][N_MOVE];
+extern int16 UBtoDF_Move[N_UBtoDF][N_MOVE];
 
 // Table to merge the coordinates of the UR,UF,UL and UB,DR,DF edges at the beginning of phase2
-extern short MergeURtoULandUBtoDF[336][336];
+extern int16 MergeURtoULandUBtoDF[336][336];
 
 // ****************************************Pruning tables for the search*********************************************
 
 // Pruning table for the permutation of the corners and the UD-slice edges in phase2.
 // The pruning table entries give a lower estimation for the number of moves to reach the solved cube.
-extern signed char Slice_URFtoDLF_Parity_Prun[N_SLICE2 * N_URFtoDLF * N_PARITY / 2];
+extern int8 Slice_URFtoDLF_Parity_Prun[N_SLICE2 * N_URFtoDLF * N_PARITY / 2];
 
 // Pruning table for the permutation of the edges in phase2.
 // The pruning table entries give a lower estimation for the number of moves to reach the solved cube.
-extern signed char Slice_URtoDF_Parity_Prun[N_SLICE2 * N_URtoDF * N_PARITY / 2];
+extern int8 Slice_URtoDF_Parity_Prun[N_SLICE2 * N_URtoDF * N_PARITY / 2];
 
 // Pruning table for the twist of the corners and the position (not permutation) of the UD-slice edges in phase1
 // The pruning table entries give a lower estimation for the number of moves to reach the H-subgroup.
-extern signed char Slice_Twist_Prun[N_SLICE1 * N_TWIST / 2 + 1];
+extern int8 Slice_Twist_Prun[N_SLICE1 * N_TWIST / 2 + 1];
 
 // Pruning table for the flip of the edges and the position (not permutation) of the UD-slice edges in phase1
 // The pruning table entries give a lower estimation for the number of moves to reach the H-subgroup.
-extern signed char Slice_Flip_Prun[N_SLICE1 * N_FLIP / 2];
+extern int8 Slice_Flip_Prun[N_SLICE1 * N_FLIP / 2];
 
-extern int PRUNING_INITED;
+extern int32 PRUNING_INITED;
 void InitPruning(const FString& CacheDir);
 
 // Set pruning value in table. Two values are stored in one char.
-void SetPruning(signed char *table, int index, signed char value);
+void SetPruning(int8* table, int32 index, int8 value);
 
 // Extract pruning value
-signed char GetPruning(const signed char *table, int index);
+int8 GetPruning(const int8* table, int32 index);
 
-FCoordCube* GetCoordCube(FCubieCube* CubieCube);
-void Move(FCoordCube* CoordCube, int32 MoveIndex, const FString& CacheDir);
+FCoordCube GetCoordCube(FCubieCube& CubieCube);
 
 static bool CheckCachedTable(const FString& Name, void* Ptr, int32 Len, const FString& CacheDir);
 static void DumpToFile(void* Ptr, int32 Len, const FString& Name, const FString& CacheDir);

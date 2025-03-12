@@ -55,7 +55,6 @@ enum class EColorType : uint8
     B
 };
 
-//Cube on the facelet level
 USTRUCT(BlueprintType)
 struct FFaceCube
 {
@@ -70,25 +69,12 @@ struct FFaceCube
     }
 };
 
-// Map the corner positions to facelet positions. cornerFacelet[URF.ordinal()][0] e.g. gives the position of the
-// facelet in the URF corner position, which defines the orientation.<br>
-// cornerFacelet[URF.ordinal()][1] and cornerFacelet[URF.ordinal()][2] give the position of the other two facelets
-// of the URF corner (clockwise).
 extern EFaceletType CornerFacelet[8][3];
-
-// Map the edge positions to facelet positions. edgeFacelet[UR.ordinal()][0] e.g. gives the position of the facelet in
-// the UR edge position, which defines the orientation.<br>
-// edgeFacelet[UR.ordinal()][1] gives the position of the other facelet
 extern EFaceletType EdgeFacelet[12][2];
-
-// Map the corner positions to facelet colors.
 extern EColorType CornerColor[8][3];
-
-// Map the edge positions to facelet colors.
 extern EColorType EdgeColor[12][2];
 
-FFaceCube* GetFaceCube();
-FFaceCube* GetFaceCubeFromString(const char* CubeString);
+FFaceCube GetFaceCube();
+FFaceCube GetFaceCubeFromString(FString CubeString);
 
-void ToString(FFaceCube* FaceCube, char* res);
-struct FCubieCube* ToCubieCube(FFaceCube* FaceCube);
+struct FCubieCube ToCubieCube(FFaceCube& FaceCube);
