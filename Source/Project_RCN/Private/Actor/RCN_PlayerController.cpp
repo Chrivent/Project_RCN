@@ -152,7 +152,6 @@ void ARCN_PlayerController::UpdateScaleImage(UImage* Image, const FVector2D Targ
 		return;
 	}
 
-	// 다음 프레임에 계속 업데이트
 	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
 		UpdateScaleImage(Image, TargetScale);
