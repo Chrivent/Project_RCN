@@ -5,7 +5,6 @@
 FCubieCube* GetMoveCube()
 {
     static FCubieCube MoveCube[6] = {};
-    static bool MoveCubeInitialized = false;
     
     static constexpr ECornerType cpU[8]  = { ECornerType::UBR, ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB };
     static const int8 coU[8]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -37,38 +36,35 @@ FCubieCube* GetMoveCube()
     static constexpr EEdgeType epB[12] = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::BR, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::BL, EEdgeType::FR, EEdgeType::FL, EEdgeType::UB, EEdgeType::DB };
     static const int8 eoB[12] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1 };
 
-    if (!MoveCubeInitialized)
-    {
-        MoveCube[0].Cp = TArray(cpU, UE_ARRAY_COUNT(cpU));
-        MoveCube[0].Co = TArray(coU, UE_ARRAY_COUNT(coU));
-        MoveCube[0].Ep = TArray(epU, UE_ARRAY_COUNT(epU));
-        MoveCube[0].Eo = TArray(eoU, UE_ARRAY_COUNT(eoU));
+    MoveCube[0].Cp = TArray(cpU, UE_ARRAY_COUNT(cpU));
+    MoveCube[0].Co = TArray(coU, UE_ARRAY_COUNT(coU));
+    MoveCube[0].Ep = TArray(epU, UE_ARRAY_COUNT(epU));
+    MoveCube[0].Eo = TArray(eoU, UE_ARRAY_COUNT(eoU));
 
-        MoveCube[1].Cp = TArray(cpR, UE_ARRAY_COUNT(cpR));
-        MoveCube[1].Co = TArray(coR, UE_ARRAY_COUNT(coR));
-        MoveCube[1].Ep = TArray(epR, UE_ARRAY_COUNT(epR));
-        MoveCube[1].Eo = TArray(eoR, UE_ARRAY_COUNT(eoR));
+    MoveCube[1].Cp = TArray(cpR, UE_ARRAY_COUNT(cpR));
+    MoveCube[1].Co = TArray(coR, UE_ARRAY_COUNT(coR));
+    MoveCube[1].Ep = TArray(epR, UE_ARRAY_COUNT(epR));
+    MoveCube[1].Eo = TArray(eoR, UE_ARRAY_COUNT(eoR));
 
-        MoveCube[2].Cp = TArray(cpF, UE_ARRAY_COUNT(cpF));
-        MoveCube[2].Co = TArray(coF, UE_ARRAY_COUNT(coF));
-        MoveCube[2].Ep = TArray(epF, UE_ARRAY_COUNT(epF));
-        MoveCube[2].Eo = TArray(eoF, UE_ARRAY_COUNT(eoF));
+    MoveCube[2].Cp = TArray(cpF, UE_ARRAY_COUNT(cpF));
+    MoveCube[2].Co = TArray(coF, UE_ARRAY_COUNT(coF));
+    MoveCube[2].Ep = TArray(epF, UE_ARRAY_COUNT(epF));
+    MoveCube[2].Eo = TArray(eoF, UE_ARRAY_COUNT(eoF));
 
-        MoveCube[3].Cp = TArray(cpD, UE_ARRAY_COUNT(cpD));
-        MoveCube[3].Co = TArray(coD, UE_ARRAY_COUNT(coD));
-        MoveCube[3].Ep = TArray(epD, UE_ARRAY_COUNT(epD));
-        MoveCube[3].Eo = TArray(eoD, UE_ARRAY_COUNT(eoD));
+    MoveCube[3].Cp = TArray(cpD, UE_ARRAY_COUNT(cpD));
+    MoveCube[3].Co = TArray(coD, UE_ARRAY_COUNT(coD));
+    MoveCube[3].Ep = TArray(epD, UE_ARRAY_COUNT(epD));
+    MoveCube[3].Eo = TArray(eoD, UE_ARRAY_COUNT(eoD));
 
-        MoveCube[4].Cp = TArray(cpL, UE_ARRAY_COUNT(cpL));
-        MoveCube[4].Co = TArray(coL, UE_ARRAY_COUNT(coL));
-        MoveCube[4].Ep = TArray(epL, UE_ARRAY_COUNT(epL));
-        MoveCube[4].Eo = TArray(eoL, UE_ARRAY_COUNT(eoL));
+    MoveCube[4].Cp = TArray(cpL, UE_ARRAY_COUNT(cpL));
+    MoveCube[4].Co = TArray(coL, UE_ARRAY_COUNT(coL));
+    MoveCube[4].Ep = TArray(epL, UE_ARRAY_COUNT(epL));
+    MoveCube[4].Eo = TArray(eoL, UE_ARRAY_COUNT(eoL));
 
-        MoveCube[5].Cp = TArray(cpB, UE_ARRAY_COUNT(cpB));
-        MoveCube[5].Co = TArray(coB, UE_ARRAY_COUNT(coB));
-        MoveCube[5].Ep = TArray(epB, UE_ARRAY_COUNT(epB));
-        MoveCube[5].Eo = TArray(eoB, UE_ARRAY_COUNT(eoB));
-    }
+    MoveCube[5].Cp = TArray(cpB, UE_ARRAY_COUNT(cpB));
+    MoveCube[5].Co = TArray(coB, UE_ARRAY_COUNT(coB));
+    MoveCube[5].Ep = TArray(epB, UE_ARRAY_COUNT(epB));
+    MoveCube[5].Eo = TArray(eoB, UE_ARRAY_COUNT(eoB));
 
     return MoveCube;
 }
@@ -98,6 +94,62 @@ FCubieCube GetCubieCube()
     result.Eo = TArray(eo, UE_ARRAY_COUNT(eo));
 
     return result;
+}
+
+FCubieCube ToCubieCube(FFaceCube& FaceCube)
+{
+    int8 ori;
+    FCubieCube ccRet;
+    for (int32 i = 0; i < 8; i++)
+    {
+        ccRet.Cp[i] = ECornerType::URF;
+    }
+    for (int32 i = 0; i < 12; i++)
+    {
+        ccRet.Ep[i] = EEdgeType::UR;
+    }
+    for (int32 i = 0; i < CORNER_COUNT; i++)
+    {
+        for (ori = 0; ori < 3; ori++)
+        {
+            if (FaceCube.Facelets[static_cast<int32>(FFaceCube::CornerFacelet()[i][ori])] == EColorType::U || FaceCube.Facelets[static_cast<int32>(FFaceCube::CornerFacelet()[i][ori])] == EColorType::D)
+            {
+                break;
+            }
+        }
+        EColorType col1 = FaceCube.Facelets[static_cast<int32>(FFaceCube::CornerFacelet()[i][(ori + 1) % 3])];
+        EColorType col2 = FaceCube.Facelets[static_cast<int32>(FFaceCube::CornerFacelet()[i][(ori + 2) % 3])];
+        for (int32 j = 0; j < CORNER_COUNT; j++)
+        {
+            if (col1 == FFaceCube::CornerColor()[j][1] && col2 == FFaceCube::CornerColor()[j][2])
+            {
+                ccRet.Cp[i] = static_cast<ECornerType>(j);
+                ccRet.Co[i] = ori % 3;
+                break;
+            }
+        }
+    }
+    for (int32 i = 0; i < EDGE_COUNT; i++)
+    {
+        for (int32 j = 0; j < EDGE_COUNT; j++)
+        {
+            if (FaceCube.Facelets[static_cast<int32>(FFaceCube::EdgeFacelet()[i][0])] == FFaceCube::EdgeColor()[j][0]
+                && FaceCube.Facelets[static_cast<int32>(FFaceCube::EdgeFacelet()[i][1])] == FFaceCube::EdgeColor()[j][1])
+            {
+                ccRet.Ep[i] = static_cast<EEdgeType>(j);
+                ccRet.Eo[i] = 0;
+                break;
+            }
+            if (FaceCube.Facelets[static_cast<int32>(FFaceCube::EdgeFacelet()[i][0])] == FFaceCube::EdgeColor()[j][1]
+                && FaceCube.Facelets[static_cast<int32>(FFaceCube::EdgeFacelet()[i][1])] == FFaceCube::EdgeColor()[j][0])
+            {
+                ccRet.Ep[i] = static_cast<EEdgeType>(j);
+                ccRet.Eo[i] = 1;
+                break;
+            }
+        }
+    }
+    return ccRet;
 }
 
 int32 Cnk(const int32 N, int32 K)
@@ -158,19 +210,19 @@ FFaceCube ToFaceCube(FCubieCube& CubieCube)
 {
     int32 j;
     int8 ori;
-    FFaceCube fcRet = GetFaceCube();
+    FFaceCube fcRet;
     for (int32 i = 0; i < CORNER_COUNT; i++) {
         j = static_cast<int32>(CubieCube.Cp[i]);
         ori = CubieCube.Co[i];
         for (int32 n = 0; n < 3; n++)
-            fcRet.Facelets[static_cast<int32>(CornerFacelet[i][(n + ori) % 3])] = CornerColor[j][n];
+            fcRet.Facelets[static_cast<int32>(FFaceCube::CornerFacelet()[i][(n + ori) % 3])] = FFaceCube::CornerColor()[j][n];
     }
     for (int32 i = 0; i < EDGE_COUNT; i++)
     {
         j = static_cast<int32>(CubieCube.Ep[i]);
         ori = CubieCube.Eo[i];
         for (int32 n = 0; n < 2; n++)
-            fcRet.Facelets[static_cast<int32>(EdgeFacelet[i][(n + ori) % 2])] = EdgeColor[j][n];
+            fcRet.Facelets[static_cast<int32>(FFaceCube::EdgeFacelet()[i][(n + ori) % 2])] = FFaceCube::EdgeColor()[j][n];
     }
     return fcRet;
 }

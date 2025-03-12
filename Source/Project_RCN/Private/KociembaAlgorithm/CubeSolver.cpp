@@ -35,8 +35,8 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
         return FString("ERROR: Invalid cube state");
     }
     
-    FFaceCube Fc = GetFaceCubeFromString(Facelets);
-    FCubieCube Cc = ToCubieCube(Fc);
+    FFaceCube Fc(Facelets);
+    FCubieCube Cc = Fc.ToCubieCube();
     int32 S = Verify(Cc);
     if (S != 0)
     {

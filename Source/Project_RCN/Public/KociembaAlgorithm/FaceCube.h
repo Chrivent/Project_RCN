@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CubieCube.h"
 #include "FaceCube.generated.h"
 
 /**
@@ -60,21 +61,16 @@ struct FFaceCube
 {
     GENERATED_BODY()
 
+    FFaceCube();
+    explicit FFaceCube(FString CubeString);
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cube")
     TArray<EColorType> Facelets;
+    
+    static const TArray<TArray<EFaceletType>>& CornerFacelet();
+    static const TArray<TArray<EFaceletType>>& EdgeFacelet();
+    static const TArray<TArray<EColorType>>& CornerColor();
+    static const TArray<TArray<EColorType>>& EdgeColor();
 
-    FFaceCube()
-    {
-        Facelets.Init(EColorType::U, 54);
-    }
+    FCubieCube ToCubieCube();
 };
-
-extern EFaceletType CornerFacelet[8][3];
-extern EFaceletType EdgeFacelet[12][2];
-extern EColorType CornerColor[8][3];
-extern EColorType EdgeColor[12][2];
-
-FFaceCube GetFaceCube();
-FFaceCube GetFaceCubeFromString(FString CubeString);
-
-struct FCubieCube ToCubieCube(FFaceCube& FaceCube);
