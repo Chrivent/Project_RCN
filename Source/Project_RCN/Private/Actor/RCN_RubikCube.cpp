@@ -22,6 +22,32 @@ const TArray<FSignInfo> ARCN_RubikCube::SignInfos = {
 	{"U", EAxisType::AxisZ, 1, true, 1},   {"U'", EAxisType::AxisZ, 1, false, 1}, {"U2", EAxisType::AxisZ, 1, true, 2}
 };
 
+const TArray<FVector> ARCN_RubikCube::PatternOrderPositions = {
+	FVector(-1, -1, 2), FVector(0, -1, 2), FVector(1, -1, 2),
+	FVector(-1,  0, 2), FVector(0,  0, 2), FVector(1,  0, 2),
+	FVector(-1,  1, 2), FVector(0,  1, 2), FVector(1,  1, 2),
+
+	FVector(2,  1,  1), FVector(2,  0,  1), FVector(2, -1,  1),
+	FVector(2,  1,  0), FVector(2,  0,  0), FVector(2, -1,  0),
+	FVector(2,  1, -1), FVector(2,  0, -1), FVector(2, -1, -1),
+
+	FVector(-1, 2,  1), FVector(0, 2,  1), FVector(1, 2,  1),
+	FVector(-1, 2,  0), FVector(0, 2,  0), FVector(1, 2,  0),
+	FVector(-1, 2, -1), FVector(0, 2, -1), FVector(1, 2, -1),
+
+	FVector(-1,  1, -2), FVector(0,  1, -2), FVector(1,  1, -2),
+	FVector(-1,  0, -2), FVector(0,  0, -2), FVector(1,  0, -2),
+	FVector(-1, -1, -2), FVector(0, -1, -2), FVector(1, -1, -2),
+
+	FVector(-2, -1,  1), FVector(-2,  0,  1), FVector(-2,  1,  1),
+	FVector(-2, -1,  0), FVector(-2,  0,  0), FVector(-2,  1,  0),
+	FVector(-2, -1, -1), FVector(-2,  0, -1), FVector(-2,  1, -1),
+
+	FVector( 1, -2,  1), FVector( 0, -2,  1), FVector(-1, -2,  1),
+	FVector( 1, -2,  0), FVector( 0, -2,  0), FVector(-1, -2,  0),
+	FVector( 1, -2, -1), FVector( 0, -2, -1), FVector(-1, -2, -1),
+};
+
 // Sets default values
 ARCN_RubikCube::ARCN_RubikCube()
 {
@@ -100,54 +126,6 @@ ARCN_RubikCube::ARCN_RubikCube()
 				PieceMeshComponents.Emplace(PieceMeshComponent);
 				PiecePositions.Emplace(PieceMeshComponent, FVector(X, Y, Z));
 			}
-		}
-	}
-
-	for (int32 Y = -1; Y <= 1; Y++)
-	{
-		for (int32 X = -1; X <= 1; X++)
-		{
-			PatternOrderPositions.Emplace(FVector(X, Y, 2));
-		}
-	}
-
-	for (int32 Z = 1; Z >= -1; Z--)
-	{
-		for (int32 Y = 1; Y >= -1; Y--)
-		{
-			PatternOrderPositions.Emplace(FVector(2, Y, Z));
-		}
-	}
-	
-	for (int32 Z = 1; Z >= -1; Z--)
-	{
-		for (int32 X = -1; X <= 1; X++)
-		{
-			PatternOrderPositions.Emplace(FVector(X, 2, Z));
-		}
-	}
-
-	for (int32 Y = 1; Y >= -1; Y--)
-	{
-		for (int32 X = -1; X <= 1; X++)
-		{
-			PatternOrderPositions.Emplace(FVector(X, Y, -2));
-		}
-	}
-
-	for (int32 Z = 1; Z >= -1; Z--)
-	{
-		for (int32 Y = -1; Y <= 1; Y++)
-		{
-			PatternOrderPositions.Emplace(FVector(-2, Y, Z));
-		}
-	}
-
-	for (int32 Z = 1; Z >= -1; Z--)
-	{
-		for (int32 X = 1; X >= -1; X--)
-		{
-			PatternOrderPositions.Emplace(FVector(X, -2, Z));
 		}
 	}
 

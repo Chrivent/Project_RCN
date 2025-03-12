@@ -139,7 +139,7 @@ protected:
 	FString Pattern;
 
 	static const TArray<FSignInfo> SignInfos;
-	TArray<FVector> PatternOrderPositions;
+	static const TArray<FVector> PatternOrderPositions;
 	TQueue<FSignInfo> SignQueue;
 
 	// 네트워크 로직
