@@ -21,121 +21,113 @@ int32 PRUNING_INITED = 0;
 
 FCoordCube::FCoordCube(FCubieCube& CubieCube)
 {
-    Twist = GetTwist(CubieCube);
-    Flip = GetFlip(CubieCube);
-    Parity = CornerParity(CubieCube);
-    FRtoBR = GetFRtoBR(CubieCube);
-    URFtoDLF = GetURFtoDLF(CubieCube);
-    URtoUL = GetURtoUL(CubieCube);
-    UBtoDF = GetUBtoDF(CubieCube);
-    URtoDF = GetURtoDF(CubieCube);
+    Twist = CubieCube.GetTwist();
+    Flip = CubieCube.GetFlip();
+    Parity = CubieCube.CornerParity();
+    FRtoBR = CubieCube.GetFRtoBR();
+    URFtoDLF = CubieCube.GetURFtoDLF();
+    URtoUL = CubieCube.GetURtoUL();
+    UBtoDF = CubieCube.GetUBtoDF();
+    URtoDF = CubieCube.GetURtoDF();
 }
 
 void InitPruning(const FString& CacheDir)
 {
     FCubieCube CubieCube;
-    TArray<FCubieCube> MoveCube = FCubieCube::GetMoveCube();
 
     if (CheckCachedTable("twistMove", TwistMove, sizeof(TwistMove), CacheDir) != 0) {
-        CubieCube = GetCubieCube();
         for (int32 i = 0; i < N_TWIST; i++) {
-            SetTwist(CubieCube, i);
+            CubieCube.SetTwist(i);
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
-                    CornerMultiply(CubieCube, &MoveCube[j]);
-                    TwistMove[i][3 * j + k] = GetTwist(CubieCube);
+                    CubieCube.CornerMultiply(j);
+                    TwistMove[i][3 * j + k] = CubieCube.GetTwist();
                 }
-                CornerMultiply(CubieCube, &MoveCube[j]);
+                CubieCube.CornerMultiply(j);
             }
         }
         DumpToFile(TwistMove, sizeof(TwistMove), "twistMove", CacheDir);
     }
 
     if (CheckCachedTable("flipMove", FlipMove, sizeof(FlipMove), CacheDir) != 0) {
-        CubieCube = GetCubieCube();
         for (int32 i = 0; i < N_FLIP; i++) {
-            SetFlip(CubieCube, i);
+            CubieCube.SetFlip(i);
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
-                    EdgeMultiply(CubieCube, &MoveCube[j]);
-                    FlipMove[i][3 * j + k] = GetFlip(CubieCube);
+                    CubieCube.EdgeMultiply(j);
+                    FlipMove[i][3 * j + k] = CubieCube.GetFlip();
                 }
-                EdgeMultiply(CubieCube, &MoveCube[j]);
+                CubieCube.EdgeMultiply(j);
             }
         }
         DumpToFile(FlipMove, sizeof(FlipMove), "flipMove", CacheDir);
     }
 
     if (CheckCachedTable("FRtoBR_Move", FRtoBR_Move, sizeof(FRtoBR_Move), CacheDir) != 0) {
-        CubieCube = GetCubieCube();
         for (int32 i = 0; i < N_FRtoBR; i++) {
-            SetFRtoBR(CubieCube, i);
+            CubieCube.SetFRtoBR(i);
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
-                    EdgeMultiply(CubieCube, &MoveCube[j]);
-                    FRtoBR_Move[i][3 * j + k] = GetFRtoBR(CubieCube);
+                    CubieCube.EdgeMultiply(j);
+                    FRtoBR_Move[i][3 * j + k] = CubieCube.GetFRtoBR();
                 }
-                EdgeMultiply(CubieCube, &MoveCube[j]);
+                CubieCube.EdgeMultiply(j);
             }
         }
         DumpToFile(FRtoBR_Move, sizeof(FRtoBR_Move), "FRtoBR_Move", CacheDir);
     }
 
     if (CheckCachedTable("URFtoDLF_Move", URFtoDLF_Move, sizeof(URFtoDLF_Move), CacheDir) != 0) {
-        CubieCube = GetCubieCube();
         for (int32 i = 0; i < N_URFtoDLF; i++) {
-            SetURFtoDLF(CubieCube, i);
+            CubieCube.SetURFtoDLF(i);
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
-                    CornerMultiply(CubieCube, &MoveCube[j]);
-                    URFtoDLF_Move[i][3 * j + k] = GetURFtoDLF(CubieCube);
+                    CubieCube.CornerMultiply(j);
+                    URFtoDLF_Move[i][3 * j + k] = CubieCube.GetURFtoDLF();
                 }
-                CornerMultiply(CubieCube, &MoveCube[j]);
+                CubieCube.CornerMultiply(j);
             }
         }
         DumpToFile(URFtoDLF_Move, sizeof(URFtoDLF_Move), "URFtoDLF_Move", CacheDir);
     }
 
     if (CheckCachedTable("URtoDF_Move", URtoDF_Move, sizeof(URtoDF_Move), CacheDir) != 0) {
-        CubieCube = GetCubieCube();
         for (int32 i = 0; i < N_URtoDF; i++) {
-            SetURtoDF(CubieCube, i);
+            CubieCube.SetURtoDF(i);
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
-                    EdgeMultiply(CubieCube, &MoveCube[j]);
-                    URtoDF_Move[i][3 * j + k] = static_cast<int16>(GetURtoDF(CubieCube));
+                    CubieCube.EdgeMultiply(j);
+                    URtoDF_Move[i][3 * j + k] = static_cast<int16>(CubieCube.GetURtoDF());
                 }
-                EdgeMultiply(CubieCube, &MoveCube[j]);
+                CubieCube.EdgeMultiply(j);
             }
         }
         DumpToFile(URtoDF_Move, sizeof(URtoDF_Move), "URtoDF_Move", CacheDir);
     }
 
     if (CheckCachedTable("URtoUL_Move", URtoUL_Move, sizeof(URtoUL_Move), CacheDir) != 0) {
-        CubieCube = GetCubieCube();
         for (int32 i = 0; i < N_URtoUL; i++) {
-            SetURtoUL(CubieCube, i);
+            CubieCube.SetURtoUL(i);
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
-                    EdgeMultiply(CubieCube, &MoveCube[j]);
-                    URtoUL_Move[i][3 * j + k] = GetURtoUL(CubieCube);
+                    CubieCube.EdgeMultiply(j);
+                    URtoUL_Move[i][3 * j + k] = CubieCube.GetURtoUL();
                 }
-                EdgeMultiply(CubieCube, &MoveCube[j]);
+                CubieCube.EdgeMultiply(j);
             }
         }
         DumpToFile(URtoUL_Move, sizeof(URtoUL_Move), "URtoUL_Move", CacheDir);
     }
 
     if (CheckCachedTable("UBtoDF_Move", UBtoDF_Move, sizeof(UBtoDF_Move), CacheDir) != 0) {
-        CubieCube = GetCubieCube();
         for (int32 i = 0; i < N_UBtoDF; i++) {
-            SetUBtoDF(CubieCube, i);
+            CubieCube.SetUBtoDF(i);
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
-                    EdgeMultiply(CubieCube, &MoveCube[j]);
-                    UBtoDF_Move[i][3 * j + k] = GetUBtoDF(CubieCube);
+                    CubieCube.EdgeMultiply(j);
+                    UBtoDF_Move[i][3 * j + k] = CubieCube.GetUBtoDF();
                 }
-                EdgeMultiply(CubieCube, &MoveCube[j]);
+                CubieCube.EdgeMultiply(j);
             }
         }
         DumpToFile(UBtoDF_Move, sizeof(UBtoDF_Move), "UBtoDF_Move", CacheDir);
@@ -146,7 +138,7 @@ void InitPruning(const FString& CacheDir)
         int16 uRtoUL, uBtoDF;
         for (uRtoUL = 0; uRtoUL < 336; uRtoUL++) {
             for (uBtoDF = 0; uBtoDF < 336; uBtoDF++) {
-                MergeURtoULandUBtoDF[uRtoUL][uBtoDF] = static_cast<int16>(GetURtoDF_Standalone(uRtoUL, uBtoDF));
+                MergeURtoULandUBtoDF[uRtoUL][uBtoDF] = static_cast<int16>(FCubieCube::GetURtoDF_Standalone(uRtoUL, uBtoDF));
             }
         }
         DumpToFile(MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), "MergeURtoULandUBtoDF", CacheDir);

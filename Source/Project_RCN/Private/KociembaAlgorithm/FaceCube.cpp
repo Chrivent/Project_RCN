@@ -2,19 +2,6 @@
 
 #include "KociembaAlgorithm/CubieCube.h"
 
-
-FFaceCube::FFaceCube()
-{
-    Facelets = {
-        EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U, EColorType::U,
-        EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R, EColorType::R,
-        EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F, EColorType::F,
-        EColorType::D, EColorType::D, EColorType::D, EColorType::D, EColorType::D, EColorType::D, EColorType::D, EColorType::D, EColorType::D,
-        EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L, EColorType::L,
-        EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B, EColorType::B
-    };
-}
-
 FFaceCube::FFaceCube(FString CubeString)
 {
     Facelets.Init(EColorType::U, 54);

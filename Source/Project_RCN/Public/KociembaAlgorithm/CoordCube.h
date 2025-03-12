@@ -23,7 +23,7 @@ struct FCoordCube
     GENERATED_BODY()
 
     FCoordCube() = default;
-    FCoordCube(FCubieCube& CubieCube);
+    explicit FCoordCube(FCubieCube& CubieCube);
 
     int16 Twist;
     int16 Flip;

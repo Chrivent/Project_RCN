@@ -8,6 +8,20 @@
 #include "KociembaAlgorithm/CubeSolver.h"
 #include "Project_RCN/Project_RCN.h"
 
+const TArray<FSignInfo> ARCN_RubikCube::SignInfos = {
+	{"L", EAxisType::AxisX, -1, false, 1}, {"L'", EAxisType::AxisX, -1, true, 1}, {"L2", EAxisType::AxisX, -1, false, 2},
+	{"M", EAxisType::AxisX, 0, false, 1},  {"M'", EAxisType::AxisX, 0, true, 1},  {"M2", EAxisType::AxisX, 0, false, 2},
+	{"R", EAxisType::AxisX, 1, true, 1},   {"R'", EAxisType::AxisX, 1, false, 1}, {"R2", EAxisType::AxisX, 1, true, 2},
+
+	{"B", EAxisType::AxisY, -1, false, 1}, {"B'", EAxisType::AxisY, -1, true, 1}, {"B2", EAxisType::AxisY, -1, false, 2},
+	{"S", EAxisType::AxisY, 0, true, 1},   {"S'", EAxisType::AxisY, 0, false, 1}, {"S2", EAxisType::AxisY, 0, true, 2},
+	{"F", EAxisType::AxisY, 1, true, 1},   {"F'", EAxisType::AxisY, 1, false, 1}, {"F2", EAxisType::AxisY, 1, true, 2},
+
+	{"D", EAxisType::AxisZ, -1, false, 1}, {"D'", EAxisType::AxisZ, -1, true, 1}, {"D2", EAxisType::AxisZ, -1, false, 2},
+	{"E", EAxisType::AxisZ, 0, false, 1},  {"E'", EAxisType::AxisZ, 0, true, 1},  {"E2", EAxisType::AxisZ, 0, false, 2},
+	{"U", EAxisType::AxisZ, 1, true, 1},   {"U'", EAxisType::AxisZ, 1, false, 1}, {"U2", EAxisType::AxisZ, 1, true, 2}
+};
+
 // Sets default values
 ARCN_RubikCube::ARCN_RubikCube()
 {
@@ -88,42 +102,6 @@ ARCN_RubikCube::ARCN_RubikCube()
 			}
 		}
 	}
-	
-	SignInfos.Emplace("L", EAxisType::AxisX, -1, false, 1);
-	SignInfos.Emplace("L'", EAxisType::AxisX, -1, true, 1);
-	SignInfos.Emplace("L2", EAxisType::AxisX, -1, false, 2);
-	
-	SignInfos.Emplace("M", EAxisType::AxisX, 0, false, 1);
-	SignInfos.Emplace("M'", EAxisType::AxisX, 0, true, 1);
-	SignInfos.Emplace("M2", EAxisType::AxisX, 0, false, 2);
-	
-	SignInfos.Emplace("R", EAxisType::AxisX, 1, true, 1);
-	SignInfos.Emplace("R'", EAxisType::AxisX, 1, false, 1);
-	SignInfos.Emplace("R2", EAxisType::AxisX, 1, true, 2);
-
-	SignInfos.Emplace("B", EAxisType::AxisY, -1, false, 1);
-	SignInfos.Emplace("B'", EAxisType::AxisY, -1, true, 1);
-	SignInfos.Emplace("B2", EAxisType::AxisY, -1, false, 2);
-	
-	SignInfos.Emplace("S", EAxisType::AxisY, 0, true, 1);
-	SignInfos.Emplace("S'", EAxisType::AxisY, 0, false, 1);
-	SignInfos.Emplace("S2", EAxisType::AxisY, 0, true, 2);
-	
-	SignInfos.Emplace("F", EAxisType::AxisY, 1, true, 1);
-	SignInfos.Emplace("F'", EAxisType::AxisY, 1, false, 1);
-	SignInfos.Emplace("F2", EAxisType::AxisY, 1, true, 2);
-
-	SignInfos.Emplace("D", EAxisType::AxisZ, -1, false, 1);
-	SignInfos.Emplace("D'", EAxisType::AxisZ, -1, true, 1);
-	SignInfos.Emplace("D2", EAxisType::AxisZ, -1, false, 2);
-	
-	SignInfos.Emplace("E", EAxisType::AxisZ, 0, false, 1);
-	SignInfos.Emplace("E'", EAxisType::AxisZ, 0, true, 1);
-	SignInfos.Emplace("E2", EAxisType::AxisZ, 0, false, 2);
-	
-	SignInfos.Emplace("U", EAxisType::AxisZ, 1, true, 1);
-	SignInfos.Emplace("U'", EAxisType::AxisZ, 1, false, 1);
-	SignInfos.Emplace("U2", EAxisType::AxisZ, 1, true, 2);
 
 	for (int32 Y = -1; Y <= 1; Y++)
 	{

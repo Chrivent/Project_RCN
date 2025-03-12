@@ -37,7 +37,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, int32 MaxDepth, double T
     
     FFaceCube Fc(Facelets);
     FCubieCube Cc = Fc.ToCubieCube();
-    if (Verify(Cc))
+    if (Cc.Verify())
     {
         return FString("ERROR: Unsolvable cube");
     }
@@ -271,10 +271,10 @@ FString UCubeSolver::SolutionToString(const FSearch& Search, const int32 Length,
     
     for (int32 i = 0; i < Length; i++)
     {
-        static const TCHAR* MoveAxis[] = { TEXT("U"), TEXT("R"), TEXT("F"), TEXT("D"), TEXT("L"), TEXT("B") };
+        FString MoveAxis[] = { TEXT("U"), TEXT("R"), TEXT("F"), TEXT("D"), TEXT("L"), TEXT("B") };
         SolutionString += MoveAxis[Search.Ax[i]];
 
-        static const TCHAR* MovePower[] = { TEXT(" "), TEXT("2 "), TEXT("' ") };
+        FString MovePower[] = { TEXT(" "), TEXT("2 "), TEXT("' ") };
         SolutionString += MovePower[Search.Po[i] - 1];
 
         if (i == DepthPhase1 - 1)

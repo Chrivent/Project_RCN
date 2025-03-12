@@ -61,7 +61,7 @@ struct FFaceCube
 {
     GENERATED_BODY()
 
-    FFaceCube();
+    FFaceCube() = default;
     explicit FFaceCube(FString CubeString);
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cube")

@@ -118,8 +118,16 @@ protected:
 	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PiecePositions;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<FSignInfo> SignInfos;
-	TQueue<FSignInfo> SignQueue;
+	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<UBoxComponent>> ButtonBoxComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UBoxComponent>, FVector> ButtonPositions;
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;
@@ -128,22 +136,11 @@ protected:
 	uint8 bIsScrambling : 1;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
-
-	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
-
-	UPROPERTY(VisibleAnywhere)
 	FString Pattern;
 
-	UPROPERTY(VisibleAnywhere)
+	static const TArray<FSignInfo> SignInfos;
 	TArray<FVector> PatternOrderPositions;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<UBoxComponent>> ButtonBoxComponents;
-
-	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UBoxComponent>, FVector> ButtonPositions;
+	TQueue<FSignInfo> SignQueue;
 
 	// 네트워크 로직
 	UFUNCTION(Server, Reliable)
