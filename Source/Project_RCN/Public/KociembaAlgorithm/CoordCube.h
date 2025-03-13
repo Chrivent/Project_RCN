@@ -16,20 +16,21 @@
 
 extern int16 TwistMove[N_TWIST][N_MOVE];
 extern int16 FlipMove[N_FLIP][N_MOVE];
-extern int16 ParityMove[2][18];
-
 extern int16 FRtoBR_Move[N_FRtoBR][N_MOVE];
 extern int16 URFtoDLF_Move[N_URFtoDLF][N_MOVE];
 extern int16 URtoDF_Move[N_URtoDF][N_MOVE];
-
 extern int16 URtoUL_Move[N_URtoUL][N_MOVE];
 extern int16 UBtoDF_Move[N_UBtoDF][N_MOVE];
+
 extern int16 MergeURtoULandUBtoDF[336][336];
 
 extern int8 Slice_URFtoDLF_Parity_Pruning[N_SLICE2 * N_URFtoDLF * N_PARITY / 2];
 extern int8 Slice_URtoDF_Parity_Pruning[N_SLICE2 * N_URtoDF * N_PARITY / 2];
+
 extern int8 Slice_Twist_Pruning[N_SLICE1 * N_TWIST / 2 + 1];
 extern int8 Slice_Flip_Pruning[N_SLICE1 * N_FLIP / 2];
+
+extern int16 ParityMove[2][18];
 
 extern int32 PRUNING_INITED;
 

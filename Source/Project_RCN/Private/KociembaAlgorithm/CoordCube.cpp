@@ -4,152 +4,132 @@
 
 int16 TwistMove[N_TWIST][N_MOVE];
 int16 FlipMove[N_FLIP][N_MOVE];
-int16 ParityMove[2][18] = {
-    { 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1 },
-    { 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 }
-};
 int16 FRtoBR_Move[N_FRtoBR][N_MOVE];
 int16 URFtoDLF_Move[N_URFtoDLF][N_MOVE] = {{0}};
 int16 URtoDF_Move[N_URtoDF][N_MOVE] = {{0}};
 int16 URtoUL_Move[N_URtoUL][N_MOVE] = {{0}};
 int16 UBtoDF_Move[N_UBtoDF][N_MOVE] = {{0}};
+
 int16 MergeURtoULandUBtoDF[336][336] = {{0}};
+
 int8 Slice_URFtoDLF_Parity_Pruning[N_SLICE2 * N_URFtoDLF * N_PARITY / 2] = {0};
 int8 Slice_URtoDF_Parity_Pruning[N_SLICE2 * N_URtoDF * N_PARITY / 2] = {0};
+
 int8 Slice_Twist_Pruning[N_SLICE1 * N_TWIST / 2 + 1] = {0};
 int8 Slice_Flip_Pruning[N_SLICE1 * N_FLIP / 2] = {0};
 
+int16 ParityMove[2][18] = {
+    { 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1 },
+    { 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 }
+};
+
 int32 PRUNING_INITED = 0;
+
+template <typename T, size_t Row, size_t Col, typename SetFunc, typename MultiplyFunc, typename GetFunc>
+void ComputeMoveTable(const FString& TableName, T (&MoveTable)[Row][Col], 
+                      SetFunc SetFunction, MultiplyFunc MultiplyFunction, GetFunc GetFunction, 
+                      FCubieCube& CubieCube, const FString& CacheDir)
+{
+    if (CheckCachedTable(TableName, MoveTable, sizeof(MoveTable), CacheDir))
+    {
+        for (int32 i = 0; i < Row; i++)
+        {
+            (CubieCube.*SetFunction)(i);
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
+                    (CubieCube.*MultiplyFunction)(j);
+                    MoveTable[i][3 * j + k] = (CubieCube.*GetFunction)();
+                }
+                (CubieCube.*MultiplyFunction)(j); // 원상복구
+            }
+        }
+        DumpToFile(MoveTable, sizeof(MoveTable), TableName, CacheDir);
+    }
+}
+
+template <size_t Size, typename MoveTable1, typename MoveTable2>
+void ComputePruningTable(const FString& TableName, int8 (&PruningTable)[Size], 
+                         MoveTable1& MoveTableA, MoveTable2& MoveTableB, 
+                         const int16 (&ParityMove)[2][18], const FString& CacheDir)
+{
+    if (CheckCachedTable(TableName, PruningTable, sizeof(PruningTable), CacheDir))
+    {
+        int32 depth = 0, done = 1;
+        FMemory::Memset(PruningTable, -1, sizeof(PruningTable)); // 전체를 -1로 초기화
+
+        SetPruning(PruningTable, 0, 0);
+
+        while (done != Size * 2)
+        {
+            for (int32 i = 0; i < Size * 2; i++)
+            {
+                int32 parity = i % 2;
+                int32 stateA = i / 2 / N_SLICE2;
+                int32 slice = i / 2 % N_SLICE2;
+
+                if (GetPruning(PruningTable, i) == depth)
+                {
+                    for (int32 j = 0; j < 18; j++)
+                    {
+                        switch (j)
+                        {
+                        case 3: case 5: case 6: case 8:
+                        case 12: case 14: case 15: case 17:
+                            continue;
+                        default:
+                            int32 newSlice = MoveTableA[slice][j];
+                            int32 newStateA = MoveTableB[stateA][j];
+                            int32 newParity = ParityMove[parity][j];
+
+                            int32 newIndex = (N_SLICE2 * newStateA + newSlice) * 2 + newParity;
+                            if (GetPruning(PruningTable, newIndex) == 0x0f)
+                            {
+                                SetPruning(PruningTable, newIndex, depth + 1);
+                                done++;
+                            }
+                        }
+                    }
+                }
+            }
+            depth++;
+        }
+        DumpToFile(PruningTable, sizeof(PruningTable), TableName, CacheDir);
+    }
+}
 
 void InitPruning(const FString& CacheDir)
 {
     FCubieCube CubieCube;
 
-    if (CheckCachedTable("twistMove", TwistMove, sizeof(TwistMove), CacheDir))
-    {
-        for (int32 i = 0; i < N_TWIST; i++)
-        {
-            CubieCube.SetTwist(i);
-            for (int32 j = 0; j < 6; j++)
-            {
-                for (int32 k = 0; k < 3; k++)
-                {
-                    CubieCube.CornerMultiply(j);
-                    TwistMove[i][3 * j + k] = CubieCube.GetTwist();
-                }
-                CubieCube.CornerMultiply(j);
-            }
-        }
-        DumpToFile(TwistMove, sizeof(TwistMove), "twistMove", CacheDir);
-    }
+    ComputeMoveTable("twistMove", TwistMove, 
+                     &FCubieCube::SetTwist, &FCubieCube::CornerMultiply, &FCubieCube::GetTwist, 
+                     CubieCube, CacheDir);
 
-    if (CheckCachedTable("flipMove", FlipMove, sizeof(FlipMove), CacheDir))
-    {
-        for (int32 i = 0; i < N_FLIP; i++)
-        {
-            CubieCube.SetFlip(i);
-            for (int32 j = 0; j < 6; j++)
-            {
-                for (int32 k = 0; k < 3; k++)
-                {
-                    CubieCube.EdgeMultiply(j);
-                    FlipMove[i][3 * j + k] = CubieCube.GetFlip();
-                }
-                CubieCube.EdgeMultiply(j);
-            }
-        }
-        DumpToFile(FlipMove, sizeof(FlipMove), "flipMove", CacheDir);
-    }
+    ComputeMoveTable("flipMove", FlipMove, 
+                     &FCubieCube::SetFlip, &FCubieCube::EdgeMultiply, &FCubieCube::GetFlip, 
+                     CubieCube, CacheDir);
 
-    if (CheckCachedTable("FRtoBR_Move", FRtoBR_Move, sizeof(FRtoBR_Move), CacheDir))
-    {
-        for (int32 i = 0; i < N_FRtoBR; i++)
-        {
-            CubieCube.SetFRtoBR(i);
-            for (int32 j = 0; j < 6; j++)
-            {
-                for (int32 k = 0; k < 3; k++)
-                {
-                    CubieCube.EdgeMultiply(j);
-                    FRtoBR_Move[i][3 * j + k] = CubieCube.GetFRtoBR();
-                }
-                CubieCube.EdgeMultiply(j);
-            }
-        }
-        DumpToFile(FRtoBR_Move, sizeof(FRtoBR_Move), "FRtoBR_Move", CacheDir);
-    }
+    ComputeMoveTable("FRtoBR_Move", FRtoBR_Move, 
+                     &FCubieCube::SetFRtoBR, &FCubieCube::EdgeMultiply, &FCubieCube::GetFRtoBR, 
+                     CubieCube, CacheDir);
 
-    if (CheckCachedTable("URFtoDLF_Move", URFtoDLF_Move, sizeof(URFtoDLF_Move), CacheDir))
-    {
-        for (int32 i = 0; i < N_URFtoDLF; i++)
-        {
-            CubieCube.SetURFtoDLF(i);
-            for (int32 j = 0; j < 6; j++)
-            {
-                for (int32 k = 0; k < 3; k++)
-                {
-                    CubieCube.CornerMultiply(j);
-                    URFtoDLF_Move[i][3 * j + k] = CubieCube.GetURFtoDLF();
-                }
-                CubieCube.CornerMultiply(j);
-            }
-        }
-        DumpToFile(URFtoDLF_Move, sizeof(URFtoDLF_Move), "URFtoDLF_Move", CacheDir);
-    }
+    ComputeMoveTable("URFtoDLF_Move", URFtoDLF_Move, 
+                     &FCubieCube::SetURFtoDLF, &FCubieCube::CornerMultiply, &FCubieCube::GetURFtoDLF, 
+                     CubieCube, CacheDir);
 
-    if (CheckCachedTable("URtoDF_Move", URtoDF_Move, sizeof(URtoDF_Move), CacheDir))
-    {
-        for (int32 i = 0; i < N_URtoDF; i++)
-        {
-            CubieCube.SetURtoDF(i);
-            for (int32 j = 0; j < 6; j++)
-            {
-                for (int32 k = 0; k < 3; k++)
-                {
-                    CubieCube.EdgeMultiply(j);
-                    URtoDF_Move[i][3 * j + k] = CubieCube.GetURtoDF();
-                }
-                CubieCube.EdgeMultiply(j);
-            }
-        }
-        DumpToFile(URtoDF_Move, sizeof(URtoDF_Move), "URtoDF_Move", CacheDir);
-    }
+    ComputeMoveTable("URtoDF_Move", URtoDF_Move, 
+                     &FCubieCube::SetURtoDF, &FCubieCube::EdgeMultiply, &FCubieCube::GetURtoDF, 
+                     CubieCube, CacheDir);
 
-    if (CheckCachedTable("URtoUL_Move", URtoUL_Move, sizeof(URtoUL_Move), CacheDir))
-    {
-        for (int32 i = 0; i < N_URtoUL; i++)
-        {
-            CubieCube.SetURtoUL(i);
-            for (int32 j = 0; j < 6; j++)
-            {
-                for (int32 k = 0; k < 3; k++)
-                {
-                    CubieCube.EdgeMultiply(j);
-                    URtoUL_Move[i][3 * j + k] = CubieCube.GetURtoUL();
-                }
-                CubieCube.EdgeMultiply(j);
-            }
-        }
-        DumpToFile(URtoUL_Move, sizeof(URtoUL_Move), "URtoUL_Move", CacheDir);
-    }
+    ComputeMoveTable("URtoUL_Move", URtoUL_Move, 
+                     &FCubieCube::SetURtoUL, &FCubieCube::EdgeMultiply, &FCubieCube::GetURtoUL, 
+                     CubieCube, CacheDir);
 
-    if (CheckCachedTable("UBtoDF_Move", UBtoDF_Move, sizeof(UBtoDF_Move), CacheDir))
-    {
-        for (int32 i = 0; i < N_UBtoDF; i++)
-        {
-            CubieCube.SetUBtoDF(i);
-            for (int32 j = 0; j < 6; j++)
-            {
-                for (int32 k = 0; k < 3; k++)
-                {
-                    CubieCube.EdgeMultiply(j);
-                    UBtoDF_Move[i][3 * j + k] = CubieCube.GetUBtoDF();
-                }
-                CubieCube.EdgeMultiply(j);
-            }
-        }
-        DumpToFile(UBtoDF_Move, sizeof(UBtoDF_Move), "UBtoDF_Move", CacheDir);
-    }
+    ComputeMoveTable("UBtoDF_Move", UBtoDF_Move, 
+                     &FCubieCube::SetUBtoDF, &FCubieCube::EdgeMultiply, &FCubieCube::GetUBtoDF, 
+                     CubieCube, CacheDir);
 
     if (CheckCachedTable("MergeURtoULandUBtoDF", MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), CacheDir))
     {
@@ -164,107 +144,11 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), "MergeURtoULandUBtoDF", CacheDir);
     }
 
-    if (CheckCachedTable("Slice_URFtoDLF_Parity_Prun", Slice_URFtoDLF_Parity_Pruning, sizeof(Slice_URFtoDLF_Parity_Pruning), CacheDir))
-    {
-        int32 depth = 0, done = 1;
-        for (int32 i = 0; i < N_SLICE2 * N_URFtoDLF * N_PARITY / 2; i++)
-        {
-            Slice_URFtoDLF_Parity_Pruning[i] = -1;
-        }
-        SetPruning(Slice_URFtoDLF_Parity_Pruning, 0, 0);
-        while (done != N_SLICE2 * N_URFtoDLF * N_PARITY)
-        {
-            for (int32 i = 0; i < N_SLICE2 * N_URFtoDLF * N_PARITY; i++)
-            {
-                int32 parity = i % 2;
-                int32 URFtoDLF = i / 2 / N_SLICE2;
-                int32 slice = i / 2 % N_SLICE2;
-                if (GetPruning(Slice_URFtoDLF_Parity_Pruning, i) == depth)
-                {
-                    for (int32 j = 0; j < 18; j++)
-                    {
-                        int32 newSlice;
-                        int32 newURFtoDLF;
-                        int32 newParity;
-                        switch (j)
-                        {
-                        case 3:
-                        case 5:
-                        case 6:
-                        case 8:
-                        case 12:
-                        case 14:
-                        case 15:
-                        case 17:
-                            continue;
-                        default:
-                            newSlice = FRtoBR_Move[slice][j];
-                            newURFtoDLF = URFtoDLF_Move[URFtoDLF][j];
-                            newParity = ParityMove[parity][j];
-                            if (GetPruning(Slice_URFtoDLF_Parity_Pruning, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity) == 0x0f)
-                            {
-                                SetPruning(Slice_URFtoDLF_Parity_Pruning, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity, depth + 1);
-                                done++;
-                            }
-                        }
-                    }
-                }
-            }
-            depth++;
-        }
-        DumpToFile(Slice_URFtoDLF_Parity_Pruning, sizeof(Slice_URFtoDLF_Parity_Pruning), "Slice_URFtoDLF_Parity_Prun", CacheDir);
-    }
+    ComputePruningTable("Slice_URFtoDLF_Parity_Prun", Slice_URFtoDLF_Parity_Pruning,
+                       FRtoBR_Move, URFtoDLF_Move, ParityMove, CacheDir);
 
-    if (CheckCachedTable("Slice_URtoDF_Parity_Prun", Slice_URtoDF_Parity_Pruning, sizeof(Slice_URtoDF_Parity_Pruning), CacheDir))
-    {
-        int32 depth = 0, done = 1;
-        for (int32 i = 0; i < N_SLICE2 * N_URtoDF * N_PARITY / 2; i++)
-        {
-            Slice_URtoDF_Parity_Pruning[i] = -1;
-        }
-        SetPruning(Slice_URtoDF_Parity_Pruning, 0, 0);
-        while (done != N_SLICE2 * N_URtoDF * N_PARITY)
-        {
-            for (int32 i = 0; i < N_SLICE2 * N_URtoDF * N_PARITY; i++)
-            {
-                int32 parity = i % 2;
-                int32 URtoDF = i / 2 / N_SLICE2;
-                int32 slice = i / 2 % N_SLICE2;
-                if (GetPruning(Slice_URtoDF_Parity_Pruning, i) == depth)
-                {
-                    for (int32 j = 0; j < 18; j++)
-                    {
-                        int32 newSlice;
-                        int32 newURtoDF;
-                        int32 newParity;
-                        switch (j)
-                        {
-                        case 3:
-                        case 5:
-                        case 6:
-                        case 8:
-                        case 12:
-                        case 14:
-                        case 15:
-                        case 17:
-                            continue;
-                        default:
-                            newSlice = FRtoBR_Move[slice][j];
-                            newURtoDF = URtoDF_Move[URtoDF][j];
-                            newParity = ParityMove[parity][j];
-                            if (GetPruning(Slice_URtoDF_Parity_Pruning, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity) == 0x0f)
-                            {
-                                SetPruning(Slice_URtoDF_Parity_Pruning, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity, depth + 1);
-                                done++;
-                            }
-                        }
-                    }
-                }
-            }
-            depth++;
-        }
-        DumpToFile(Slice_URtoDF_Parity_Pruning, sizeof(Slice_URtoDF_Parity_Pruning), "Slice_URtoDF_Parity_Prun", CacheDir);
-    }
+    ComputePruningTable("Slice_URtoDF_Parity_Prun", Slice_URtoDF_Parity_Pruning,
+                        FRtoBR_Move, URtoDF_Move, ParityMove, CacheDir);
 
     if (CheckCachedTable("Slice_Twist_Prun", Slice_Twist_Pruning, sizeof(Slice_Twist_Pruning), CacheDir))
     {
