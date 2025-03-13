@@ -31,11 +31,11 @@ extern int8 Slice_URtoDF_Parity_Pruning[N_SLICE2 * N_URtoDF * N_PARITY / 2];
 extern int8 Slice_Twist_Pruning[N_SLICE1 * N_TWIST / 2 + 1];
 extern int8 Slice_Flip_Pruning[N_SLICE1 * N_FLIP / 2];
 
+extern int32 PRUNING_INITED;
+
 void InitPruning(const FString& CacheDir);
 
 void SetPruning(int8* Table, int32 Idx, int8 Value);
 int8 GetPruning(const int8* Table, int32 Idx);
 static bool CheckCachedTable(const FString& Name, void* Ptr, const int32 Length, const FString& CacheDir);
 static void DumpToFile(void* Ptr, const int32 Length, const FString& Name, const FString& CacheDir);
-
-extern int32 PRUNING_INITED;

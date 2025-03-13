@@ -2,7 +2,7 @@
 
 #include "KociembaAlgorithm/CoordCube.h"
 
-const TArray<TArray<EFaceletType>> UCubieCube::CornerFacelet = {
+const TArray<TArray<EFaceletType>> FCubieCube::CornerFacelet = {
     { EFaceletType::U9, EFaceletType::R1, EFaceletType::F3 },
     { EFaceletType::U7, EFaceletType::F1, EFaceletType::L3 },
     { EFaceletType::U1, EFaceletType::L1, EFaceletType::B3 },
@@ -13,7 +13,7 @@ const TArray<TArray<EFaceletType>> UCubieCube::CornerFacelet = {
     { EFaceletType::D9, EFaceletType::R9, EFaceletType::B7 }
 };
 
-const TArray<TArray<EFaceletType>> UCubieCube::EdgeFacelet = {
+const TArray<TArray<EFaceletType>> FCubieCube::EdgeFacelet = {
     { EFaceletType::U6, EFaceletType::R2 },
     { EFaceletType::U8, EFaceletType::F2 },
     { EFaceletType::U4, EFaceletType::L2 },
@@ -28,7 +28,7 @@ const TArray<TArray<EFaceletType>> UCubieCube::EdgeFacelet = {
     { EFaceletType::B4, EFaceletType::R6 }
 };
 
-const TArray<TArray<EColorType>> UCubieCube::CornerColor = {
+const TArray<TArray<EColorType>> FCubieCube::CornerColor = {
     { EColorType::U, EColorType::R, EColorType::F },
     { EColorType::U, EColorType::F, EColorType::L },
     { EColorType::U, EColorType::L, EColorType::B },
@@ -39,7 +39,7 @@ const TArray<TArray<EColorType>> UCubieCube::CornerColor = {
     { EColorType::D, EColorType::R, EColorType::B }
 };
 
-const TArray<TArray<EColorType>> UCubieCube::EdgeColor = {
+const TArray<TArray<EColorType>> FCubieCube::EdgeColor = {
     { EColorType::U, EColorType::R }, 
     { EColorType::U, EColorType::F }, 
     { EColorType::U, EColorType::L }, 
@@ -54,11 +54,11 @@ const TArray<TArray<EColorType>> UCubieCube::EdgeColor = {
     { EColorType::B, EColorType::R }
 };
 
-const TArray<TObjectPtr<UCubieCube>> UCubieCube::MoveCube = []
+const TArray<FCubieCube> FCubieCube::MoveCube = []
 {
-    TArray<TObjectPtr<UCubieCube>> TempMoveCube;
+    TArray<FCubieCube> TempMoveCube;
     TempMoveCube.SetNum(6);
-    constexpr ECornerType TempCp[6][8] = {
+    static const TArray<TArray<ECornerType>> TempCp = {
         { ECornerType::UBR, ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::DFR, ECornerType::DLF, ECornerType::DBL, ECornerType::DRB },
         { ECornerType::DFR, ECornerType::UFL, ECornerType::ULB, ECornerType::URF, ECornerType::DRB, ECornerType::DLF, ECornerType::DBL, ECornerType::UBR },
         { ECornerType::UFL, ECornerType::DLF, ECornerType::ULB, ECornerType::UBR, ECornerType::URF, ECornerType::DFR, ECornerType::DBL, ECornerType::DRB },
@@ -66,7 +66,7 @@ const TArray<TObjectPtr<UCubieCube>> UCubieCube::MoveCube = []
         { ECornerType::URF, ECornerType::ULB, ECornerType::DBL, ECornerType::UBR, ECornerType::DFR, ECornerType::UFL, ECornerType::DLF, ECornerType::DRB },
         { ECornerType::URF, ECornerType::UFL, ECornerType::UBR, ECornerType::DRB, ECornerType::DFR, ECornerType::DLF, ECornerType::ULB, ECornerType::DBL }
     };
-    constexpr int8 TempCo[6][8] = {
+    static const TArray<TArray<int8>> TempCo = {
         { 0, 0, 0, 0, 0, 0, 0, 0 },
         { 2, 0, 0, 1, 1, 0, 0, 2 },
         { 1, 2, 0, 0, 2, 1, 0, 0 },
@@ -74,7 +74,7 @@ const TArray<TObjectPtr<UCubieCube>> UCubieCube::MoveCube = []
         { 0, 1, 2, 0, 0, 2, 1, 0 },
         { 0, 0, 1, 2, 0, 0, 2, 1 }
     };
-    constexpr EEdgeType TempEp[6][12] = {
+    static const TArray<TArray<EEdgeType>> TempEp = {
         { EEdgeType::UB, EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR },
         { EEdgeType::FR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::BR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB, EEdgeType::DR, EEdgeType::FL, EEdgeType::BL, EEdgeType::UR },
         { EEdgeType::UR, EEdgeType::FL, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::FR, EEdgeType::DL, EEdgeType::DB, EEdgeType::UF, EEdgeType::DF, EEdgeType::BL, EEdgeType::BR },
@@ -82,7 +82,7 @@ const TArray<TObjectPtr<UCubieCube>> UCubieCube::MoveCube = []
         { EEdgeType::UR, EEdgeType::UF, EEdgeType::BL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::FL, EEdgeType::DB, EEdgeType::FR, EEdgeType::UL, EEdgeType::DL, EEdgeType::BR },
         { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::BR, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::BL, EEdgeType::FR, EEdgeType::FL, EEdgeType::UB, EEdgeType::DB }
     };
-    constexpr int8 TempEo[6][12] = {
+    static const TArray<TArray<int8>> TempEo = {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 },
@@ -92,17 +92,15 @@ const TArray<TObjectPtr<UCubieCube>> UCubieCube::MoveCube = []
     };
     for (int32 i = 0; i < 6; i++)
     {
-        const TObjectPtr<UCubieCube> NewCube = NewObject<UCubieCube>();
-        NewCube->Cp = TArray(TempCp[i], UE_ARRAY_COUNT(TempCp[i]));
-        NewCube->Co = TArray(TempCo[i], UE_ARRAY_COUNT(TempCo[i]));
-        NewCube->Ep = TArray(TempEp[i], UE_ARRAY_COUNT(TempEp[i]));
-        NewCube->Eo = TArray(TempEo[i], UE_ARRAY_COUNT(TempEo[i]));
-        TempMoveCube[i] = NewCube;
+        TempMoveCube[i].Cp = TempCp[i];
+        TempMoveCube[i].Co = TempCo[i];
+        TempMoveCube[i].Ep = TempEp[i];
+        TempMoveCube[i].Eo = TempEo[i];
     }
     return TempMoveCube;
 }();
 
-UCubieCube::UCubieCube()
+FCubieCube::FCubieCube()
 {
     Cp = { 
         ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, 
@@ -117,8 +115,12 @@ UCubieCube::UCubieCube()
     Eo = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 }
 
-void UCubieCube::Initialize(const FString& CubeString)
+FCubieCube::FCubieCube(const FString& CubeString)
 {
+    Cp.SetNum(CORNER_COUNT);
+    Co.SetNum(CORNER_COUNT);
+    Ep.SetNum(EDGE_COUNT);
+    Eo.SetNum(EDGE_COUNT);
     TArray<EColorType> Colors;
     Colors.SetNum(54);
     for (int32 i = 0; i < 54; ++i)
@@ -133,14 +135,6 @@ void UCubieCube::Initialize(const FString& CubeString)
         case 'B': Colors[i] = EColorType::B; break;
         default:  break;
         }
-    }
-    for (int32 i = 0; i < CORNER_COUNT; i++)
-    {
-        Cp[i] = ECornerType::URF;
-    }
-    for (int32 i = 0; i < EDGE_COUNT; i++)
-    {
-        Ep[i] = EEdgeType::UR;
     }
     for (int32 i = 0; i < CORNER_COUNT; i++)
     {
@@ -187,41 +181,41 @@ void UCubieCube::Initialize(const FString& CubeString)
     }
 }
 
-void UCubieCube::CornerMultiply(const int32 MoveCubeIdx)
+void FCubieCube::CornerMultiply(const int32 MoveCubeIdx)
 {
     TArray<ECornerType> CornPerm;
     TArray<int8> CornOri;
     CornPerm.SetNum(CORNER_COUNT);
     CornOri.SetNum(CORNER_COUNT);
-    const UCubieCube* Move = MoveCube[MoveCubeIdx];
+    const FCubieCube Move = MoveCube[MoveCubeIdx];
     for (int32 i = 0; i < CORNER_COUNT; i++)
     {
-        const int32 Idx = static_cast<int32>(Move->Cp[i]);
+        const int32 Idx = static_cast<int32>(Move.Cp[i]);
         CornPerm[i] = Cp[Idx];
-        CornOri[i] = (Co[Idx] + (Move->Co[i] < 3 ? Move->Co[i] : Move->Co[i] - 3) + 3) % 3;
+        CornOri[i] = (Co[Idx] + (Move.Co[i] < 3 ? Move.Co[i] : Move.Co[i] - 3) + 3) % 3;
     }
     Cp = CornPerm;
     Co = CornOri;
 }
 
-void UCubieCube::EdgeMultiply(const int32 MoveCubeIdx)
+void FCubieCube::EdgeMultiply(const int32 MoveCubeIdx)
 {
     TArray<EEdgeType> EdgePerm;
     TArray<int8> EdgeOri;
     EdgePerm.SetNum(EDGE_COUNT);
     EdgeOri.SetNum(EDGE_COUNT);
-    const UCubieCube* Move = MoveCube[MoveCubeIdx];
+    const FCubieCube Move = MoveCube[MoveCubeIdx];
     for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        const int32 Idx = static_cast<int32>(Move->Ep[i]);
+        const int32 Idx = static_cast<int32>(Move.Ep[i]);
         EdgePerm[i] = Ep[Idx];
-        EdgeOri[i] = (Move->Eo[i] + Eo[Idx]) % 2;
+        EdgeOri[i] = (Move.Eo[i] + Eo[Idx]) % 2;
     }
     Ep = EdgePerm;
     Eo = EdgeOri;
 }
 
-int16 UCubieCube::GetTwist()
+int16 FCubieCube::GetTwist()
 {
     int16 Twist = 0;
     for (int32 i = 0; i < CORNER_COUNT - 1; i++)
@@ -231,7 +225,7 @@ int16 UCubieCube::GetTwist()
     return Twist;
 }
 
-void UCubieCube::SetTwist(int16 Twist)
+void FCubieCube::SetTwist(int16 Twist)
 {
     int32 TempTwist = 0;
     for (int32 i = CORNER_COUNT - 2; i >= 0; i--)
@@ -243,7 +237,7 @@ void UCubieCube::SetTwist(int16 Twist)
     Co[CORNER_COUNT - 1] = (3 - TempTwist % 3) % 3;
 }
 
-int16 UCubieCube::GetFlip()
+int16 FCubieCube::GetFlip()
 {
     int16 Flip = 0;
     for (int32 i = 0; i < EDGE_COUNT - 1; i++)
@@ -253,7 +247,7 @@ int16 UCubieCube::GetFlip()
     return Flip;
 }
 
-void UCubieCube::SetFlip(int16 Flip)
+void FCubieCube::SetFlip(int16 Flip)
 {
     int32 TempFlip = 0;
     for (int32 i = EDGE_COUNT - 2; i >= 0; i--)
@@ -265,7 +259,7 @@ void UCubieCube::SetFlip(int16 Flip)
     Eo[EDGE_COUNT - 1] = (2 - TempFlip % 2) % 2;
 }
 
-int16 UCubieCube::CornerParity()
+int16 FCubieCube::CornerParity()
 {
     int16 s = 0;
     for (int32 i = CORNER_COUNT - 1; i >= 1; i--)
@@ -281,7 +275,7 @@ int16 UCubieCube::CornerParity()
     return s % 2;
 }
 
-int16 UCubieCube::EdgeParity()
+int16 FCubieCube::EdgeParity()
 {
     int16 s = 0;
     for (int32 i = EDGE_COUNT - 1; i >= 1; i--)
@@ -297,7 +291,7 @@ int16 UCubieCube::EdgeParity()
     return s % 2;
 }
 
-int16 UCubieCube::GetFRtoBR()
+int16 FCubieCube::GetFRtoBR()
 {
     int16 a = 0, b = 0;
     TArray<EEdgeType> Edge4;
@@ -324,7 +318,7 @@ int16 UCubieCube::GetFRtoBR()
     return 24 * a + b;
 }
 
-void UCubieCube::SetFRtoBR(const int16 Idx)
+void FCubieCube::SetFRtoBR(const int16 Idx)
 {
     int32 a = Idx / 24, b = Idx % 24;
     TArray Edge4 = { EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
@@ -361,7 +355,7 @@ void UCubieCube::SetFRtoBR(const int16 Idx)
     }
 }
 
-int16 UCubieCube::GetURFtoDLF()
+int16 FCubieCube::GetURFtoDLF()
 {
     int16 a = 0, b = 0;
     TArray<ECornerType> Corner6;
@@ -388,7 +382,7 @@ int16 UCubieCube::GetURFtoDLF()
     return 720 * a + b;
 }
 
-void UCubieCube::SetURFtoDLF(const int16 Idx)
+void FCubieCube::SetURFtoDLF(const int16 Idx)
 {
     int32 a = Idx / 720, b = Idx % 720;
     TArray Corner6 = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DFR, ECornerType::DLF };
@@ -425,7 +419,7 @@ void UCubieCube::SetURFtoDLF(const int16 Idx)
     }
 }
 
-int32 UCubieCube::GetURtoDF()
+int32 FCubieCube::GetURtoDF()
 {
     int16 a = 0, b = 0;
     TArray<EEdgeType> Edge6;
@@ -452,7 +446,7 @@ int32 UCubieCube::GetURtoDF()
     return 720 * a + b;
 }
 
-void UCubieCube::SetURtoDF(const int32 Idx)
+void FCubieCube::SetURtoDF(const int32 Idx)
 {
     int32 a = Idx / 720, b = Idx % 720;
     TArray Edge6 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
@@ -489,7 +483,7 @@ void UCubieCube::SetURtoDF(const int32 Idx)
     }
 }
 
-int16 UCubieCube::GetURtoUL()
+int16 FCubieCube::GetURtoUL()
 {
     int16 a = 0, b = 0;
     TArray<EEdgeType> Edge3;
@@ -516,7 +510,7 @@ int16 UCubieCube::GetURtoUL()
     return 6 * a + b;
 }
 
-void UCubieCube::SetURtoUL(const int16 Idx)
+void FCubieCube::SetURtoUL(const int16 Idx)
 {
     int32 a = Idx / 6, b = Idx % 6;
     TArray Edge3 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL };
@@ -544,7 +538,7 @@ void UCubieCube::SetURtoUL(const int16 Idx)
     }
 }
 
-int16 UCubieCube::GetUBtoDF()
+int16 FCubieCube::GetUBtoDF()
 {
     int16 a = 0, b = 0;
     TArray<EEdgeType> Edge3;
@@ -571,7 +565,7 @@ int16 UCubieCube::GetUBtoDF()
     return 6 * a + b;
 }
 
-void UCubieCube::SetUBtoDF(const int16 Idx)
+void FCubieCube::SetUBtoDF(const int16 Idx)
 {
     int32 a = Idx / 6, b = Idx % 6;
     TArray Edge3 = { EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
@@ -599,27 +593,27 @@ void UCubieCube::SetUBtoDF(const int16 Idx)
     }
 }
 
-int32 UCubieCube::GetURtoDF_Standalone(const int16 Idx1, const int16 Idx2)
+int32 FCubieCube::GetURtoDF_Standalone(const int16 Idx1, const int16 Idx2)
 {
-    UCubieCube* a = NewObject<UCubieCube>();
-    UCubieCube* b = NewObject<UCubieCube>();
-    a->SetURtoUL(Idx1);
-    b->SetUBtoDF(Idx2);
+    FCubieCube a;
+    FCubieCube b;
+    a.SetURtoUL(Idx1);
+    b.SetUBtoDF(Idx2);
     for (int32 i = 0; i < 8; i++)
     {
-        if (a->Ep[i] != EEdgeType::BR)
+        if (a.Ep[i] != EEdgeType::BR)
         {
-            if (b->Ep[i] != EEdgeType::BR)
+            if (b.Ep[i] != EEdgeType::BR)
             {
                 return -1;
             }
-            b->Ep[i] = a->Ep[i];
+            b.Ep[i] = a.Ep[i];
         }
     }
-    return b->GetURtoDF();
+    return b.GetURtoDF();
 }
 
-int32 UCubieCube::Verify()
+int32 FCubieCube::Verify()
 {
     TArray<int32> EdgeCount;
     TArray<int32> CornerCount;
@@ -672,7 +666,7 @@ int32 UCubieCube::Verify()
     return 0;
 }
 
-int32 UCubieCube::Cnk(const int32 N, int32 K)
+int32 FCubieCube::Cnk(const int32 N, int32 K)
 {
     if (N < K)
     {
@@ -691,7 +685,7 @@ int32 UCubieCube::Cnk(const int32 N, int32 K)
 }
 
 template <typename T>
-void UCubieCube::Rotate(TArray<T>& Arr, const int32 L, const int32 R)
+void FCubieCube::Rotate(TArray<T>& Arr, const int32 L, const int32 R)
 {
     const T Temp = Arr[L];
     Arr.RemoveAt(L);
@@ -748,23 +742,22 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         return FString("ERROR: Invalid cube state");
     }
     
-    UCubieCube* Cc = NewObject<UCubieCube>();
-    Cc->Initialize(CubeString);
-    if (Cc->Verify())
+    FCubieCube Cc(CubeString);
+    if (Cc.Verify())
     {
         return FString("ERROR: Unsolvable cube");
     }
 
     Search.Po[0] = 0;
     Search.Ax[0] = 0;
-    Search.Flip[0] = Cc->GetFlip();
-    Search.Twist[0] = Cc->GetTwist();
-    Search.Parity[0] = Cc->CornerParity();
-    Search.Slice[0] = Cc->GetFRtoBR() / 24;
-    Search.URFtoDLF[0] = Cc->GetURFtoDLF();
-    Search.FRtoBR[0] = Cc->GetFRtoBR();
-    Search.URtoUL[0] = Cc->GetURtoUL();
-    Search.UBtoDF[0] = Cc->GetUBtoDF();
+    Search.Flip[0] = Cc.GetFlip();
+    Search.Twist[0] = Cc.GetTwist();
+    Search.Parity[0] = Cc.CornerParity();
+    Search.Slice[0] = Cc.GetFRtoBR() / 24;
+    Search.URFtoDLF[0] = Cc.GetURFtoDLF();
+    Search.FRtoBR[0] = Cc.GetFRtoBR();
+    Search.URtoUL[0] = Cc.GetURtoUL();
+    Search.UBtoDF[0] = Cc.GetUBtoDF();
 
     Search.MinDistPhase1[1] = 1;
     int32 N = 0, Busy = 0, DepthPhase1 = 1;

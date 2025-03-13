@@ -78,14 +78,13 @@ struct FSearch
     int32 MinDistPhase2[31];
 };
 
-UCLASS()
-class UCubieCube : public UObject
+USTRUCT(BlueprintType)
+struct FCubieCube
 {
     GENERATED_BODY()
 
-public:
-    UCubieCube();
-    void Initialize(const FString& CubeString);
+    FCubieCube();
+    explicit FCubieCube(const FString& CubeString);
     
     void CornerMultiply(const int32 MoveCubeIdx);
     void EdgeMultiply(const int32 MoveCubeIdx);
@@ -122,7 +121,7 @@ protected:
     static const TArray<TArray<EFaceletType>> EdgeFacelet;
     static const TArray<TArray<EColorType>> CornerColor;
     static const TArray<TArray<EColorType>> EdgeColor;
-    static const TArray<TObjectPtr<UCubieCube>> MoveCube;
+    static const TArray<FCubieCube> MoveCube;
     
     TArray<ECornerType> Cp;
     TArray<int8> Co;
