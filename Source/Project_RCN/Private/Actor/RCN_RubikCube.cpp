@@ -557,16 +557,11 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	}
 	
 	FString Command = TEXT("");
-
-	Command = UCubeSolver::SolveCube(
-		Pattern,
-		24,
-		1000,
-		"cache"
-	);
-
+	
+	Command = UCubeSolver::SolveCube(Pattern);
+	
 	RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
-
+	
 	ServerRPC_Spin(Command);
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));

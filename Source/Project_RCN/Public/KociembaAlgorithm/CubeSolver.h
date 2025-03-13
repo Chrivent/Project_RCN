@@ -195,7 +195,7 @@ public:
      * Error 7: No solution exists for the given maxDepth<br>
      * Error 8: Timeout, no solution within given time
      */
-    static FString SolveCube(const FString& Facelets, const int32 MaxDepth, double TimeOut, const FString& CacheDir);
+    static FString SolveCube(const FString& Facelets, const int32 MaxDepth = 24, double TimeOut = 1000.0f, const FString& CacheDir = TEXT("cache"));
 
 protected:
     static int32 TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth);
