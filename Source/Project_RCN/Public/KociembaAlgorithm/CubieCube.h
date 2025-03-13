@@ -41,13 +41,6 @@ struct FCubieCube
     GENERATED_BODY()
     
     FCubieCube();
-    
-    TArray<ECornerType> Cp;
-    TArray<int8> Co;
-    TArray<EEdgeType> Ep;
-    TArray<int8> Eo;
-
-    static const TArray<FCubieCube> MoveCube;
 
     static int32 Cnk(const int32 N, int32 K);
 
@@ -78,4 +71,11 @@ struct FCubieCube
     int32 Verify();
 
     static int32 GetURtoDF_Standalone(int16 idx1, int16 idx2);
+    
+    TArray<ECornerType> Cp;
+    TArray<int8> Co;
+    TArray<EEdgeType> Ep;
+    TArray<int8> Eo;
+
+    static const TArray<FCubieCube> MoveCube;
 };

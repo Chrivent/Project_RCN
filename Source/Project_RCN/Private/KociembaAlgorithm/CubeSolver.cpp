@@ -1,7 +1,58 @@
 #include "KociembaAlgorithm/CubeSolver.h"
 
-#include "KociembaAlgorithm/facecube.h"
 #include "KociembaAlgorithm/CoordCube.h"
+
+const TArray<TArray<EFaceletType>> UCubeSolver::CornerFacelet = {
+    { EFaceletType::U9, EFaceletType::R1, EFaceletType::F3 },
+    { EFaceletType::U7, EFaceletType::F1, EFaceletType::L3 },
+    { EFaceletType::U1, EFaceletType::L1, EFaceletType::B3 },
+    { EFaceletType::U3, EFaceletType::B1, EFaceletType::R3 },
+    { EFaceletType::D3, EFaceletType::F9, EFaceletType::R7 },
+    { EFaceletType::D1, EFaceletType::L9, EFaceletType::F7 },
+    { EFaceletType::D7, EFaceletType::B9, EFaceletType::L7 },
+    { EFaceletType::D9, EFaceletType::R9, EFaceletType::B7 }
+};
+
+const TArray<TArray<EFaceletType>> UCubeSolver::EdgeFacelet = {
+    { EFaceletType::U6, EFaceletType::R2 },
+    { EFaceletType::U8, EFaceletType::F2 },
+    { EFaceletType::U4, EFaceletType::L2 },
+    { EFaceletType::U2, EFaceletType::B2 },
+    { EFaceletType::D6, EFaceletType::R8 },
+    { EFaceletType::D2, EFaceletType::F8 },
+    { EFaceletType::D4, EFaceletType::L8 },
+    { EFaceletType::D8, EFaceletType::B8 },
+    { EFaceletType::F6, EFaceletType::R4 },
+    { EFaceletType::F4, EFaceletType::L6 },
+    { EFaceletType::B6, EFaceletType::L4 },
+    { EFaceletType::B4, EFaceletType::R6 }
+};
+
+const TArray<TArray<EColorType>> UCubeSolver::CornerColor = {
+    { EColorType::U, EColorType::R, EColorType::F },
+    { EColorType::U, EColorType::F, EColorType::L },
+    { EColorType::U, EColorType::L, EColorType::B },
+    { EColorType::U, EColorType::B, EColorType::R },
+    { EColorType::D, EColorType::F, EColorType::R },
+    { EColorType::D, EColorType::L, EColorType::F },
+    { EColorType::D, EColorType::B, EColorType::L },
+    { EColorType::D, EColorType::R, EColorType::B }
+};
+
+const TArray<TArray<EColorType>> UCubeSolver::EdgeColor = {
+    { EColorType::U, EColorType::R }, 
+    { EColorType::U, EColorType::F }, 
+    { EColorType::U, EColorType::L }, 
+    { EColorType::U, EColorType::B }, 
+    { EColorType::D, EColorType::R }, 
+    { EColorType::D, EColorType::F }, 
+    { EColorType::D, EColorType::L }, 
+    { EColorType::D, EColorType::B },
+    { EColorType::F, EColorType::R }, 
+    { EColorType::F, EColorType::L }, 
+    { EColorType::B, EColorType::L }, 
+    { EColorType::B, EColorType::R }
+};
 
 FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const bool bUseSeparator, const FString& CacheDir)
 {
@@ -35,8 +86,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         return FString("ERROR: Invalid cube state");
     }
     
-    FFaceCube Fc(Facelets);
-    FCubieCube Cc = Fc.ToCubieCube();
+    FCubieCube Cc = ToCubieCube(Facelets);
     if (Cc.Verify())
     {
         return FString("ERROR: Unsolvable cube");
@@ -284,4 +334,91 @@ FString UCubeSolver::SolutionToString(const FSearch& Search, const int32 Length,
     }
     
     return SolutionString;
+}
+
+FCubieCube UCubeSolver::ToCubieCube(FString CubeString)
+{
+    TArray<EColorType> Facelets;
+    Facelets.SetNum(54);
+    
+    for (int32 i = 0; i < 54; i++)
+    {
+        switch(CubeString[i])
+        {
+        case 'U':
+            Facelets[i] = EColorType::U;
+            break;
+        case 'R':
+            Facelets[i] = EColorType::R;
+            break;
+        case 'F':
+            Facelets[i] = EColorType::F;
+            break;
+        case 'D':
+            Facelets[i] = EColorType::D;
+            break;
+        case 'L':
+            Facelets[i] = EColorType::L;
+            break;
+        case 'B':
+            Facelets[i] = EColorType::B;
+            break;
+        default:
+            break;
+        }
+    }
+    
+    FCubieCube CubieCube;
+    for (int32 i = 0; i < CORNER_COUNT; i++)
+    {
+        CubieCube.Cp[i] = ECornerType::URF;
+    }
+    for (int32 i = 0; i < EDGE_COUNT; i++)
+    {
+        CubieCube.Ep[i] = EEdgeType::UR;
+    }
+    for (int32 i = 0; i < CORNER_COUNT; i++)
+    {
+        int8 Orientation;
+        for (Orientation = 0; Orientation < 3; Orientation++)
+        {
+            if (Facelets[static_cast<int32>(CornerFacelet[i][Orientation])] == EColorType::U ||
+                Facelets[static_cast<int32>(CornerFacelet[i][Orientation])] == EColorType::D)
+            {
+                break;
+            }
+        }
+        const EColorType Color1 = Facelets[static_cast<int32>(CornerFacelet[i][(Orientation + 1) % 3])];
+        const EColorType Color2 = Facelets[static_cast<int32>(CornerFacelet[i][(Orientation + 2) % 3])];
+        for (int32 j = 0; j < CORNER_COUNT; j++)
+        {
+            if (Color1 == CornerColor[j][1] && Color2 == CornerColor[j][2])
+            {
+                CubieCube.Cp[i] = static_cast<ECornerType>(j);
+                CubieCube.Co[i] = Orientation % 3;
+                break;
+            }
+        }
+    }
+    for (int32 i = 0; i < EDGE_COUNT; i++)
+    {
+        const EColorType Color1 = Facelets[static_cast<int32>(EdgeFacelet[i][0])];
+        const EColorType Color2 = Facelets[static_cast<int32>(EdgeFacelet[i][1])];
+        for (int32 j = 0; j < EDGE_COUNT; j++)
+        {
+            if (Color1 == EdgeColor[j][0] && Color2 == EdgeColor[j][1])
+            {
+                CubieCube.Ep[i] = static_cast<EEdgeType>(j);
+                CubieCube.Eo[i] = 0;
+                break;
+            }
+            if (Color1 == EdgeColor[j][1] && Color2 == EdgeColor[j][0])
+            {
+                CubieCube.Ep[i] = static_cast<EEdgeType>(j);
+                CubieCube.Eo[i] = 1;
+                break;
+            }
+        }
+    }
+    return CubieCube;
 }

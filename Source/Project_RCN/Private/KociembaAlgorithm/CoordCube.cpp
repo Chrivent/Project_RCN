@@ -97,7 +97,7 @@ void InitPruning(const FString& CacheDir)
             for (int32 j = 0; j < 6; j++) {
                 for (int32 k = 0; k < 3; k++) {
                     CubieCube.EdgeMultiply(j);
-                    URtoDF_Move[i][3 * j + k] = static_cast<int16>(CubieCube.GetURtoDF());
+                    URtoDF_Move[i][3 * j + k] = CubieCube.GetURtoDF();
                 }
                 CubieCube.EdgeMultiply(j);
             }
@@ -138,7 +138,7 @@ void InitPruning(const FString& CacheDir)
         int16 uRtoUL, uBtoDF;
         for (uRtoUL = 0; uRtoUL < 336; uRtoUL++) {
             for (uBtoDF = 0; uBtoDF < 336; uBtoDF++) {
-                MergeURtoULandUBtoDF[uRtoUL][uBtoDF] = static_cast<int16>(FCubieCube::GetURtoDF_Standalone(uRtoUL, uBtoDF));
+                MergeURtoULandUBtoDF[uRtoUL][uBtoDF] = FCubieCube::GetURtoDF_Standalone(uRtoUL, uBtoDF);
             }
         }
         DumpToFile(MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), "MergeURtoULandUBtoDF", CacheDir);
@@ -181,8 +181,7 @@ void InitPruning(const FString& CacheDir)
                             newURFtoDLF = URFtoDLF_Move[URFtoDLF][j];
                             newParity = ParityMove[parity][j];
                             if (GetPruning(Slice_URFtoDLF_Parity_Prun, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity) == 0x0f) {
-                                SetPruning(Slice_URFtoDLF_Parity_Prun, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity,
-                                        static_cast<int8>(depth + 1));
+                                SetPruning(Slice_URFtoDLF_Parity_Prun, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity, depth + 1);
                                 done++;
                             }
                         }
@@ -231,8 +230,7 @@ void InitPruning(const FString& CacheDir)
                             newURtoDF = URtoDF_Move[URtoDF][j];
                             newParity = ParityMove[parity][j];
                             if (GetPruning(Slice_URtoDF_Parity_Prun, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity) == 0x0f) {
-                                SetPruning(Slice_URtoDF_Parity_Prun, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity,
-                                        static_cast<int8>(depth + 1));
+                                SetPruning(Slice_URtoDF_Parity_Prun, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity, depth + 1);
                                 done++;
                             }
                         }
@@ -259,7 +257,7 @@ void InitPruning(const FString& CacheDir)
                         int32 newSlice = FRtoBR_Move[slice * 24][j] / 24;
                         int32 newTwist = TwistMove[twist][j];
                         if (GetPruning(Slice_Twist_Prun, N_SLICE1 * newTwist + newSlice) == 0x0f) {
-                            SetPruning(Slice_Twist_Prun, N_SLICE1 * newTwist + newSlice, static_cast<int8>(depth + 1));
+                            SetPruning(Slice_Twist_Prun, N_SLICE1 * newTwist + newSlice, depth + 1);
                             done++;
                         }
                     }
@@ -286,7 +284,7 @@ void InitPruning(const FString& CacheDir)
                         int32 newSlice = FRtoBR_Move[slice * 24][j] / 24;
                         int32 newFlip = FlipMove[flip][j];
                         if (GetPruning(Slice_Flip_Prun, N_SLICE1 * newFlip + newSlice) == 0x0f) {
-                            SetPruning(Slice_Flip_Prun, N_SLICE1 * newFlip + newSlice, static_cast<int8>(depth + 1));
+                            SetPruning(Slice_Flip_Prun, N_SLICE1 * newFlip + newSlice, depth + 1);
                             done++;
                         }
                     }

@@ -506,21 +506,21 @@ void FCubieCube::SetUBtoDF(const int16 Idx)
 
 int32 FCubieCube::Verify()
 {
-    int32 sum = 0, i;
     int32 edgeCount[12] = {0};
     int32 cornerCount[8] = {0};
     for(int32 e = 0; e < EDGE_COUNT; e++)
     {
         edgeCount[static_cast<int32>(Ep[e])]++;
     }
-    for (i = 0; i < 12; i++)
+    for (int32 i = 0; i < 12; i++)
     {
         if (edgeCount[i] != 1)
         {
             return -2;
         }
     }
-    for (i = 0; i < 12; i++)
+    int32 sum = 0;
+    for (int32 i = 0; i < 12; i++)
     {
         sum += Eo[i];
     }
@@ -528,11 +528,11 @@ int32 FCubieCube::Verify()
     {
         return -3;
     }
-    for(int32 c = 0; c < CORNER_COUNT; c++)
+    for (int32 c = 0; c < CORNER_COUNT; c++)
     {
         cornerCount[static_cast<int32>(Cp[c])]++;
     }
-    for (i = 0; i < 8; i++)
+    for (int32 i = 0; i < 8; i++)
     {
         if (cornerCount[i] != 1)
         {
@@ -540,7 +540,7 @@ int32 FCubieCube::Verify()
         }
     }
     sum = 0;
-    for (i = 0; i < 8; i++)
+    for (int32 i = 0; i < 8; i++)
     {
         sum += Co[i];
     }
@@ -548,7 +548,7 @@ int32 FCubieCube::Verify()
     {
         return -5;
     }
-    if ((EdgeParity() ^ CornerParity()) != 0)
+    if (EdgeParity() != CornerParity())
     {
         return -6;
     }
