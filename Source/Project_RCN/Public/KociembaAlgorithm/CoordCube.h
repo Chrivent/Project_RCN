@@ -1,8 +1,5 @@
 #pragma once
 
-#include "CubieCube.h"
-#include "CoordCube.generated.h"
-
 #define N_TWIST     2187
 #define N_FLIP      2048
 #define N_SLICE1    495
@@ -16,24 +13,6 @@
 #define N_URFtoDLB  40320
 #define N_URtoBR    479001600
 #define N_MOVE      18
-
-USTRUCT(BlueprintType)
-struct FCoordCube
-{
-    GENERATED_BODY()
-
-    FCoordCube() = default;
-    explicit FCoordCube(FCubieCube& CubieCube);
-
-    int16 Twist;
-    int16 Flip;
-    int16 Parity;
-    int16 FRtoBR;
-    int16 URFtoDLF;
-    int16 URtoUL;
-    int16 UBtoDF;
-    int32 URtoDF;
-};
 
 extern int16 TwistMove[N_TWIST][N_MOVE];
 extern int16 FlipMove[N_FLIP][N_MOVE];

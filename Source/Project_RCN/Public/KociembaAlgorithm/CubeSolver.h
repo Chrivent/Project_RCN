@@ -97,10 +97,6 @@ public:
      * defines the maximum computing time of the method in seconds. If it does not return with a solution, it returns with
      * an error code.
      * 
-     * @param bUseSeparator
-     * determines if a " . " separates the phase1 and phase2 parts of the solver string like in F' R B R L2 F .
-     * U2 U D for example.
-     * 
      * @param CacheDir
      * Directory to cache results
      * 
@@ -114,12 +110,12 @@ public:
      * Error 7: No solution exists for the given maxDepth<br>
      * Error 8: Timeout, no solution within given time
      */
-    static FString SolveCube(const FString& Facelets, int32 MaxDepth, double TimeOut, bool bUseSeparator, const FString& CacheDir);
+    static FString SolveCube(const FString& Facelets, const int32 MaxDepth, double TimeOut, const FString& CacheDir);
 
 protected:
-    static int32 TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth);
-    static FString SolutionToString(const FSearch& Search, int32 Length, int32 DepthPhase1);
-    static FCubieCube ToCubieCube(FString CubeString);
+    static int32 TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth);
+    static FString SolutionToString(const FSearch& Search, int32 Length);
+    static FCubieCube ToCubieCube(const FString& CubeString);
 
     static const TArray<TArray<EFaceletType>> CornerFacelet;
     static const TArray<TArray<EFaceletType>> EdgeFacelet;

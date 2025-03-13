@@ -506,8 +506,10 @@ void FCubieCube::SetUBtoDF(const int16 Idx)
 
 int32 FCubieCube::Verify()
 {
-    int32 edgeCount[12] = {0};
-    int32 cornerCount[8] = {0};
+    TArray<int32> edgeCount;
+    TArray<int32> cornerCount;
+    edgeCount.SetNum(EDGE_COUNT);
+    cornerCount.SetNum(CORNER_COUNT);
     for(int32 e = 0; e < EDGE_COUNT; e++)
     {
         edgeCount[static_cast<int32>(Ep[e])]++;
@@ -555,12 +557,12 @@ int32 FCubieCube::Verify()
     return 0;
 }
 
-int32 FCubieCube::GetURtoDF_Standalone(int16 idx1, int16 idx2)
+int32 FCubieCube::GetURtoDF_Standalone(const int16 Idx1, const int16 Idx2)
 {
     FCubieCube a;
     FCubieCube b;
-    a.SetURtoUL(idx1);
-    b.SetUBtoDF(idx2);
+    a.SetURtoUL(Idx1);
+    b.SetUBtoDF(Idx2);
     for (int32 i = 0; i < 8; i++)
     {
         if (a.Ep[i] != EEdgeType::BR)

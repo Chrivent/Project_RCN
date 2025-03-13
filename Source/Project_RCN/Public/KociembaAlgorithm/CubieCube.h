@@ -70,7 +70,7 @@ struct FCubieCube
 
     int32 Verify();
 
-    static int32 GetURtoDF_Standalone(int16 idx1, int16 idx2);
+    static int32 GetURtoDF_Standalone(const int16 Idx1, const int16 Idx2);
     
     TArray<ECornerType> Cp;
     TArray<int8> Co;

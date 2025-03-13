@@ -1,5 +1,7 @@
 #include "KociembaAlgorithm/CoordCube.h"
 
+#include "KociembaAlgorithm/CubieCube.h"
+
 int16 TwistMove[N_TWIST][N_MOVE];
 int16 FlipMove[N_FLIP][N_MOVE];
 int16 ParityMove[2][18] = {
@@ -18,18 +20,6 @@ int8 Slice_Twist_Prun[N_SLICE1 * N_TWIST / 2 + 1] = {0};
 int8 Slice_Flip_Prun[N_SLICE1 * N_FLIP / 2] = {0};
 
 int32 PRUNING_INITED = 0;
-
-FCoordCube::FCoordCube(FCubieCube& CubieCube)
-{
-    Twist = CubieCube.GetTwist();
-    Flip = CubieCube.GetFlip();
-    Parity = CubieCube.CornerParity();
-    FRtoBR = CubieCube.GetFRtoBR();
-    URFtoDLF = CubieCube.GetURFtoDLF();
-    URtoUL = CubieCube.GetURtoUL();
-    UBtoDF = CubieCube.GetUBtoDF();
-    URtoDF = CubieCube.GetURtoDF();
-}
 
 void InitPruning(const FString& CacheDir)
 {

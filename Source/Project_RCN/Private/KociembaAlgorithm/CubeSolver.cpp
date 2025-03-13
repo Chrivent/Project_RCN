@@ -54,7 +54,7 @@ const TArray<TArray<EColorType>> UCubeSolver::EdgeColor = {
     { EColorType::B, EColorType::R }
 };
 
-FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const bool bUseSeparator, const FString& CacheDir)
+FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
 {
     FSearch Search;
     
@@ -92,22 +92,20 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         return FString("ERROR: Unsolvable cube");
     }
 
-    FCoordCube C(Cc);
-
     Search.Po[0] = 0;
     Search.Ax[0] = 0;
-    Search.Flip[0] = C.Flip;
-    Search.Twist[0] = C.Twist;
-    Search.Parity[0] = C.Parity;
-    Search.Slice[0] = C.FRtoBR / 24;
-    Search.URFtoDLF[0] = C.URFtoDLF;
-    Search.FRtoBR[0] = C.FRtoBR;
-    Search.URtoUL[0] = C.URtoUL;
-    Search.UBtoDF[0] = C.UBtoDF;
+    Search.Flip[0] = Cc.GetFlip();
+    Search.Twist[0] = Cc.GetTwist();
+    Search.Parity[0] = Cc.CornerParity();
+    Search.Slice[0] = Cc.GetFRtoBR() / 24;
+    Search.URFtoDLF[0] = Cc.GetURFtoDLF();
+    Search.FRtoBR[0] = Cc.GetFRtoBR();
+    Search.URtoUL[0] = Cc.GetURtoUL();
+    Search.UBtoDF[0] = Cc.GetUBtoDF();
 
     Search.MinDistPhase1[1] = 1;
     int32 N = 0, Busy = 0, DepthPhase1 = 1;
-    double TStart = FPlatformTime::Seconds();
+    const double Time = FPlatformTime::Seconds();
     
     do
     {
@@ -131,7 +129,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
                 {
                     if (++Search.Ax[N] > 5)
                     {
-                        if (FPlatformTime::Seconds() - TStart > TimeOut)
+                        if (FPlatformTime::Seconds() - Time > TimeOut)
                         {
                             return FString("ERROR: Timeout");
                         }
@@ -165,10 +163,10 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
             }
         } while (Busy);
 
-        int32 Mv = 3 * Search.Ax[N] + Search.Po[N] - 1;
-        Search.Flip[N + 1] = FlipMove[Search.Flip[N]][Mv];
-        Search.Twist[N + 1] = TwistMove[Search.Twist[N]][Mv];
-        Search.Slice[N + 1] = FRtoBR_Move[Search.Slice[N] * 24][Mv] / 24;
+        const int32 Move = 3 * Search.Ax[N] + Search.Po[N] - 1;
+        Search.Flip[N + 1] = FlipMove[Search.Flip[N]][Move];
+        Search.Twist[N + 1] = TwistMove[Search.Twist[N]][Move];
+        Search.Slice[N + 1] = FRtoBR_Move[Search.Slice[N] * 24][Move] / 24;
     
         Search.MinDistPhase1[N + 1] = FMath::Max(
             GetPruning(Slice_Flip_Prun, N_SLICE1 * Search.Flip[N + 1] + Search.Slice[N + 1]),
@@ -182,34 +180,32 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
             if (N == DepthPhase1 - 1)
             {
                 int32 S = TotalDepth(Search, DepthPhase1, MaxDepth);
-                if (S >= 0 && 
-                    (S == DepthPhase1 || 
-                    (Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] && Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] + 3)))
+                if (S >= 0 && (S == DepthPhase1 || (Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] && Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] + 3)))
                 {
-                    return SolutionToString(Search, S, bUseSeparator ? DepthPhase1 : -1);
+                    return SolutionToString(Search, S);
                 }
             }
         }
     } while (true);
 }
 
-int32 UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth)
+int32 UCubeSolver::TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth)
 {
     constexpr int32 MaxPhase2Moves = 10;
-    int32 MaxDepthPhase2 = FMath::Min(MaxPhase2Moves, MaxDepth - DepthPhase1);
+    const int32 MaxDepthPhase2 = FMath::Min(MaxPhase2Moves, MaxDepth - DepthPhase1);
     int32 DepthPhase2 = 1;
     int32 N = DepthPhase1;
     int32 Busy = 0;
 
     for (int32 i = 0; i < DepthPhase1; i++)
     {
-        int32 Move = 3 * Search.Ax[i] + Search.Po[i] - 1;
+        const int32 Move = 3 * Search.Ax[i] + Search.Po[i] - 1;
         Search.URFtoDLF[i + 1] = URFtoDLF_Move[Search.URFtoDLF[i]][Move];
         Search.FRtoBR[i + 1] = FRtoBR_Move[Search.FRtoBR[i]][Move];
         Search.Parity[i + 1] = ParityMove[Search.Parity[i]][Move];
     }
 
-    int32 D1 = GetPruning(Slice_URFtoDLF_Parity_Prun,
+    const int32 D1 = GetPruning(Slice_URFtoDLF_Parity_Prun,
         (N_SLICE2 * Search.URFtoDLF[DepthPhase1] + Search.FRtoBR[DepthPhase1]) * 2 + Search.Parity[DepthPhase1]);
     
     if (D1 > MaxDepthPhase2)
@@ -219,14 +215,14 @@ int32 UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth
 
     for (int32 i = 0; i < DepthPhase1; i++)
     {
-        int32 Move = 3 * Search.Ax[i] + Search.Po[i] - 1;
+        const int32 Move = 3 * Search.Ax[i] + Search.Po[i] - 1;
         Search.URtoUL[i + 1] = URtoUL_Move[Search.URtoUL[i]][Move];
         Search.UBtoDF[i + 1] = UBtoDF_Move[Search.UBtoDF[i]][Move];
     }
 
     Search.URtoDF[DepthPhase1] = MergeURtoULandUBtoDF[Search.URtoUL[DepthPhase1]][Search.UBtoDF[DepthPhase1]];
 
-    int32 D2 = GetPruning(Slice_URtoDF_Parity_Prun,
+    const int32 D2 = GetPruning(Slice_URtoDF_Parity_Prun,
         (N_SLICE2 * Search.URtoDF[DepthPhase1] + Search.FRtoBR[DepthPhase1]) * 2 + Search.Parity[DepthPhase1]);
 
     if (D2 > MaxDepthPhase2)
@@ -296,7 +292,7 @@ int32 UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth
             }
         } while (Busy);
 
-        int32 Move = 3 * Search.Ax[N] + Search.Po[N] - 1;
+        const int32 Move = 3 * Search.Ax[N] + Search.Po[N] - 1;
 
         Search.URFtoDLF[N + 1] = URFtoDLF_Move[Search.URFtoDLF[N]][Move];
         Search.FRtoBR[N + 1] = FRtoBR_Move[Search.FRtoBR[N]][Move];
@@ -315,59 +311,36 @@ int32 UCubeSolver::TotalDepth(FSearch& Search, int32 DepthPhase1, int32 MaxDepth
     return DepthPhase1 + DepthPhase2;
 }
 
-FString UCubeSolver::SolutionToString(const FSearch& Search, const int32 Length, const int32 DepthPhase1)
+FString UCubeSolver::SolutionToString(const FSearch& Search, const int32 Length)
 {
     FString SolutionString;
-    
     for (int32 i = 0; i < Length; i++)
     {
-        FString MoveAxis[] = { TEXT("U"), TEXT("R"), TEXT("F"), TEXT("D"), TEXT("L"), TEXT("B") };
+        TArray MoveAxis = { TEXT("U"), TEXT("R"), TEXT("F"), TEXT("D"), TEXT("L"), TEXT("B") };
         SolutionString += MoveAxis[Search.Ax[i]];
-
-        FString MovePower[] = { TEXT(" "), TEXT("2 "), TEXT("' ") };
+        TArray MovePower = { TEXT(" "), TEXT("2 "), TEXT("' ") };
         SolutionString += MovePower[Search.Po[i] - 1];
-
-        if (i == DepthPhase1 - 1)
-        {
-            SolutionString += TEXT(". ");
-        }
     }
-    
     return SolutionString;
 }
 
-FCubieCube UCubeSolver::ToCubieCube(FString CubeString)
+FCubieCube UCubeSolver::ToCubieCube(const FString& CubeString)
 {
     TArray<EColorType> Facelets;
     Facelets.SetNum(54);
-    
-    for (int32 i = 0; i < 54; i++)
+    for (int32 i = 0; i < 54; ++i)
     {
-        switch(CubeString[i])
+        switch (CubeString[i])
         {
-        case 'U':
-            Facelets[i] = EColorType::U;
-            break;
-        case 'R':
-            Facelets[i] = EColorType::R;
-            break;
-        case 'F':
-            Facelets[i] = EColorType::F;
-            break;
-        case 'D':
-            Facelets[i] = EColorType::D;
-            break;
-        case 'L':
-            Facelets[i] = EColorType::L;
-            break;
-        case 'B':
-            Facelets[i] = EColorType::B;
-            break;
-        default:
-            break;
+        case 'U': Facelets[i] = EColorType::U; break;
+        case 'R': Facelets[i] = EColorType::R; break;
+        case 'F': Facelets[i] = EColorType::F; break;
+        case 'D': Facelets[i] = EColorType::D; break;
+        case 'L': Facelets[i] = EColorType::L; break;
+        case 'B': Facelets[i] = EColorType::B; break;
+        default:  break;
         }
     }
-    
     FCubieCube CubieCube;
     for (int32 i = 0; i < CORNER_COUNT; i++)
     {
@@ -395,7 +368,7 @@ FCubieCube UCubeSolver::ToCubieCube(FString CubeString)
             if (Color1 == CornerColor[j][1] && Color2 == CornerColor[j][2])
             {
                 CubieCube.Cp[i] = static_cast<ECornerType>(j);
-                CubieCube.Co[i] = Orientation % 3;
+                CubieCube.Co[i] = Orientation;
                 break;
             }
         }

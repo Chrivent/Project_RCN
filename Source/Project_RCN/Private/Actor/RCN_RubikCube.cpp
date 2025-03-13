@@ -478,7 +478,7 @@ FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
 void ARCN_RubikCube::ServerRPC_Spin_Implementation(const FString& Command)
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
-
+	
 	MulticastRPC_Spin(Command);
 	MulticastRPC_ChangePattern(Pattern);
 
@@ -578,9 +578,10 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 		Facelet,
 		24,
 		1000,
-		0,
 		"cache"
 	);
+
+	RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
 
 	ServerRPC_Spin(Command);
 
