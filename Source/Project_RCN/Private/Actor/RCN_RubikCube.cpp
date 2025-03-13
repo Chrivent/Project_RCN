@@ -9,17 +9,17 @@
 #include "Project_RCN/Project_RCN.h"
 
 const TArray<FSignInfo> ARCN_RubikCube::SignInfos = {
-	{"L", EAxisType::AxisX, -1, false, 1}, {"L'", EAxisType::AxisX, -1, true, 1}, {"L2", EAxisType::AxisX, -1, false, 2},
-	{"M", EAxisType::AxisX, 0, false, 1},  {"M'", EAxisType::AxisX, 0, true, 1},  {"M2", EAxisType::AxisX, 0, false, 2},
-	{"R", EAxisType::AxisX, 1, true, 1},   {"R'", EAxisType::AxisX, 1, false, 1}, {"R2", EAxisType::AxisX, 1, true, 2},
+	{"L", ECubeAxisType::X, -1, false, 1}, {"L'", ECubeAxisType::X, -1, true, 1}, {"L2", ECubeAxisType::X, -1, false, 2},
+	{"M", ECubeAxisType::X, 0, false, 1},  {"M'", ECubeAxisType::X, 0, true, 1},  {"M2", ECubeAxisType::X, 0, false, 2},
+	{"R", ECubeAxisType::X, 1, true, 1},   {"R'", ECubeAxisType::X, 1, false, 1}, {"R2", ECubeAxisType::X, 1, true, 2},
 
-	{"B", EAxisType::AxisY, -1, false, 1}, {"B'", EAxisType::AxisY, -1, true, 1}, {"B2", EAxisType::AxisY, -1, false, 2},
-	{"S", EAxisType::AxisY, 0, true, 1},   {"S'", EAxisType::AxisY, 0, false, 1}, {"S2", EAxisType::AxisY, 0, true, 2},
-	{"F", EAxisType::AxisY, 1, true, 1},   {"F'", EAxisType::AxisY, 1, false, 1}, {"F2", EAxisType::AxisY, 1, true, 2},
+	{"B", ECubeAxisType::Y, -1, false, 1}, {"B'", ECubeAxisType::Y, -1, true, 1}, {"B2", ECubeAxisType::Y, -1, false, 2},
+	{"S", ECubeAxisType::Y, 0, true, 1},   {"S'", ECubeAxisType::Y, 0, false, 1}, {"S2", ECubeAxisType::Y, 0, true, 2},
+	{"F", ECubeAxisType::Y, 1, true, 1},   {"F'", ECubeAxisType::Y, 1, false, 1}, {"F2", ECubeAxisType::Y, 1, true, 2},
 
-	{"D", EAxisType::AxisZ, -1, false, 1}, {"D'", EAxisType::AxisZ, -1, true, 1}, {"D2", EAxisType::AxisZ, -1, false, 2},
-	{"E", EAxisType::AxisZ, 0, false, 1},  {"E'", EAxisType::AxisZ, 0, true, 1},  {"E2", EAxisType::AxisZ, 0, false, 2},
-	{"U", EAxisType::AxisZ, 1, true, 1},   {"U'", EAxisType::AxisZ, 1, false, 1}, {"U2", EAxisType::AxisZ, 1, true, 2}
+	{"D", ECubeAxisType::Z, -1, false, 1}, {"D'", ECubeAxisType::Z, -1, true, 1}, {"D2", ECubeAxisType::Z, -1, false, 2},
+	{"E", ECubeAxisType::Z, 0, false, 1},  {"E'", ECubeAxisType::Z, 0, true, 1},  {"E2", ECubeAxisType::Z, 0, false, 2},
+	{"U", ECubeAxisType::Z, 1, true, 1},   {"U'", ECubeAxisType::Z, 1, false, 1}, {"U2", ECubeAxisType::Z, 1, true, 2}
 };
 
 const TArray<FVector> ARCN_RubikCube::PatternOrderPositions = {
@@ -238,7 +238,6 @@ void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshCompo
 		ButtonBoxComponent->SetBoxExtent(FVector(ButtonSize, ButtonSize, ButtonThickness));
 	}
 	ButtonBoxComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-	ButtonBoxComponent->SetHiddenInGame(false);
 
 	ButtonBoxComponents.Emplace(ButtonBoxComponent);
 	ButtonPositions.Emplace(ButtonBoxComponent, Position);
@@ -305,17 +304,17 @@ void ARCN_RubikCube::TurnCore(const FSignInfo& SignInfo)
 	const float TargetAngle = SignInfo.TurnCount == 2 ? 180.0f : SignInfo.CCW ? -90.0f : 90.0f;
 	
 	FQuat TargetQuat = FQuat::Identity;
-	switch (SignInfo.AxisType)
+	switch (SignInfo.CubeAxisType)
 	{
-	case EAxisType::AxisX:
+	case ECubeAxisType::X:
 		TargetQuat = FRotator(0.0f, 0.0f, TargetAngle).Quaternion();
 		break;
         
-	case EAxisType::AxisY:
+	case ECubeAxisType::Y:
 		TargetQuat = FRotator(TargetAngle, 0.0f, 0.0f).Quaternion();
 		break;
         
-	case EAxisType::AxisZ:
+	case ECubeAxisType::Z:
 		TargetQuat = FRotator(0.0f, -TargetAngle, 0.0f).Quaternion();
 		break;
 	}
@@ -346,23 +345,23 @@ void ARCN_RubikCube::GrabPieces(const FSignInfo& SignInfo)
 {
 	for (const auto PiecePosition : PiecePositions)
 	{
-		switch (SignInfo.AxisType)
+		switch (SignInfo.CubeAxisType)
 		{
-		case EAxisType::AxisX:
+		case ECubeAxisType::X:
 			if (PiecePosition.Value.X == SignInfo.Layer)
 			{
 				PiecePosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			break;
 		
-		case EAxisType::AxisY:
+		case ECubeAxisType::Y:
 			if (PiecePosition.Value.Y == SignInfo.Layer)
 			{
 				PiecePosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepWorldTransform);
 			}
 			break;
 		
-		case EAxisType::AxisZ:
+		case ECubeAxisType::Z:
 			if (PiecePosition.Value.Z == SignInfo.Layer)
 			{
 				PiecePosition.Key->AttachToComponent(CoreComponent, FAttachmentTransformRules::KeepWorldTransform);
@@ -445,9 +444,9 @@ FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
 	const int32 Sin = SignInfo.TurnCount == 2 ? 0 : SignInfo.CCW ? -1 : 1;
 	const int32 Cos = SignInfo.TurnCount == 2 ? -1 : 0;
 			
-	switch (SignInfo.AxisType)
+	switch (SignInfo.CubeAxisType)
 	{
-	case EAxisType::AxisX:
+	case ECubeAxisType::X:
 		return FMatrix(
 			FVector(1, 0, 0),
 			FVector(0, Cos, -Sin),
@@ -455,7 +454,7 @@ FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
 			FVector::ZeroVector
 		);
 
-	case EAxisType::AxisY:
+	case ECubeAxisType::Y:
 		return FMatrix(
 			FVector(Cos, 0, Sin),
 			FVector(0, 1, 0),
@@ -463,7 +462,7 @@ FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
 			FVector::ZeroVector
 		);
 
-	case EAxisType::AxisZ:
+	case ECubeAxisType::Z:
 		return FMatrix(
 			FVector(Cos, -Sin, 0),
 			FVector(Sin, Cos, 0),

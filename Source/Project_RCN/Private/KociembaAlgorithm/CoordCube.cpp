@@ -25,11 +25,15 @@ void InitPruning(const FString& CacheDir)
 {
     FCubieCube CubieCube;
 
-    if (CheckCachedTable("twistMove", TwistMove, sizeof(TwistMove), CacheDir) != 0) {
-        for (int32 i = 0; i < N_TWIST; i++) {
+    if (CheckCachedTable("twistMove", TwistMove, sizeof(TwistMove), CacheDir))
+    {
+        for (int32 i = 0; i < N_TWIST; i++)
+            {
             CubieCube.SetTwist(i);
-            for (int32 j = 0; j < 6; j++) {
-                for (int32 k = 0; k < 3; k++) {
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
                     CubieCube.CornerMultiply(j);
                     TwistMove[i][3 * j + k] = CubieCube.GetTwist();
                 }
@@ -39,11 +43,15 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(TwistMove, sizeof(TwistMove), "twistMove", CacheDir);
     }
 
-    if (CheckCachedTable("flipMove", FlipMove, sizeof(FlipMove), CacheDir) != 0) {
-        for (int32 i = 0; i < N_FLIP; i++) {
+    if (CheckCachedTable("flipMove", FlipMove, sizeof(FlipMove), CacheDir))
+    {
+        for (int32 i = 0; i < N_FLIP; i++)
+        {
             CubieCube.SetFlip(i);
-            for (int32 j = 0; j < 6; j++) {
-                for (int32 k = 0; k < 3; k++) {
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
                     CubieCube.EdgeMultiply(j);
                     FlipMove[i][3 * j + k] = CubieCube.GetFlip();
                 }
@@ -53,11 +61,15 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(FlipMove, sizeof(FlipMove), "flipMove", CacheDir);
     }
 
-    if (CheckCachedTable("FRtoBR_Move", FRtoBR_Move, sizeof(FRtoBR_Move), CacheDir) != 0) {
-        for (int32 i = 0; i < N_FRtoBR; i++) {
+    if (CheckCachedTable("FRtoBR_Move", FRtoBR_Move, sizeof(FRtoBR_Move), CacheDir))
+    {
+        for (int32 i = 0; i < N_FRtoBR; i++)
+        {
             CubieCube.SetFRtoBR(i);
-            for (int32 j = 0; j < 6; j++) {
-                for (int32 k = 0; k < 3; k++) {
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
                     CubieCube.EdgeMultiply(j);
                     FRtoBR_Move[i][3 * j + k] = CubieCube.GetFRtoBR();
                 }
@@ -67,11 +79,15 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(FRtoBR_Move, sizeof(FRtoBR_Move), "FRtoBR_Move", CacheDir);
     }
 
-    if (CheckCachedTable("URFtoDLF_Move", URFtoDLF_Move, sizeof(URFtoDLF_Move), CacheDir) != 0) {
-        for (int32 i = 0; i < N_URFtoDLF; i++) {
+    if (CheckCachedTable("URFtoDLF_Move", URFtoDLF_Move, sizeof(URFtoDLF_Move), CacheDir))
+    {
+        for (int32 i = 0; i < N_URFtoDLF; i++)
+        {
             CubieCube.SetURFtoDLF(i);
-            for (int32 j = 0; j < 6; j++) {
-                for (int32 k = 0; k < 3; k++) {
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
                     CubieCube.CornerMultiply(j);
                     URFtoDLF_Move[i][3 * j + k] = CubieCube.GetURFtoDLF();
                 }
@@ -81,11 +97,15 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(URFtoDLF_Move, sizeof(URFtoDLF_Move), "URFtoDLF_Move", CacheDir);
     }
 
-    if (CheckCachedTable("URtoDF_Move", URtoDF_Move, sizeof(URtoDF_Move), CacheDir) != 0) {
-        for (int32 i = 0; i < N_URtoDF; i++) {
+    if (CheckCachedTable("URtoDF_Move", URtoDF_Move, sizeof(URtoDF_Move), CacheDir))
+    {
+        for (int32 i = 0; i < N_URtoDF; i++)
+        {
             CubieCube.SetURtoDF(i);
-            for (int32 j = 0; j < 6; j++) {
-                for (int32 k = 0; k < 3; k++) {
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
                     CubieCube.EdgeMultiply(j);
                     URtoDF_Move[i][3 * j + k] = CubieCube.GetURtoDF();
                 }
@@ -95,11 +115,15 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(URtoDF_Move, sizeof(URtoDF_Move), "URtoDF_Move", CacheDir);
     }
 
-    if (CheckCachedTable("URtoUL_Move", URtoUL_Move, sizeof(URtoUL_Move), CacheDir) != 0) {
-        for (int32 i = 0; i < N_URtoUL; i++) {
+    if (CheckCachedTable("URtoUL_Move", URtoUL_Move, sizeof(URtoUL_Move), CacheDir))
+    {
+        for (int32 i = 0; i < N_URtoUL; i++)
+        {
             CubieCube.SetURtoUL(i);
-            for (int32 j = 0; j < 6; j++) {
-                for (int32 k = 0; k < 3; k++) {
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
                     CubieCube.EdgeMultiply(j);
                     URtoUL_Move[i][3 * j + k] = CubieCube.GetURtoUL();
                 }
@@ -109,11 +133,15 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(URtoUL_Move, sizeof(URtoUL_Move), "URtoUL_Move", CacheDir);
     }
 
-    if (CheckCachedTable("UBtoDF_Move", UBtoDF_Move, sizeof(UBtoDF_Move), CacheDir) != 0) {
-        for (int32 i = 0; i < N_UBtoDF; i++) {
+    if (CheckCachedTable("UBtoDF_Move", UBtoDF_Move, sizeof(UBtoDF_Move), CacheDir))
+    {
+        for (int32 i = 0; i < N_UBtoDF; i++)
+        {
             CubieCube.SetUBtoDF(i);
-            for (int32 j = 0; j < 6; j++) {
-                for (int32 k = 0; k < 3; k++) {
+            for (int32 j = 0; j < 6; j++)
+            {
+                for (int32 k = 0; k < 3; k++)
+                {
                     CubieCube.EdgeMultiply(j);
                     UBtoDF_Move[i][3 * j + k] = CubieCube.GetUBtoDF();
                 }
@@ -123,18 +151,21 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(UBtoDF_Move, sizeof(UBtoDF_Move), "UBtoDF_Move", CacheDir);
     }
 
-    if (CheckCachedTable("MergeURtoULandUBtoDF", MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), CacheDir) != 0)
+    if (CheckCachedTable("MergeURtoULandUBtoDF", MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), CacheDir))
     {
         int16 uRtoUL, uBtoDF;
-        for (uRtoUL = 0; uRtoUL < 336; uRtoUL++) {
-            for (uBtoDF = 0; uBtoDF < 336; uBtoDF++) {
+        for (uRtoUL = 0; uRtoUL < 336; uRtoUL++)
+        {
+            for (uBtoDF = 0; uBtoDF < 336; uBtoDF++)
+            {
                 MergeURtoULandUBtoDF[uRtoUL][uBtoDF] = FCubieCube::GetURtoDF_Standalone(uRtoUL, uBtoDF);
             }
         }
         DumpToFile(MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), "MergeURtoULandUBtoDF", CacheDir);
     }
 
-    if (CheckCachedTable("Slice_URFtoDLF_Parity_Prun", Slice_URFtoDLF_Parity_Prun, sizeof(Slice_URFtoDLF_Parity_Prun), CacheDir) != 0) {
+    if (CheckCachedTable("Slice_URFtoDLF_Parity_Prun", Slice_URFtoDLF_Parity_Prun, sizeof(Slice_URFtoDLF_Parity_Prun), CacheDir))
+    {
         int32 depth = 0, done = 1;
         for (int32 i = 0; i < N_SLICE2 * N_URFtoDLF * N_PARITY / 2; i++)
         {
@@ -170,7 +201,8 @@ void InitPruning(const FString& CacheDir)
                             newSlice = FRtoBR_Move[slice][j];
                             newURFtoDLF = URFtoDLF_Move[URFtoDLF][j];
                             newParity = ParityMove[parity][j];
-                            if (GetPruning(Slice_URFtoDLF_Parity_Prun, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity) == 0x0f) {
+                            if (GetPruning(Slice_URFtoDLF_Parity_Prun, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity) == 0x0f)
+                            {
                                 SetPruning(Slice_URFtoDLF_Parity_Prun, (N_SLICE2 * newURFtoDLF + newSlice) * 2 + newParity, depth + 1);
                                 done++;
                             }
@@ -183,7 +215,8 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(Slice_URFtoDLF_Parity_Prun, sizeof(Slice_URFtoDLF_Parity_Prun), "Slice_URFtoDLF_Parity_Prun", CacheDir);
     }
 
-    if (CheckCachedTable("Slice_URtoDF_Parity_Prun", Slice_URtoDF_Parity_Prun, sizeof(Slice_URtoDF_Parity_Prun), CacheDir) != 0) {
+    if (CheckCachedTable("Slice_URtoDF_Parity_Prun", Slice_URtoDF_Parity_Prun, sizeof(Slice_URtoDF_Parity_Prun), CacheDir))
+    {
         int32 depth = 0, done = 1;
         for (int32 i = 0; i < N_SLICE2 * N_URtoDF * N_PARITY / 2; i++)
         {
@@ -219,7 +252,8 @@ void InitPruning(const FString& CacheDir)
                             newSlice = FRtoBR_Move[slice][j];
                             newURtoDF = URtoDF_Move[URtoDF][j];
                             newParity = ParityMove[parity][j];
-                            if (GetPruning(Slice_URtoDF_Parity_Prun, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity) == 0x0f) {
+                            if (GetPruning(Slice_URtoDF_Parity_Prun, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity) == 0x0f)
+                            {
                                 SetPruning(Slice_URtoDF_Parity_Prun, (N_SLICE2 * newURtoDF + newSlice) * 2 + newParity, depth + 1);
                                 done++;
                             }
@@ -232,21 +266,27 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(Slice_URtoDF_Parity_Prun, sizeof(Slice_URtoDF_Parity_Prun), "Slice_URtoDF_Parity_Prun", CacheDir);
     }
 
-    if (CheckCachedTable("Slice_Twist_Prun", Slice_Twist_Prun, sizeof(Slice_Twist_Prun), CacheDir) != 0) {
+    if (CheckCachedTable("Slice_Twist_Prun", Slice_Twist_Prun, sizeof(Slice_Twist_Prun), CacheDir))
+    {
         int32 depth = 0, done = 1;
         for (int32 i = 0; i < N_SLICE1 * N_TWIST / 2 + 1; i++)
         {
             Slice_Twist_Prun[i] = -1;
         }
         SetPruning(Slice_Twist_Prun, 0, 0);
-        while (done != N_SLICE1 * N_TWIST) {
-            for (int32 i = 0; i < N_SLICE1 * N_TWIST; i++) {
+        while (done != N_SLICE1 * N_TWIST)
+        {
+            for (int32 i = 0; i < N_SLICE1 * N_TWIST; i++)
+            {
                 int32 twist = i / N_SLICE1, slice = i % N_SLICE1;
-                if (GetPruning(Slice_Twist_Prun, i) == depth) {
-                    for (int32 j = 0; j < 18; j++) {
+                if (GetPruning(Slice_Twist_Prun, i) == depth)
+                {
+                    for (int32 j = 0; j < 18; j++)
+                    {
                         int32 newSlice = FRtoBR_Move[slice * 24][j] / 24;
                         int32 newTwist = TwistMove[twist][j];
-                        if (GetPruning(Slice_Twist_Prun, N_SLICE1 * newTwist + newSlice) == 0x0f) {
+                        if (GetPruning(Slice_Twist_Prun, N_SLICE1 * newTwist + newSlice) == 0x0f)
+                        {
                             SetPruning(Slice_Twist_Prun, N_SLICE1 * newTwist + newSlice, depth + 1);
                             done++;
                         }
@@ -258,22 +298,27 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(Slice_Twist_Prun, sizeof(Slice_Twist_Prun), "Slice_Twist_Prun", CacheDir);
     }
 
-    if (CheckCachedTable("Slice_Flip_Prun", Slice_Flip_Prun, sizeof(Slice_Flip_Prun), CacheDir) != 0) {
+    if (CheckCachedTable("Slice_Flip_Prun", Slice_Flip_Prun, sizeof(Slice_Flip_Prun), CacheDir) != 0)
+    {
         int32 depth = 0, done = 1;
         for (int32 i = 0; i < N_SLICE1 * N_FLIP / 2; i++)
         {
             Slice_Flip_Prun[i] = -1;
         }
         SetPruning(Slice_Flip_Prun, 0, 0);
-        while (done != N_SLICE1 * N_FLIP) {
-            for (int32 i = 0; i < N_SLICE1 * N_FLIP; i++) {
+        while (done != N_SLICE1 * N_FLIP)
+        {
+            for (int32 i = 0; i < N_SLICE1 * N_FLIP; i++)
+            {
                 int32 flip = i / N_SLICE1, slice = i % N_SLICE1;
-                if (GetPruning(Slice_Flip_Prun, i) == depth) {
+                if (GetPruning(Slice_Flip_Prun, i) == depth)
+                {
                     for (int32 j = 0; j < 18; j++)
                     {
                         int32 newSlice = FRtoBR_Move[slice * 24][j] / 24;
                         int32 newFlip = FlipMove[flip][j];
-                        if (GetPruning(Slice_Flip_Prun, N_SLICE1 * newFlip + newSlice) == 0x0f) {
+                        if (GetPruning(Slice_Flip_Prun, N_SLICE1 * newFlip + newSlice) == 0x0f)
+                        {
                             SetPruning(Slice_Flip_Prun, N_SLICE1 * newFlip + newSlice, depth + 1);
                             done++;
                         }
@@ -291,9 +336,13 @@ void InitPruning(const FString& CacheDir)
 void SetPruning(int8* table, int32 index, int8 value)
 {
     if ((index & 1) == 0)
+    {
         table[index / 2] &= 0xf0 | value;
+    }
     else
+    {
         table[index / 2] &= 0x0f | value << 4;
+    }
 }
 
 int8 GetPruning(const int8* table, int32 index)
@@ -301,9 +350,13 @@ int8 GetPruning(const int8* table, int32 index)
     int8 res;
 
     if ((index & 1) == 0)
+    {
         res = table[index / 2] & 0x0f;
+    }
     else
+    {
         res = table[index / 2] >> 4 & 0x0f;
+    }
 
     return res;
 }

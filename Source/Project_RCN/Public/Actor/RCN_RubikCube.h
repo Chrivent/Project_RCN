@@ -17,11 +17,11 @@ DECLARE_MULTICAST_DELEGATE(FFinishScramble)
 DECLARE_MULTICAST_DELEGATE(FFinishSolve)
 
 UENUM(BlueprintType)
-enum class EAxisType : uint8
+enum class ECubeAxisType : uint8
 {
-	AxisX,
-	AxisY,
-	AxisZ
+	X,
+	Y,
+	Z
 };
 
 UENUM(BlueprintType)
@@ -40,10 +40,10 @@ struct FSignInfo
 {
 	GENERATED_BODY()
 
-	FSignInfo(FString InSign = "L", const EAxisType InAxisType = EAxisType::AxisX, const int32 InLayer = -1, const bool InCCW = false, const int32 InTurnCount = 1)
+	FSignInfo(FString InSign = "L", const ECubeAxisType InCubeAxisType = ECubeAxisType::X, const int32 InLayer = -1, const bool InCCW = false, const int32 InTurnCount = 1)
 	{
 		Sign = InSign;
-		AxisType = InAxisType;
+		CubeAxisType = InCubeAxisType;
 		Layer = InLayer;
 		CCW = InCCW;
 		TurnCount = InTurnCount;
@@ -53,7 +53,7 @@ struct FSignInfo
 	FString Sign;
 
 	UPROPERTY(VisibleAnywhere)
-	EAxisType AxisType;
+	ECubeAxisType CubeAxisType;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 Layer;
