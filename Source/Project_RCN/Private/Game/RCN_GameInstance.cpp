@@ -37,6 +37,22 @@ void URCN_GameInstance::Init()
 	}
 }
 
+bool URCN_GameInstance::JoinSession(ULocalPlayer* LocalPlayer, const FOnlineSessionSearchResult& SearchResult)
+{
+	if (!SessionInterface.IsValid())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
+	}
+	else
+	{
+		// 세션 참가 요청
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Attempting to join session: %s"), *SearchResult.Session.OwningUserName));
+		SessionInterface.Pin()->JoinSession(0, NAME_GameSession, SearchResult);
+	}
+
+	return Super::JoinSession(LocalPlayer, SearchResult);
+}
+
 void URCN_GameInstance::CreateSession(const int32 NumPlayers) const
 {
 	if (!SessionInterface.IsValid())
@@ -76,19 +92,6 @@ void URCN_GameInstance::FindSessions()
 	SessionSearch->bIsLanQuery = true;
 
 	SessionInterface.Pin()->FindSessions(0, SessionSearch.ToSharedRef());
-}
-
-void URCN_GameInstance::JoinSession(const FOnlineSessionSearchResult& SearchResult) const
-{
-	if (!SessionInterface.IsValid())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
-		return;
-	}
-	
-	// 세션 참가 요청
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Attempting to join session: %s"), *SearchResult.Session.OwningUserName));
-	SessionInterface.Pin()->JoinSession(0, NAME_GameSession, SearchResult);
 }
 
 void URCN_GameInstance::DestroySession() const

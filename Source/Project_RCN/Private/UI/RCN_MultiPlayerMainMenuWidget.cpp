@@ -38,7 +38,7 @@ void URCN_MultiPlayerMainMenuWidget::JoinSessionButtonReleasedHandle()
 	{
 		if (GameInstance->GetSessionSearch().IsValid() && GameInstance->GetSessionSearch()->SearchResults.Num() > 0)
 		{
-			GameInstance->JoinSession(GameInstance->GetSessionSearch()->SearchResults[0]); // 첫 번째 세션 참가
+			GameInstance->JoinSession(GameInstance->GetFirstGamePlayer(), GameInstance->GetSessionSearch()->SearchResults[0]); // 첫 번째 세션 참가
 		}
 		else
 		{

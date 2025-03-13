@@ -1,31 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CubieCube.h"
 #include "CubeSolver.generated.h"
 
 #define CORNER_COUNT 8
 #define EDGE_COUNT 12
-
-USTRUCT(BlueprintType)
-struct FSearch
-{
-    GENERATED_BODY()
-
-    int32 Ax[31];
-    int32 Po[31];
-    int32 Flip[31];
-    int32 Twist[31];
-    int32 Slice[31];
-    int32 Parity[31];
-    int32 URFtoDLF[31];
-    int32 FRtoBR[31];
-    int32 URtoUL[31];
-    int32 UBtoDF[31];
-    int32 URtoDF[31];
-    int32 MinDistPhase1[31];
-    int32 MinDistPhase2[31];
-};
 
 UENUM(BlueprintType)
 enum class EFaceletType : uint8
@@ -79,6 +58,78 @@ enum class EEdgeType : uint8
     BR
 };
 
+USTRUCT(BlueprintType)
+struct FSearch
+{
+    GENERATED_BODY()
+
+    int32 Ax[31];
+    int32 Po[31];
+    int32 Flip[31];
+    int32 Twist[31];
+    int32 Slice[31];
+    int32 Parity[31];
+    int32 URFtoDLF[31];
+    int32 FRtoBR[31];
+    int32 URtoUL[31];
+    int32 UBtoDF[31];
+    int32 URtoDF[31];
+    int32 MinDistPhase1[31];
+    int32 MinDistPhase2[31];
+};
+
+UCLASS()
+class UCubieCube : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UCubieCube();
+    void Initialize(const FString& CubeString);
+    
+    void CornerMultiply(const int32 MoveCubeIdx);
+    void EdgeMultiply(const int32 MoveCubeIdx);
+    
+    int16 GetTwist();
+    void SetTwist(int16 Twist);
+    int16 GetFlip();
+    void SetFlip(int16 Flip);
+    int16 CornerParity();
+    int16 EdgeParity();
+    int16 GetFRtoBR();
+    void SetFRtoBR(const int16 Idx);
+    int16 GetURFtoDLF();
+    void SetURFtoDLF(const int16 Idx);
+    int32 GetURtoDF();
+    void SetURtoDF(const int32 Idx);
+
+    int16 GetURtoUL();
+    void SetURtoUL(const int16 Idx);
+    int16 GetUBtoDF();
+    void SetUBtoDF(const int16 Idx);
+
+    static int32 GetURtoDF_Standalone(const int16 Idx1, const int16 Idx2);
+    
+    int32 Verify();
+
+protected:
+    static int32 Cnk(const int32 N, int32 K);
+
+    template <typename T>
+    void Rotate(TArray<T>& Arr, const int32 L, const int32 R);
+
+    static const TArray<TArray<EFaceletType>> CornerFacelet;
+    static const TArray<TArray<EFaceletType>> EdgeFacelet;
+    static const TArray<TArray<EColorType>> CornerColor;
+    static const TArray<TArray<EColorType>> EdgeColor;
+    static const TArray<TObjectPtr<UCubieCube>> MoveCube;
+    
+    TArray<ECornerType> Cp;
+    TArray<int8> Co;
+    TArray<EEdgeType> Ep;
+    TArray<int8> Eo;
+};
+
 /**
  * The names of the facelet positions of the cube
  * <pre>
@@ -110,7 +161,7 @@ enum class EEdgeType : uint8
  * L5, L6, L7, L8, L9, B1, B2, B3, B4, B5, B6, B7, B8, B9 of the enum constants.
  */
 UCLASS()
-class PROJECT_RCN_API UCubeSolver : public UObject
+class UCubeSolver : public UObject
 {
     GENERATED_BODY()
 
@@ -148,10 +199,4 @@ public:
 protected:
     static int32 TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth);
     static FString SolutionToString(const FSearch& Search, int32 Length);
-    static FCubieCube ToCubieCube(const FString& CubeString);
-
-    static const TArray<TArray<EFaceletType>> CornerFacelet;
-    static const TArray<TArray<EFaceletType>> EdgeFacelet;
-    static const TArray<TArray<EColorType>> CornerColor;
-    static const TArray<TArray<EColorType>> EdgeColor;
 };

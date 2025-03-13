@@ -21,9 +21,10 @@ protected:
 	virtual void Init() override;
 
 public:
+	virtual bool JoinSession(ULocalPlayer* LocalPlayer, const FOnlineSessionSearchResult& SearchResult) override;
+	
 	void CreateSession(const int32 NumPlayers) const;
 	void FindSessions();
-	void JoinSession(const FOnlineSessionSearchResult& SearchResult) const;
 	void DestroySession() const;
 
 protected:

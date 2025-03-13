@@ -314,7 +314,7 @@ void ARCN_Player::SpinDragTriggered(const FInputActionValue& Value)
 	}
 	
 	UBoxComponent* CurrentBoxComponent;
-	FVector CurrentHitLocation;
+	FVector CurrentHitLocation = FVector::ZeroVector;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
 		FVector CursorLocation, CursorDirection;
@@ -359,7 +359,7 @@ void ARCN_Player::SpinInput(const FInputActionValue& Value)
 {
 	FVector SelectedButtonPosition;
 	FVector InputStartHitLocation;
-	float HitDistance;
+	float HitDistance = 0.0f;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
 		FVector CursorLocation, CursorDirection;
