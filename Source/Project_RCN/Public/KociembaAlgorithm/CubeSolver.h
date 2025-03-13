@@ -63,19 +63,21 @@ struct FSearch
 {
     GENERATED_BODY()
 
-    int32 Ax[31];
-    int32 Po[31];
-    int32 Flip[31];
-    int32 Twist[31];
-    int32 Slice[31];
-    int32 Parity[31];
-    int32 URFtoDLF[31];
-    int32 FRtoBR[31];
-    int32 URtoUL[31];
-    int32 UBtoDF[31];
-    int32 URtoDF[31];
-    int32 MinDistPhase1[31];
-    int32 MinDistPhase2[31];
+    FSearch();
+
+    TArray<int32> Ax;
+    TArray<int32> Po;
+    TArray<int32> Flip;
+    TArray<int32> Twist;
+    TArray<int32> Slice;
+    TArray<int32> Parity;
+    TArray<int32> URFtoDLF;
+    TArray<int32> FRtoBR;
+    TArray<int32> URtoUL;
+    TArray<int32> UBtoDF;
+    TArray<int32> URtoDF;
+    TArray<int32> MinDistPhase1;
+    TArray<int32> MinDistPhase2;
 };
 
 USTRUCT(BlueprintType)

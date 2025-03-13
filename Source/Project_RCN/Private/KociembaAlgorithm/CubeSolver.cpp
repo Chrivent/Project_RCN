@@ -100,6 +100,23 @@ const TArray<FCubieCube> FCubieCube::MoveCube = []
     return TempMoveCube;
 }();
 
+FSearch::FSearch()
+{
+    Ax.SetNum(31);
+    Po.SetNum(31);
+    Flip.SetNum(31);
+    Twist.SetNum(31);
+    Slice.SetNum(31);
+    Parity.SetNum(31);
+    URFtoDLF.SetNum(31);
+    FRtoBR.SetNum(31);
+    URtoUL.SetNum(31);
+    UBtoDF.SetNum(31);
+    URtoDF.SetNum(31);
+    MinDistPhase1.SetNum(31);
+    MinDistPhase2.SetNum(31);
+}
+
 FCubieCube::FCubieCube()
 {
     Cp = { 
@@ -847,8 +864,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
 
 int32 UCubeSolver::TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth)
 {
-    constexpr int32 MaxPhase2Moves = 10;
-    const int32 MaxDepthPhase2 = FMath::Min(MaxPhase2Moves, MaxDepth - DepthPhase1);
+    const int32 MaxDepthPhase2 = FMath::Min(10, MaxDepth - DepthPhase1);
     int32 DepthPhase2 = 1;
     int32 N = DepthPhase1;
     int32 Busy = 0;
