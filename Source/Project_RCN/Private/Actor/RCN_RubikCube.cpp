@@ -559,23 +559,8 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	
 	FString Command = TEXT("");
 
-	TMap<TCHAR, TCHAR> ReplacementInfo = {
-		{ Pattern[4], TEXT('U') },
-		{ Pattern[13], TEXT('R') },
-		{ Pattern[22], TEXT('F') },
-		{ Pattern[31], TEXT('D') },
-		{ Pattern[40], TEXT('L') },
-		{ Pattern[49], TEXT('B') }
-	};
-
-	FString Facelet = Pattern;
-	for (auto& FaceletChar : Facelet)
-	{
-		FaceletChar = ReplacementInfo[FaceletChar];
-	}
-
 	Command = UCubeSolver::SolveCube(
-		Facelet,
+		Pattern,
 		24,
 		1000,
 		"cache"

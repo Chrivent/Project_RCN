@@ -57,16 +57,34 @@ const TArray<TArray<EColorType>> UCubeSolver::EdgeColor = {
 FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
 {
     FSearch Search;
-    
-    TArray<int32> Count;
-    Count.SetNum(6);
 
     if (PRUNING_INITED == 0)
     {
         InitPruning(CacheDir);
     }
-    
-    for (const auto Facelet : Facelets)
+
+    if (Facelets.Len() != 54)
+    {
+        return FString("ERROR: Invalid facelet input");
+    }
+
+    FString CubeString = Facelets;
+    TMap<TCHAR, TCHAR> ReplacementInfo = {
+        { Facelets[4], TEXT('U') },
+        { Facelets[13], TEXT('R') },
+        { Facelets[22], TEXT('F') },
+        { Facelets[31], TEXT('D') },
+        { Facelets[40], TEXT('L') },
+        { Facelets[49], TEXT('B') }
+    };
+    for (auto& CubeStringChar : CubeString)
+    {
+        CubeStringChar = ReplacementInfo[CubeStringChar];
+    }
+
+    TArray<int32> Count;
+    Count.SetNum(6);
+    for (const auto Facelet : CubeString)
     {
         switch (Facelet)
         {
@@ -77,7 +95,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         case 'L': Count[4]++; break;
         case 'B': Count[5]++; break;
         default:
-            return FString("ERROR: Invalid facelet input");
+            return FString("ERROR: Unrecognized String");
         }
     }
     
@@ -86,7 +104,7 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         return FString("ERROR: Invalid cube state");
     }
     
-    FCubieCube Cc = ToCubieCube(Facelets);
+    FCubieCube Cc = ToCubieCube(CubeString);
     if (Cc.Verify())
     {
         return FString("ERROR: Unsolvable cube");
@@ -326,18 +344,18 @@ FString UCubeSolver::SolutionToString(const FSearch& Search, const int32 Length)
 
 FCubieCube UCubeSolver::ToCubieCube(const FString& CubeString)
 {
-    TArray<EColorType> Facelets;
-    Facelets.SetNum(54);
+    TArray<EColorType> Colors;
+    Colors.SetNum(54);
     for (int32 i = 0; i < 54; ++i)
     {
         switch (CubeString[i])
         {
-        case 'U': Facelets[i] = EColorType::U; break;
-        case 'R': Facelets[i] = EColorType::R; break;
-        case 'F': Facelets[i] = EColorType::F; break;
-        case 'D': Facelets[i] = EColorType::D; break;
-        case 'L': Facelets[i] = EColorType::L; break;
-        case 'B': Facelets[i] = EColorType::B; break;
+        case 'U': Colors[i] = EColorType::U; break;
+        case 'R': Colors[i] = EColorType::R; break;
+        case 'F': Colors[i] = EColorType::F; break;
+        case 'D': Colors[i] = EColorType::D; break;
+        case 'L': Colors[i] = EColorType::L; break;
+        case 'B': Colors[i] = EColorType::B; break;
         default:  break;
         }
     }
@@ -355,14 +373,14 @@ FCubieCube UCubeSolver::ToCubieCube(const FString& CubeString)
         int8 Orientation;
         for (Orientation = 0; Orientation < 3; Orientation++)
         {
-            if (Facelets[static_cast<int32>(CornerFacelet[i][Orientation])] == EColorType::U ||
-                Facelets[static_cast<int32>(CornerFacelet[i][Orientation])] == EColorType::D)
+            if (Colors[static_cast<int32>(CornerFacelet[i][Orientation])] == EColorType::U ||
+                Colors[static_cast<int32>(CornerFacelet[i][Orientation])] == EColorType::D)
             {
                 break;
             }
         }
-        const EColorType Color1 = Facelets[static_cast<int32>(CornerFacelet[i][(Orientation + 1) % 3])];
-        const EColorType Color2 = Facelets[static_cast<int32>(CornerFacelet[i][(Orientation + 2) % 3])];
+        const EColorType Color1 = Colors[static_cast<int32>(CornerFacelet[i][(Orientation + 1) % 3])];
+        const EColorType Color2 = Colors[static_cast<int32>(CornerFacelet[i][(Orientation + 2) % 3])];
         for (int32 j = 0; j < CORNER_COUNT; j++)
         {
             if (Color1 == CornerColor[j][1] && Color2 == CornerColor[j][2])
@@ -375,8 +393,8 @@ FCubieCube UCubeSolver::ToCubieCube(const FString& CubeString)
     }
     for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        const EColorType Color1 = Facelets[static_cast<int32>(EdgeFacelet[i][0])];
-        const EColorType Color2 = Facelets[static_cast<int32>(EdgeFacelet[i][1])];
+        const EColorType Color1 = Colors[static_cast<int32>(EdgeFacelet[i][0])];
+        const EColorType Color2 = Colors[static_cast<int32>(EdgeFacelet[i][1])];
         for (int32 j = 0; j < EDGE_COUNT; j++)
         {
             if (Color1 == EdgeColor[j][0] && Color2 == EdgeColor[j][1])

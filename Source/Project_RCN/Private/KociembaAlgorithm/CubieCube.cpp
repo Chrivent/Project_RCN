@@ -1,5 +1,7 @@
 #include "KociembaAlgorithm/CubieCube.h"
 
+#include "KociembaAlgorithm/CubeSolver.h"
+
 const TArray<FCubieCube> FCubieCube::MoveCube = []
 {
     TArray<FCubieCube> TempMoveCube;
@@ -89,36 +91,36 @@ void FCubieCube::Rotate(TArray<T>& Arr, const int32 L, const int32 R)
 
 void FCubieCube::CornerMultiply(const int32 MoveCubeIdx)
 {
-    TArray<ECornerType> cPerm;
-    TArray<int8> cOri;
-    cPerm.SetNum(CORNER_COUNT);
-    cOri.SetNum(CORNER_COUNT);
+    TArray<ECornerType> CornPerm;
+    TArray<int8> CornOri;
+    CornPerm.SetNum(CORNER_COUNT);
+    CornOri.SetNum(CORNER_COUNT);
     const FCubieCube& Move = MoveCube[MoveCubeIdx];
-    for (int32 corn = 0; corn < CORNER_COUNT; corn++)
+    for (int32 i = 0; i < CORNER_COUNT; i++)
     {
-        const int32 Idx = static_cast<int32>(Move.Cp[corn]);
-        cPerm[corn] = Cp[Idx];
-        cOri[corn] = (Co[Idx] + (Move.Co[corn] < 3 ? Move.Co[corn] : Move.Co[corn] - 3) + 3) % 3;
+        const int32 Idx = static_cast<int32>(Move.Cp[i]);
+        CornPerm[i] = Cp[Idx];
+        CornOri[i] = (Co[Idx] + (Move.Co[i] < 3 ? Move.Co[i] : Move.Co[i] - 3) + 3) % 3;
     }
-    Cp = cPerm;
-    Co = cOri;
+    Cp = CornPerm;
+    Co = CornOri;
 }
 
 void FCubieCube::EdgeMultiply(const int32 MoveCubeIdx)
 {
-    TArray<EEdgeType> ePerm;
-    TArray<int8> eOri;
-    ePerm.SetNum(EDGE_COUNT);
-    eOri.SetNum(EDGE_COUNT);
+    TArray<EEdgeType> EdgePerm;
+    TArray<int8> EdgeOri;
+    EdgePerm.SetNum(EDGE_COUNT);
+    EdgeOri.SetNum(EDGE_COUNT);
     const FCubieCube& Move = MoveCube[MoveCubeIdx];
-    for (int32 edge = 0; edge < EDGE_COUNT; edge++)
+    for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        const int32 Idx = static_cast<int32>(Move.Ep[edge]);
-        ePerm[edge] = Ep[Idx];
-        eOri[edge] = (Move.Eo[edge] + Eo[Idx]) % 2;
+        const int32 Idx = static_cast<int32>(Move.Ep[i]);
+        EdgePerm[i] = Ep[Idx];
+        EdgeOri[i] = (Move.Eo[i] + Eo[Idx]) % 2;
     }
-    Ep = ePerm;
-    Eo = eOri;
+    Ep = EdgePerm;
+    Eo = EdgeOri;
 }
 
 int16 FCubieCube::GetTwist()
@@ -200,64 +202,63 @@ int16 FCubieCube::EdgeParity()
 int16 FCubieCube::GetFRtoBR()
 {
     int16 a = 0, b = 0;
+    TArray<EEdgeType> Edge4;
+    Edge4.SetNum(4);
     int32 x = 0;
-    TArray<EEdgeType> edge4;
-    edge4.SetNum(4);
-    for (int32 j = EDGE_COUNT - 1; j >= 0; j--)
+    for (int32 i = EDGE_COUNT - 1; i >= 0; i--)
     {
-        if (EEdgeType::FR <= Ep[j] && Ep[j] <= EEdgeType::BR)
+        if (EEdgeType::FR <= Ep[i] && Ep[i] <= EEdgeType::BR)
         {
-            a += Cnk(11 - j, x + 1);
-            edge4[3 - x++] = Ep[j];
+            a += Cnk(11 - i, x + 1);
+            Edge4[3 - x++] = Ep[i];
         }
     }
-    for (int32 j = 3; j > 0; j--)
+    for (int32 i = 3; i > 0; i--)
     {
         int32 k = 0;
-        while (static_cast<int32>(edge4[j]) != j + 8)
+        while (static_cast<int32>(Edge4[i]) != i + 8)
         {
-            Rotate(edge4, 0, j);
+            Rotate(Edge4, 0, i);
             k++;
         }
-        b = (j + 1) * b + k;
+        b = (i + 1) * b + k;
     }
     return 24 * a + b;
 }
 
 void FCubieCube::SetFRtoBR(const int16 Idx)
 {
-    TArray sliceEdge = { EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
-    TArray otherEdge = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB };
-    int32 b = Idx % 24;
-    int32 a = Idx / 24;
-    for (int32 e = 0; e < EDGE_COUNT; e++)
+    int32 a = Idx / 24, b = Idx % 24;
+    TArray Edge4 = { EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
+    TArray OtherEdge = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF, EEdgeType::DL, EEdgeType::DB };
+    for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        Ep[e] = EEdgeType::DB;
+        Ep[i] = EEdgeType::DB;
     }
-    for (int32 j = 1; j < 4; j++)
+    for (int32 i = 1; i < 4; i++)
     {
-        int32 k = b % (j + 1);
-        b /= j + 1;
+        int32 k = b % (i + 1);
+        b /= i + 1;
         while (k-- > 0)
         {
-            Rotate(sliceEdge, j, 0);
+            Rotate(Edge4, i, 0);
         }
     }
     int32 x = 3;
-    for (int32 j = 0; j <= EDGE_COUNT - 1; j++)
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
     {
-        if (a - Cnk(11 - j, x + 1) >= 0)
+        if (a - Cnk(11 - i, x + 1) >= 0)
         {
-            Ep[j] = sliceEdge[3 - x];
-            a -= Cnk(11 - j, x-- + 1);
+            Ep[i] = Edge4[3 - x];
+            a -= Cnk(11 - i, x-- + 1);
         }
     }
     x = 0;
-    for (int32 j = 0; j <= EDGE_COUNT - 1; j++)
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
     {
-        if (Ep[j] == EEdgeType::DB)
+        if (Ep[i] == EEdgeType::DB)
         {
-            Ep[j] = otherEdge[x++];
+            Ep[i] = OtherEdge[x++];
         }
     }
 }
@@ -265,64 +266,63 @@ void FCubieCube::SetFRtoBR(const int16 Idx)
 int16 FCubieCube::GetURFtoDLF()
 {
     int16 a = 0, b = 0;
+    TArray<ECornerType> Corner6;
+    Corner6.SetNum(6);
     int32 x = 0;
-    TArray<ECornerType> corner6;
-    corner6.SetNum(6);
-    for (int32 j = 0; j <= CORNER_COUNT - 1; j++)
+    for (int32 i = 0; i <= CORNER_COUNT - 1; i++)
     {
-        if (Cp[j] <= ECornerType::DLF)
+        if (Cp[i] <= ECornerType::DLF)
         {
-            a += Cnk(j, x + 1);
-            corner6[x++] = Cp[j];
+            a += Cnk(i, x + 1);
+            Corner6[x++] = Cp[i];
         }
     }
-    for (int32 j = 5; j > 0; j--)
+    for (int32 i = 5; i > 0; i--)
     {
         int32 k = 0;
-        while (static_cast<int32>(corner6[j]) != j)
+        while (static_cast<int32>(Corner6[i]) != i)
         {
-            Rotate(corner6, 0, j);
+            Rotate(Corner6, 0, i);
             k++;
         }
-        b = (j + 1) * b + k;
+        b = (i + 1) * b + k;
     }
     return 720 * a + b;
 }
 
 void FCubieCube::SetURFtoDLF(const int16 Idx)
 {
-    TArray corner6 = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DFR, ECornerType::DLF };
-    TArray otherCorner = { ECornerType::DBL, ECornerType::DRB };
-    int32 b = Idx % 720;
-    int32 a = Idx / 720;
-    for (int32 c = 0; c < CORNER_COUNT; c++)
+    int32 a = Idx / 720, b = Idx % 720;
+    TArray Corner6 = { ECornerType::URF, ECornerType::UFL, ECornerType::ULB, ECornerType::UBR, ECornerType::DFR, ECornerType::DLF };
+    TArray OtherCorner = { ECornerType::DBL, ECornerType::DRB };
+    for (int32 i = 0; i < CORNER_COUNT; i++)
     {
-        Cp[c] = ECornerType::DRB;
+        Cp[i] = ECornerType::DRB;
     }
-    for (int32 j = 1; j < 6; j++)
+    for (int32 i = 1; i < 6; i++)
     {
-        int32 k = b % (j + 1);
-        b /= j + 1;
+        int32 k = b % (i + 1);
+        b /= i + 1;
         while (k-- > 0)
         {
-            Rotate(corner6, j, 0);
+            Rotate(Corner6, i, 0);
         }
     }
     int32 x = 5;
-    for (int32 j = CORNER_COUNT - 1; j >= 0; j--)
+    for (int32 i = CORNER_COUNT - 1; i >= 0; i--)
     {
-        if (a - Cnk(j, x + 1) >= 0)
+        if (a - Cnk(i, x + 1) >= 0)
         {
-            Cp[j] = corner6[x];
-            a -= Cnk(j, x-- + 1);
+            Cp[i] = Corner6[x];
+            a -= Cnk(i, x-- + 1);
         }
     }
     x = 0;
-    for (int32 j = 0; j <= CORNER_COUNT - 1; j++)
+    for (int32 i = 0; i <= CORNER_COUNT - 1; i++)
     {
-        if (Cp[j] == ECornerType::DRB)
+        if (Cp[i] == ECornerType::DRB)
         {
-            Cp[j] = otherCorner[x++];
+            Cp[i] = OtherCorner[x++];
         }
     }
 }
@@ -330,64 +330,63 @@ void FCubieCube::SetURFtoDLF(const int16 Idx)
 int32 FCubieCube::GetURtoDF()
 {
     int16 a = 0, b = 0;
+    TArray<EEdgeType> Edge6;
+    Edge6.SetNum(6);
     int32 x = 0;
-    TArray<EEdgeType> edge6;
-    edge6.SetNum(6);
-    for (int32 j = 0; j <= EDGE_COUNT - 1; j++)
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
     {
-        if (Ep[j] <= EEdgeType::DF)
+        if (Ep[i] <= EEdgeType::DF)
         {
-            a += Cnk(j, x + 1);
-            edge6[x++] = Ep[j];
+            a += Cnk(i, x + 1);
+            Edge6[x++] = Ep[i];
         }
     }
-    for (int32 j = 5; j > 0; j--)
+    for (int32 i = 5; i > 0; i--)
     {
         int32 k = 0;
-        while (static_cast<int32>(edge6[j]) != j)
+        while (static_cast<int32>(Edge6[i]) != i)
         {
-            Rotate(edge6, 0, j);
+            Rotate(Edge6, 0, i);
             k++;
         }
-        b = (j + 1) * b + k;
+        b = (i + 1) * b + k;
     }
     return 720 * a + b;
 }
 
 void FCubieCube::SetURtoDF(const int32 Idx)
 {
-    TArray edge6 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
-    TArray otherEdge = { EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
-    int32 b = Idx % 720;
-    int32 a = Idx / 720;
-    for (int32 e = 0; e < EDGE_COUNT; e++)
+    int32 a = Idx / 720, b = Idx % 720;
+    TArray Edge6 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL, EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
+    TArray OtherEdge = { EEdgeType::DL, EEdgeType::DB, EEdgeType::FR, EEdgeType::FL, EEdgeType::BL, EEdgeType::BR };
+    for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        Ep[e] = EEdgeType::BR;
+        Ep[i] = EEdgeType::BR;
     }
-    for (int32 j = 1; j < 6; j++)
+    for (int32 i = 1; i < 6; i++)
     {
-        int32 k = b % (j + 1);
-        b /= j + 1;
+        int32 k = b % (i + 1);
+        b /= i + 1;
         while (k-- > 0)
         {
-            Rotate(edge6, j, 0);
+            Rotate(Edge6, i, 0);
         }
     }
     int32 x = 5;
-    for (int32 j = EDGE_COUNT - 1; j >= 0; j--)
+    for (int32 i = EDGE_COUNT - 1; i >= 0; i--)
     {
-        if (a - Cnk(j, x + 1) >= 0)
+        if (a - Cnk(i, x + 1) >= 0)
         {
-            Ep[j] = edge6[x];
-            a -= Cnk(j, x-- + 1);
+            Ep[i] = Edge6[x];
+            a -= Cnk(i, x-- + 1);
         }
     }
     x = 0;
-    for (int32 j = 0; j <= EDGE_COUNT - 1; j++)
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
     {
-        if (Ep[j] == EEdgeType::BR)
+        if (Ep[i] == EEdgeType::BR)
         {
-            Ep[j] = otherEdge[x++];
+            Ep[i] = OtherEdge[x++];
         }
     }
 }
@@ -395,55 +394,54 @@ void FCubieCube::SetURtoDF(const int32 Idx)
 int16 FCubieCube::GetURtoUL()
 {
     int16 a = 0, b = 0;
+    TArray<EEdgeType> Edge3;
+    Edge3.SetNum(3);
     int32 x = 0;
-    TArray<EEdgeType> edge3;
-    edge3.SetNum(3);
-    for (int32 j = 0; j <= EDGE_COUNT - 1; j++)
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
     {
-        if (Ep[j] <= EEdgeType::UL)
+        if (Ep[i] <= EEdgeType::UL)
         {
-            a += Cnk(j, x + 1);
-            edge3[x++] = Ep[j];
+            a += Cnk(i, x + 1);
+            Edge3[x++] = Ep[i];
         }
     }
-    for (int32 j = 2; j > 0; j--)
+    for (int32 i = 2; i > 0; i--)
     {
         int32 k = 0;
-        while (static_cast<int32>(edge3[j]) != j)
+        while (static_cast<int32>(Edge3[i]) != i)
         {
-            Rotate(edge3, 0, j);
+            Rotate(Edge3, 0, i);
             k++;
         }
-        b = (j + 1) * b + k;
+        b = (i + 1) * b + k;
     }
     return 6 * a + b;
 }
 
 void FCubieCube::SetURtoUL(const int16 Idx)
 {
-    TArray edge3 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL };
-    int32 b = Idx % 6;
-    int32 a = Idx / 6;
-    for(int32 e = 0; e < EDGE_COUNT; e++)
+    int32 a = Idx / 6, b = Idx % 6;
+    TArray Edge3 = { EEdgeType::UR, EEdgeType::UF, EEdgeType::UL };
+    for(int32 i = 0; i < EDGE_COUNT; i++)
     {
-        Ep[e] = EEdgeType::BR;
+        Ep[i] = EEdgeType::BR;
     }
-    for (int32 j = 1; j < 3; j++)
+    for (int32 i = 1; i < 3; i++)
     {
-        int32 k = b % (j + 1);
-        b /= j + 1;
+        int32 k = b % (i + 1);
+        b /= i + 1;
         while (k-- > 0)
         {
-            Rotate(edge3, j, 0);
+            Rotate(Edge3, i, 0);
         }
     }
     int32 x = 2;
-    for (int32 j = EDGE_COUNT - 1; j >= 0; j--)
+    for (int32 i = EDGE_COUNT - 1; i >= 0; i--)
     {
-        if (a - Cnk(j, x + 1) >= 0)
+        if (a - Cnk(i, x + 1) >= 0)
         {
-            Ep[j] = edge3[x];
-            a -= Cnk(j, x-- + 1);
+            Ep[i] = Edge3[x];
+            a -= Cnk(i, x-- + 1);
         }
     }
 }
@@ -451,102 +449,101 @@ void FCubieCube::SetURtoUL(const int16 Idx)
 int16 FCubieCube::GetUBtoDF()
 {
     int16 a = 0, b = 0;
+    TArray<EEdgeType> Edge3;
+    Edge3.SetNum(3);
     int32 x = 0;
-    TArray<EEdgeType> edge3;
-    edge3.SetNum(3);
-    for (int32 j = 0; j <= EDGE_COUNT - 1; j++)
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
     {
-        if (EEdgeType::UB <= Ep[j] && Ep[j] <= EEdgeType::DF)
+        if (EEdgeType::UB <= Ep[i] && Ep[i] <= EEdgeType::DF)
         {
-            a += Cnk(j, x + 1);
-            edge3[x++] = Ep[j];
+            a += Cnk(i, x + 1);
+            Edge3[x++] = Ep[i];
         }
     }
-    for (int32 j = 2; j > 0; j--)
+    for (int32 i = 2; i > 0; i--)
     {
         int32 k = 0;
-        while (static_cast<int32>(edge3[j]) != 3 + j)
+        while (static_cast<int32>(Edge3[i]) != 3 + i)
         {
-            Rotate(edge3, 0, j);
+            Rotate(Edge3, 0, i);
             k++;
         }
-        b = (j + 1) * b + k;
+        b = (i + 1) * b + k;
     }
     return 6 * a + b;
 }
 
 void FCubieCube::SetUBtoDF(const int16 Idx)
 {
-    TArray edge3 = { EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
-    int32 b = Idx % 6;
-    int32 a = Idx / 6;
-    for (int32 e = 0; e < EDGE_COUNT; e++)
+    int32 a = Idx / 6, b = Idx % 6;
+    TArray Edge3 = { EEdgeType::UB, EEdgeType::DR, EEdgeType::DF };
+    for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        Ep[e] = EEdgeType::BR;
+        Ep[i] = EEdgeType::BR;
     }
-    for (int32 j = 1; j < 3; j++)
+    for (int32 i = 1; i < 3; i++)
     {
-        int32 k = b % (j + 1);
-        b /= j + 1;
+        int32 k = b % (i + 1);
+        b /= i + 1;
         while (k-- > 0)
         {
-            Rotate(edge3, j, 0);
+            Rotate(Edge3, i, 0);
         }
     }
     int32 x = 2;
-    for (int32 j = EDGE_COUNT - 1; j >= 0; j--)
+    for (int32 i = EDGE_COUNT - 1; i >= 0; i--)
     {
-        if (a - Cnk(j, x + 1) >= 0)
+        if (a - Cnk(i, x + 1) >= 0)
         {
-            Ep[j] = edge3[x];
-            a -= Cnk(j, x-- + 1);
+            Ep[i] = Edge3[x];
+            a -= Cnk(i, x-- + 1);
         }
     }
 }
 
 int32 FCubieCube::Verify()
 {
-    TArray<int32> edgeCount;
-    TArray<int32> cornerCount;
-    edgeCount.SetNum(EDGE_COUNT);
-    cornerCount.SetNum(CORNER_COUNT);
-    for(int32 e = 0; e < EDGE_COUNT; e++)
+    TArray<int32> EdgeCount;
+    TArray<int32> CornerCount;
+    EdgeCount.SetNum(EDGE_COUNT);
+    CornerCount.SetNum(CORNER_COUNT);
+    for(int32 i = 0; i < EDGE_COUNT; i++)
     {
-        edgeCount[static_cast<int32>(Ep[e])]++;
+        EdgeCount[static_cast<int32>(Ep[i])]++;
     }
-    for (int32 i = 0; i < 12; i++)
+    for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        if (edgeCount[i] != 1)
+        if (EdgeCount[i] != 1)
         {
             return -2;
         }
     }
-    int32 sum = 0;
-    for (int32 i = 0; i < 12; i++)
+    int32 Sum = 0;
+    for (int32 i = 0; i < EDGE_COUNT; i++)
     {
-        sum += Eo[i];
+        Sum += Eo[i];
     }
-    if (sum % 2 != 0)
+    if (Sum % 2 != 0)
     {
         return -3;
     }
-    for (int32 c = 0; c < CORNER_COUNT; c++)
+    for (int32 i = 0; i < CORNER_COUNT; i++)
     {
-        cornerCount[static_cast<int32>(Cp[c])]++;
+        CornerCount[static_cast<int32>(Cp[i])]++;
     }
     for (int32 i = 0; i < 8; i++)
     {
-        if (cornerCount[i] != 1)
+        if (CornerCount[i] != 1)
         {
             return -4;
         }
     }
-    sum = 0;
-    for (int32 i = 0; i < 8; i++)
+    Sum = 0;
+    for (int32 i = 0; i < CORNER_COUNT; i++)
     {
-        sum += Co[i];
+        Sum += Co[i];
     }
-    if (sum % 3 != 0)
+    if (Sum % 3 != 0)
     {
         return -5;
     }

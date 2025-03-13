@@ -2,38 +2,8 @@
 
 #include "CubieCube.generated.h"
 
-#define CORNER_COUNT 8
-#define EDGE_COUNT 12
-
-UENUM(BlueprintType)
-enum class ECornerType : uint8
-{
-    URF,
-    UFL,
-    ULB,
-    UBR,
-    DFR,
-    DLF,
-    DBL,
-    DRB
-};
-
-UENUM(BlueprintType)
-enum class EEdgeType : uint8
-{
-    UR,
-    UF,
-    UL,
-    UB,
-    DR,
-    DF,
-    DL,
-    DB,
-    FR,
-    FL,
-    BL,
-    BR
-};
+enum class EEdgeType : uint8;
+enum class ECornerType : uint8;
 
 USTRUCT(BlueprintType)
 struct FCubieCube

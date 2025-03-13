@@ -4,6 +4,9 @@
 #include "CubieCube.h"
 #include "CubeSolver.generated.h"
 
+#define CORNER_COUNT 8
+#define EDGE_COUNT 12
+
 USTRUCT(BlueprintType)
 struct FSearch
 {
@@ -44,6 +47,36 @@ enum class EColorType : uint8
     D,
     L,
     B
+};
+
+UENUM(BlueprintType)
+enum class ECornerType : uint8
+{
+    URF,
+    UFL,
+    ULB,
+    UBR,
+    DFR,
+    DLF,
+    DBL,
+    DRB
+};
+
+UENUM(BlueprintType)
+enum class EEdgeType : uint8
+{
+    UR,
+    UF,
+    UL,
+    UB,
+    DR,
+    DF,
+    DL,
+    DB,
+    FR,
+    FL,
+    BL,
+    BR
 };
 
 /**
