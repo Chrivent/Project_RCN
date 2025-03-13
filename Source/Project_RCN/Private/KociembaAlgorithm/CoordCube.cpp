@@ -50,7 +50,7 @@ void ComputeMoveTable(const FString& TableName, T (&MoveTable)[Row][Col],
 }
 
 template <size_t Size, typename MoveTable1, typename MoveTable2>
-void ComputePruningTable(const FString& TableName, int8 (&PruningTable)[Size], 
+void ComputeParityPruningTable(const FString& TableName, int8 (&PruningTable)[Size], 
                          MoveTable1& MoveTableA, MoveTable2& MoveTableB, 
                          const int16 (&ParityMove)[2][18], const FString& CacheDir)
 {
@@ -89,6 +89,47 @@ void ComputePruningTable(const FString& TableName, int8 (&PruningTable)[Size],
                                 SetPruning(PruningTable, newIndex, depth + 1);
                                 done++;
                             }
+                        }
+                    }
+                }
+            }
+            depth++;
+        }
+        DumpToFile(PruningTable, sizeof(PruningTable), TableName, CacheDir);
+    }
+}
+
+template <size_t Size, size_t N_State, typename MoveTable>
+void ComputeSlicePruningTable(const FString& TableName, int8 (&PruningTable)[Size], 
+                              MoveTable& MoveData, const int16 (&MoveTableA)[N_State][N_MOVE], 
+                              const FString& CacheDir)
+{
+    if (CheckCachedTable(TableName, PruningTable, sizeof(PruningTable), CacheDir))
+    {
+        int32 depth = 0, done = 1;
+        FMemory::Memset(PruningTable, -1, Size); // 전체 -1로 초기화
+
+        SetPruning(PruningTable, 0, 0);
+
+        while (done != N_SLICE1 * N_State)
+        {
+            for (int32 i = 0; i < N_SLICE1 * N_State; i++)
+            {
+                int32 state = i / N_SLICE1;
+                int32 slice = i % N_SLICE1;
+
+                if (GetPruning(PruningTable, i) == depth)
+                {
+                    for (int32 j = 0; j < 18; j++)
+                    {
+                        int32 newSlice = MoveData[slice * 24][j] / 24;
+                        int32 newState = MoveTableA[state][j];
+
+                        int32 newIndex = N_SLICE1 * newState + newSlice;
+                        if (GetPruning(PruningTable, newIndex) == 0x0f)
+                        {
+                            SetPruning(PruningTable, newIndex, depth + 1);
+                            done++;
                         }
                     }
                 }
@@ -144,75 +185,17 @@ void InitPruning(const FString& CacheDir)
         DumpToFile(MergeURtoULandUBtoDF, sizeof(MergeURtoULandUBtoDF), "MergeURtoULandUBtoDF", CacheDir);
     }
 
-    ComputePruningTable("Slice_URFtoDLF_Parity_Prun", Slice_URFtoDLF_Parity_Pruning,
+    ComputeParityPruningTable("Slice_URFtoDLF_Parity_Prun", Slice_URFtoDLF_Parity_Pruning,
                        FRtoBR_Move, URFtoDLF_Move, ParityMove, CacheDir);
 
-    ComputePruningTable("Slice_URtoDF_Parity_Prun", Slice_URtoDF_Parity_Pruning,
+    ComputeParityPruningTable("Slice_URtoDF_Parity_Prun", Slice_URtoDF_Parity_Pruning,
                         FRtoBR_Move, URtoDF_Move, ParityMove, CacheDir);
 
-    if (CheckCachedTable("Slice_Twist_Prun", Slice_Twist_Pruning, sizeof(Slice_Twist_Pruning), CacheDir))
-    {
-        int32 depth = 0, done = 1;
-        for (int32 i = 0; i < N_SLICE1 * N_TWIST / 2 + 1; i++)
-        {
-            Slice_Twist_Pruning[i] = -1;
-        }
-        SetPruning(Slice_Twist_Pruning, 0, 0);
-        while (done != N_SLICE1 * N_TWIST)
-        {
-            for (int32 i = 0; i < N_SLICE1 * N_TWIST; i++)
-            {
-                int32 twist = i / N_SLICE1, slice = i % N_SLICE1;
-                if (GetPruning(Slice_Twist_Pruning, i) == depth)
-                {
-                    for (int32 j = 0; j < 18; j++)
-                    {
-                        int32 newSlice = FRtoBR_Move[slice * 24][j] / 24;
-                        int32 newTwist = TwistMove[twist][j];
-                        if (GetPruning(Slice_Twist_Pruning, N_SLICE1 * newTwist + newSlice) == 0x0f)
-                        {
-                            SetPruning(Slice_Twist_Pruning, N_SLICE1 * newTwist + newSlice, depth + 1);
-                            done++;
-                        }
-                    }
-                }
-            }
-            depth++;
-        }
-        DumpToFile(Slice_Twist_Pruning, sizeof(Slice_Twist_Pruning), "Slice_Twist_Prun", CacheDir);
-    }
+    ComputeSlicePruningTable<N_SLICE1 * N_TWIST / 2 + 1, N_TWIST>(
+    "Slice_Twist_Prun", Slice_Twist_Pruning, FRtoBR_Move, TwistMove, CacheDir);
 
-    if (CheckCachedTable("Slice_Flip_Prun", Slice_Flip_Pruning, sizeof(Slice_Flip_Pruning), CacheDir) != 0)
-    {
-        int32 depth = 0, done = 1;
-        for (int32 i = 0; i < N_SLICE1 * N_FLIP / 2; i++)
-        {
-            Slice_Flip_Pruning[i] = -1;
-        }
-        SetPruning(Slice_Flip_Pruning, 0, 0);
-        while (done != N_SLICE1 * N_FLIP)
-        {
-            for (int32 i = 0; i < N_SLICE1 * N_FLIP; i++)
-            {
-                int32 flip = i / N_SLICE1, slice = i % N_SLICE1;
-                if (GetPruning(Slice_Flip_Pruning, i) == depth)
-                {
-                    for (int32 j = 0; j < 18; j++)
-                    {
-                        int32 newSlice = FRtoBR_Move[slice * 24][j] / 24;
-                        int32 newFlip = FlipMove[flip][j];
-                        if (GetPruning(Slice_Flip_Pruning, N_SLICE1 * newFlip + newSlice) == 0x0f)
-                        {
-                            SetPruning(Slice_Flip_Pruning, N_SLICE1 * newFlip + newSlice, depth + 1);
-                            done++;
-                        }
-                    }
-                }
-            }
-            depth++;
-        }
-        DumpToFile(Slice_Flip_Pruning, sizeof(Slice_Flip_Pruning), "Slice_Flip_Prun", CacheDir);
-    }
+    ComputeSlicePruningTable<N_SLICE1 * N_FLIP / 2, N_FLIP>(
+    "Slice_Flip_Prun", Slice_Flip_Pruning, FRtoBR_Move, FlipMove, CacheDir);
 
     PRUNING_INITED = 1;
 }
