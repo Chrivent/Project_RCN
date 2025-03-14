@@ -257,18 +257,6 @@ int16 FCubieCube::GetTwist()
     return Twist;
 }
 
-void FCubieCube::SetTwist(int16 Twist)
-{
-    int32 TempTwist = 0;
-    for (int32 i = CORNER_COUNT - 2; i >= 0; i--)
-    {
-        Co[i] = Twist % 3;
-        TempTwist += Co[i];
-        Twist /= 3;
-    }
-    Co[CORNER_COUNT - 1] = (3 - TempTwist % 3) % 3;
-}
-
 int16 FCubieCube::GetFlip()
 {
     int16 Flip = 0;
@@ -277,18 +265,6 @@ int16 FCubieCube::GetFlip()
         Flip = Flip * 2 + Eo[i];
     }
     return Flip;
-}
-
-void FCubieCube::SetFlip(int16 Flip)
-{
-    int32 TempFlip = 0;
-    for (int32 i = EDGE_COUNT - 2; i >= 0; i--)
-    {
-        Eo[i] = Flip % 2;
-        TempFlip += Eo[i];
-        Flip /= 2;
-    }
-    Eo[EDGE_COUNT - 1] = (2 - TempFlip % 2) % 2;
 }
 
 int16 FCubieCube::GetFRtoBR()
@@ -316,6 +292,158 @@ int16 FCubieCube::GetFRtoBR()
         b = (i + 1) * b + k;
     }
     return 24 * a + b;
+}
+
+int16 FCubieCube::GetURFtoDLF()
+{
+    int16 a = 0, b = 0;
+    TArray<ECornerType> Corner6;
+    Corner6.SetNum(6);
+    int32 x = 0;
+    for (int32 i = 0; i <= CORNER_COUNT - 1; i++)
+    {
+        if (Cp[i] <= ECornerType::DLF)
+        {
+            a += Cnk(i, x + 1);
+            Corner6[x++] = Cp[i];
+        }
+    }
+    for (int32 i = 5; i > 0; i--)
+    {
+        int32 k = 0;
+        while (static_cast<int32>(Corner6[i]) != i)
+        {
+            Rotate(Corner6, 0, i);
+            k++;
+        }
+        b = (i + 1) * b + k;
+    }
+    return 720 * a + b;
+}
+
+int32 FCubieCube::GetURtoDF()
+{
+    int16 a = 0, b = 0;
+    TArray<EEdgeType> Edge6;
+    Edge6.SetNum(6);
+    int32 x = 0;
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
+    {
+        if (Ep[i] <= EEdgeType::DF)
+        {
+            a += Cnk(i, x + 1);
+            Edge6[x++] = Ep[i];
+        }
+    }
+    for (int32 i = 5; i > 0; i--)
+    {
+        int32 k = 0;
+        while (static_cast<int32>(Edge6[i]) != i)
+        {
+            Rotate(Edge6, 0, i);
+            k++;
+        }
+        b = (i + 1) * b + k;
+    }
+    return 720 * a + b;
+}
+
+int16 FCubieCube::GetURtoUL()
+{
+    int16 a = 0, b = 0;
+    TArray<EEdgeType> Edge3;
+    Edge3.SetNum(3);
+    int32 x = 0;
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
+    {
+        if (Ep[i] <= EEdgeType::UL)
+        {
+            a += Cnk(i, x + 1);
+            Edge3[x++] = Ep[i];
+        }
+    }
+    for (int32 i = 2; i > 0; i--)
+    {
+        int32 k = 0;
+        while (static_cast<int32>(Edge3[i]) != i)
+        {
+            Rotate(Edge3, 0, i);
+            k++;
+        }
+        b = (i + 1) * b + k;
+    }
+    return 6 * a + b;
+}
+
+int16 FCubieCube::GetUBtoDF()
+{
+    int16 a = 0, b = 0;
+    TArray<EEdgeType> Edge3;
+    Edge3.SetNum(3);
+    int32 x = 0;
+    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
+    {
+        if (EEdgeType::UB <= Ep[i] && Ep[i] <= EEdgeType::DF)
+        {
+            a += Cnk(i, x + 1);
+            Edge3[x++] = Ep[i];
+        }
+    }
+    for (int32 i = 2; i > 0; i--)
+    {
+        int32 k = 0;
+        while (static_cast<int32>(Edge3[i]) != 3 + i)
+        {
+            Rotate(Edge3, 0, i);
+            k++;
+        }
+        b = (i + 1) * b + k;
+    }
+    return 6 * a + b;
+}
+
+int32 FCubieCube::GetURtoDF_Standalone(const int16 Idx1, const int16 Idx2)
+{
+    FCubieCube a;
+    FCubieCube b;
+    a.SetURtoUL(Idx1);
+    b.SetUBtoDF(Idx2);
+    for (int32 i = 0; i < 8; i++)
+    {
+        if (a.Ep[i] != EEdgeType::BR)
+        {
+            if (b.Ep[i] != EEdgeType::BR)
+            {
+                return -1;
+            }
+            b.Ep[i] = a.Ep[i];
+        }
+    }
+    return b.GetURtoDF();
+}
+
+void FCubieCube::SetTwist(int16 Twist)
+{
+    int32 TempTwist = 0;
+    for (int32 i = CORNER_COUNT - 2; i >= 0; i--)
+    {
+        Co[i] = Twist % 3;
+        TempTwist += Co[i];
+        Twist /= 3;
+    }
+    Co[CORNER_COUNT - 1] = (3 - TempTwist % 3) % 3;
+}
+
+void FCubieCube::SetFlip(int16 Flip)
+{
+    int32 TempFlip = 0;
+    for (int32 i = EDGE_COUNT - 2; i >= 0; i--)
+    {
+        Eo[i] = Flip % 2;
+        TempFlip += Eo[i];
+        Flip /= 2;
+    }
+    Eo[EDGE_COUNT - 1] = (2 - TempFlip % 2) % 2;
 }
 
 void FCubieCube::SetFRtoBR(const int16 Idx)
@@ -355,33 +483,6 @@ void FCubieCube::SetFRtoBR(const int16 Idx)
     }
 }
 
-int16 FCubieCube::GetURFtoDLF()
-{
-    int16 a = 0, b = 0;
-    TArray<ECornerType> Corner6;
-    Corner6.SetNum(6);
-    int32 x = 0;
-    for (int32 i = 0; i <= CORNER_COUNT - 1; i++)
-    {
-        if (Cp[i] <= ECornerType::DLF)
-        {
-            a += Cnk(i, x + 1);
-            Corner6[x++] = Cp[i];
-        }
-    }
-    for (int32 i = 5; i > 0; i--)
-    {
-        int32 k = 0;
-        while (static_cast<int32>(Corner6[i]) != i)
-        {
-            Rotate(Corner6, 0, i);
-            k++;
-        }
-        b = (i + 1) * b + k;
-    }
-    return 720 * a + b;
-}
-
 void FCubieCube::SetURFtoDLF(const int16 Idx)
 {
     int32 a = Idx / 720, b = Idx % 720;
@@ -417,33 +518,6 @@ void FCubieCube::SetURFtoDLF(const int16 Idx)
             Cp[i] = OtherCorner[x++];
         }
     }
-}
-
-int32 FCubieCube::GetURtoDF()
-{
-    int16 a = 0, b = 0;
-    TArray<EEdgeType> Edge6;
-    Edge6.SetNum(6);
-    int32 x = 0;
-    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
-    {
-        if (Ep[i] <= EEdgeType::DF)
-        {
-            a += Cnk(i, x + 1);
-            Edge6[x++] = Ep[i];
-        }
-    }
-    for (int32 i = 5; i > 0; i--)
-    {
-        int32 k = 0;
-        while (static_cast<int32>(Edge6[i]) != i)
-        {
-            Rotate(Edge6, 0, i);
-            k++;
-        }
-        b = (i + 1) * b + k;
-    }
-    return 720 * a + b;
 }
 
 void FCubieCube::SetURtoDF(const int32 Idx)
@@ -483,33 +557,6 @@ void FCubieCube::SetURtoDF(const int32 Idx)
     }
 }
 
-int16 FCubieCube::GetURtoUL()
-{
-    int16 a = 0, b = 0;
-    TArray<EEdgeType> Edge3;
-    Edge3.SetNum(3);
-    int32 x = 0;
-    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
-    {
-        if (Ep[i] <= EEdgeType::UL)
-        {
-            a += Cnk(i, x + 1);
-            Edge3[x++] = Ep[i];
-        }
-    }
-    for (int32 i = 2; i > 0; i--)
-    {
-        int32 k = 0;
-        while (static_cast<int32>(Edge3[i]) != i)
-        {
-            Rotate(Edge3, 0, i);
-            k++;
-        }
-        b = (i + 1) * b + k;
-    }
-    return 6 * a + b;
-}
-
 void FCubieCube::SetURtoUL(const int16 Idx)
 {
     int32 a = Idx / 6, b = Idx % 6;
@@ -538,33 +585,6 @@ void FCubieCube::SetURtoUL(const int16 Idx)
     }
 }
 
-int16 FCubieCube::GetUBtoDF()
-{
-    int16 a = 0, b = 0;
-    TArray<EEdgeType> Edge3;
-    Edge3.SetNum(3);
-    int32 x = 0;
-    for (int32 i = 0; i <= EDGE_COUNT - 1; i++)
-    {
-        if (EEdgeType::UB <= Ep[i] && Ep[i] <= EEdgeType::DF)
-        {
-            a += Cnk(i, x + 1);
-            Edge3[x++] = Ep[i];
-        }
-    }
-    for (int32 i = 2; i > 0; i--)
-    {
-        int32 k = 0;
-        while (static_cast<int32>(Edge3[i]) != 3 + i)
-        {
-            Rotate(Edge3, 0, i);
-            k++;
-        }
-        b = (i + 1) * b + k;
-    }
-    return 6 * a + b;
-}
-
 void FCubieCube::SetUBtoDF(const int16 Idx)
 {
     int32 a = Idx / 6, b = Idx % 6;
@@ -591,26 +611,6 @@ void FCubieCube::SetUBtoDF(const int16 Idx)
             a -= Cnk(i, x-- + 1);
         }
     }
-}
-
-int32 FCubieCube::GetURtoDF_Standalone(const int16 Idx1, const int16 Idx2)
-{
-    FCubieCube a;
-    FCubieCube b;
-    a.SetURtoUL(Idx1);
-    b.SetUBtoDF(Idx2);
-    for (int32 i = 0; i < 8; i++)
-    {
-        if (a.Ep[i] != EEdgeType::BR)
-        {
-            if (b.Ep[i] != EEdgeType::BR)
-            {
-                return -1;
-            }
-            b.Ep[i] = a.Ep[i];
-        }
-    }
-    return b.GetURtoDF();
 }
 
 int32 FCubieCube::Verify()
