@@ -18,5 +18,4 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           # optional
           LANGUAGE: Korean
-          PROMPT:
-          IGNORE_PATTERNS: /node_modules,*.md # Regex pattern to ignore files, separated by comma
+          MODEL: gpt-4o
