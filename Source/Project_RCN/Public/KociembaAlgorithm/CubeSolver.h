@@ -87,6 +87,8 @@ struct FCubieCube
 
     FCubieCube();
     explicit FCubieCube(const FString& CubeString);
+
+    void InitalizeSearch(FSearch& Search);
     
     void CornerMultiply(const int32 MoveCubeIdx);
     void EdgeMultiply(const int32 MoveCubeIdx);
@@ -95,8 +97,7 @@ struct FCubieCube
     void SetTwist(int16 Twist);
     int16 GetFlip();
     void SetFlip(int16 Flip);
-    int16 CornerParity();
-    int16 EdgeParity();
+    
     int16 GetFRtoBR();
     void SetFRtoBR(const int16 Idx);
     int16 GetURFtoDLF();
@@ -118,6 +119,9 @@ protected:
 
     template <typename T>
     void Rotate(TArray<T>& Arr, const int32 L, const int32 R);
+    
+    int16 CornerParity();
+    int16 EdgeParity();
 
     static const TArray<TArray<EFaceletType>> CornerFacelet;
     static const TArray<TArray<EFaceletType>> EdgeFacelet;

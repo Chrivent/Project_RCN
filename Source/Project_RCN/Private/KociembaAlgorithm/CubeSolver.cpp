@@ -198,6 +198,21 @@ FCubieCube::FCubieCube(const FString& CubeString)
     }
 }
 
+void FCubieCube::InitalizeSearch(FSearch& Search)
+{
+    Search.Po[0] = 0;
+    Search.Ax[0] = 0;
+    Search.Flip[0] = GetFlip();
+    Search.Twist[0] = GetTwist();
+    Search.Parity[0] = CornerParity();
+    Search.Slice[0] = GetFRtoBR() / 24;
+    Search.URFtoDLF[0] = GetURFtoDLF();
+    Search.FRtoBR[0] = GetFRtoBR();
+    Search.URtoUL[0] = GetURtoUL();
+    Search.UBtoDF[0] = GetUBtoDF();
+    Search.MinDistPhase1[1] = 1;
+}
+
 void FCubieCube::CornerMultiply(const int32 MoveCubeIdx)
 {
     TArray<ECornerType> CornPerm;
@@ -274,38 +289,6 @@ void FCubieCube::SetFlip(int16 Flip)
         Flip /= 2;
     }
     Eo[EDGE_COUNT - 1] = (2 - TempFlip % 2) % 2;
-}
-
-int16 FCubieCube::CornerParity()
-{
-    int16 s = 0;
-    for (int32 i = CORNER_COUNT - 1; i >= 1; i--)
-    {
-        for (int32 j = i - 1; j >= 0; j--)
-        {
-            if (Cp[j] > Cp[i])
-            {
-                s++;
-            }
-        }
-    }
-    return s % 2;
-}
-
-int16 FCubieCube::EdgeParity()
-{
-    int16 s = 0;
-    for (int32 i = EDGE_COUNT - 1; i >= 1; i--)
-    {
-        for (int32 j = i - 1; j >= 0; j--)
-        {
-            if (Ep[j] > Ep[i])
-            {
-                s++;
-            }
-        }
-    }
-    return s % 2;
 }
 
 int16 FCubieCube::GetFRtoBR()
@@ -709,6 +692,38 @@ void FCubieCube::Rotate(TArray<T>& Arr, const int32 L, const int32 R)
     Arr.Insert(Temp, R);
 }
 
+int16 FCubieCube::CornerParity()
+{
+    int16 s = 0;
+    for (int32 i = CORNER_COUNT - 1; i >= 1; i--)
+    {
+        for (int32 j = i - 1; j >= 0; j--)
+        {
+            if (Cp[j] > Cp[i])
+            {
+                s++;
+            }
+        }
+    }
+    return s % 2;
+}
+
+int16 FCubieCube::EdgeParity()
+{
+    int16 s = 0;
+    for (int32 i = EDGE_COUNT - 1; i >= 1; i--)
+    {
+        for (int32 j = i - 1; j >= 0; j--)
+        {
+            if (Ep[j] > Ep[i])
+            {
+                s++;
+            }
+        }
+    }
+    return s % 2;
+}
+
 FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
 {
     FSearch Search;
@@ -764,19 +779,8 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
     {
         return FString("ERROR: Unsolvable cube");
     }
-
-    Search.Po[0] = 0;
-    Search.Ax[0] = 0;
-    Search.Flip[0] = Cc.GetFlip();
-    Search.Twist[0] = Cc.GetTwist();
-    Search.Parity[0] = Cc.CornerParity();
-    Search.Slice[0] = Cc.GetFRtoBR() / 24;
-    Search.URFtoDLF[0] = Cc.GetURFtoDLF();
-    Search.FRtoBR[0] = Cc.GetFRtoBR();
-    Search.URtoUL[0] = Cc.GetURtoUL();
-    Search.UBtoDF[0] = Cc.GetUBtoDF();
-
-    Search.MinDistPhase1[1] = 1;
+    Cc.InitalizeSearch(Search);
+    
     int32 N = 0, Busy = 0, DepthPhase1 = 1;
     const double Time = FPlatformTime::Seconds();
     
