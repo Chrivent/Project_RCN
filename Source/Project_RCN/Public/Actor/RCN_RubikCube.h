@@ -14,13 +14,14 @@ class USpringArmComponent;
 class URCN_RubikCubeDataAsset;
 
 DECLARE_MULTICAST_DELEGATE(FFinishScramble)
+DECLARE_MULTICAST_DELEGATE(FFinishSolve)
 
 UENUM(BlueprintType)
-enum class EAxisType : uint8
+enum class ECubeAxisType : uint8
 {
-	AxisX,
-	AxisY,
-	AxisZ
+	X,
+	Y,
+	Z
 };
 
 UENUM(BlueprintType)
@@ -39,10 +40,10 @@ struct FSignInfo
 {
 	GENERATED_BODY()
 
-	FSignInfo(FString InSign = "L", const EAxisType InAxisType = EAxisType::AxisX, const int32 InLayer = -1, const bool InCCW = false, const int32 InTurnCount = 1)
+	FSignInfo(FString InSign = "L", const ECubeAxisType InCubeAxisType = ECubeAxisType::X, const int32 InLayer = -1, const bool InCCW = false, const int32 InTurnCount = 1)
 	{
 		Sign = InSign;
-		AxisType = InAxisType;
+		CubeAxisType = InCubeAxisType;
 		Layer = InLayer;
 		CCW = InCCW;
 		TurnCount = InTurnCount;
@@ -52,7 +53,7 @@ struct FSignInfo
 	FString Sign;
 
 	UPROPERTY(VisibleAnywhere)
-	EAxisType AxisType;
+	ECubeAxisType CubeAxisType;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 Layer;
@@ -90,6 +91,7 @@ public:
 	FVector GetButtonPosition(UBoxComponent* ButtonBoxComponent);
 
 	FFinishScramble FinishScrambleDelegate;
+	FFinishSolve FinishSolveDelegate;
 
 protected:
 	void CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType);
@@ -116,8 +118,16 @@ protected:
 	TMap<TObjectPtr<UStaticMeshComponent>, FVector> PiecePositions;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<FSignInfo> SignInfos;
-	TQueue<FSignInfo> SignQueue;
+	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<UBoxComponent>> ButtonBoxComponents;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<UBoxComponent>, FVector> ButtonPositions;
 
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsTurning : 1;
@@ -126,22 +136,11 @@ protected:
 	uint8 bIsScrambling : 1;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<UStaticMeshComponent>> StickerMeshComponents;
-
-	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UStaticMeshComponent>, FVector> StickerPositions;
-
-	UPROPERTY(VisibleAnywhere)
 	FString Pattern;
 
-	UPROPERTY(VisibleAnywhere)
-	TArray<FVector> PatternOrderPositions;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<UBoxComponent>> ButtonBoxComponents;
-
-	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<UBoxComponent>, FVector> ButtonPositions;
+	static const TArray<FSignInfo> SignInfos;
+	static const TArray<FVector> PatternOrderPositions;
+	TQueue<FSignInfo> SignQueue;
 
 	// 네트워크 로직
 	UFUNCTION(Server, Reliable)
@@ -150,9 +149,12 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_Spin(const FString& Command);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_ChangePattern(const FString& NewPattern);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Scramble();
 
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_FinishScramble();
+	void ServerRPC_Solve();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastRPC_ChangePattern(const FString& NewPattern);
 };

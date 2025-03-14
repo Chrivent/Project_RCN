@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class UImage;
 class URCN_MainMenuWidget;
 class URCN_OtherPlayerViewWidget;
 class ARCN_Player;
@@ -23,7 +24,10 @@ public:
 	ARCN_PlayerController();
 	
 	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
-
+	
+	FORCEINLINE void SetPlayerNumber(const int32 InPlayerNumber) { PlayerNumber = InPlayerNumber; }
+	FORCEINLINE int32 GetPlayerNumber() const { return PlayerNumber; }
+	
 protected:
 	// 게임과 무관한 액터 초기화
 	virtual void PostInitializeComponents() override;
@@ -38,11 +42,17 @@ protected:
 
 public:
 	void CreateMainMenu();
-	
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player Info")
+	int32 PlayerNumber;
+
 	
 protected:
+	void UpdateMoveImage(UImage* Image, FVector2D TargetTranslation);
+	void UpdateScaleImage(UImage* Image, FVector2D TargetScale);
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 	
@@ -53,9 +63,9 @@ protected:
 	// Game UI Section
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GameUI")
 	TObjectPtr<URCN_TimerWidget> TimerWidget;
-	
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category="GameUI")
-	TObjectPtr<URCN_OtherPlayerViewWidget> OtherPlayerViewWidget;
+
+	UPROPERTY(VisibleAnywhere, Category="GameUI")
+	TArray<URCN_OtherPlayerViewWidget*> OtherPlayerViewWidgets;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)

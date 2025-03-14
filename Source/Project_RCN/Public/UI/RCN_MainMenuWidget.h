@@ -33,6 +33,9 @@ protected:
 
 	UFUNCTION()
 	void SettingButtonReleasedHandle();
+
+	UFUNCTION()
+	void GameOutButtonReleasedHandle();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UWidgetSwitcher> MainMenuWidgetSwitcher;

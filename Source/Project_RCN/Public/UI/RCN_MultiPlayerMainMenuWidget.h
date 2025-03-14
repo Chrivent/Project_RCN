@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_MultiPlayerMainMenuWidget.generated.h"
 
+class UButton;
 /**
  * 
  */
@@ -14,4 +15,24 @@ class PROJECT_RCN_API URCN_MultiPlayerMainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void CreateSessionButtonReleasedHandle();
+	
+	UFUNCTION()
+	void FindSessionButtonReleasedHandle();
+
+	UFUNCTION()
+	void JoinSessionButtonReleasedHandle();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> CreateSessionButton;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> FindSessionButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> JoinSessionButton;
 };

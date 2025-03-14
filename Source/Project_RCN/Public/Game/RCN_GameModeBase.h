@@ -32,9 +32,6 @@ protected:
 	// 게임의 시작을 지시하는 함수
 	virtual void StartPlay() override;
 
-public:
-	virtual void FinishScramble() {}
-
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_GameModeBaseDataAsset> GameModeBaseDataAsset;

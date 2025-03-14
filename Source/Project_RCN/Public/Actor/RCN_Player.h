@@ -41,11 +41,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void InitCube();
+	void InitCube() const;
 	void UpdateCubeLocation(const FVector& TargetLocation);
 	void UpdateCubeRotation(const FRotator& TargetRotation);
 	void RenewalCube();
-	void CreateRenderTarget(ARCN_Player* OtherPlayer);
+	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	
 protected:
 	void SetControl() const;
@@ -61,9 +61,6 @@ protected:
 
 	FVector GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const;
 	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection) const;
-
-	UFUNCTION()
-	void FinishScrambleHandle();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
@@ -116,12 +113,6 @@ protected:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_RotateCube(const FRotator Rotator);
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_ScrambleCube();
-	
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_SolveCube();
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);

@@ -9,12 +9,11 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "Project_RCN/Project_RCN.h"
 
 void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
+	
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
@@ -53,12 +52,14 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 						ARCN_Player* Player = Cast<ARCN_Player>(NewPlayerController->GetPawn());
 						if (IsValid(OtherPlayer) && IsValid(Player))
 						{
-							OtherPlayer->CreateRenderTarget(Player);
-							Player->CreateRenderTarget(OtherPlayer);
+							OtherPlayer->CreateOtherPlayerViewWidget(Player);
+							Player->CreateOtherPlayerViewWidget(OtherPlayer);
 						}
 					}
 				}
 			}
+
+			// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
 		}
 	}), 1.0f, false);
 }
@@ -80,10 +81,4 @@ AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player
 	}
 
 	return Super::ChoosePlayerStart_Implementation(Player);
-}
-
-void ARCN_MultiModeBase::FinishScramble()
-{
-	Super::FinishScramble();
-	
 }

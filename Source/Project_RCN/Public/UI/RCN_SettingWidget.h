@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_SettingWidget.generated.h"
 
+class UCheckBox;
+class UComboBoxString;
 class UWidgetSwitcher;
 class UButton;
 /**
@@ -17,10 +19,8 @@ class PROJECT_RCN_API URCN_SettingWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	virtual void NativeConstruct() override;
-
 	UFUNCTION()
-	void SettingCategoryAllButtonReleasedHandle();
+	virtual void NativeConstruct() override;
 
 	UFUNCTION()
 	void SettingCategorySoundButtonReleasedHandle();
@@ -33,12 +33,17 @@ protected:
 	
 	UFUNCTION()
 	void SettingCategoryEtcButtonReleasedHandle();
+
+	UFUNCTION()
+	void GraphicSettingFullScreenCheckBoxCheckStateChangedHandle(bool bIsChecked);
+	
+	UFUNCTION()
+	void GraphicSettingComboBoxSelectionChangedHandle(FString SelectedItem, ESelectInfo::Type SelectionType);
+	
+	void ChangeScreenSize(FString Resolution);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UWidgetSwitcher> SettingMenuWidgetSwitcher;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
-	TObjectPtr<UButton> SettingCategoryAllButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> SettingCategorySoundButton;
@@ -51,4 +56,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> SettingCategoryEtcButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UCheckBox> GraphicSettingFullScreenCheckBox;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UComboBoxString> GraphicSettingComboBox;
 };

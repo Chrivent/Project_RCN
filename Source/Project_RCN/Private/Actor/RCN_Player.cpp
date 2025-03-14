@@ -12,7 +12,6 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Data/RCN_PlayerDataAsset.h"
 #include "Engine/TextureRenderTarget2D.h"
-#include "Game/RCN_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
@@ -152,13 +151,11 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputRightAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
 }
 
-void ARCN_Player::InitCube()
+void ARCN_Player::InitCube() const
 {
 	NetworkRubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
 	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
 	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
-
-	NetworkRubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_Player::FinishScrambleHandle);
 }
 
 void ARCN_Player::UpdateCubeLocation(const FVector& TargetLocation)
@@ -210,7 +207,7 @@ void ARCN_Player::RenewalCube()
 	NetworkRubikCube->ChangePattern(NetworkRubikCube->GetPattern());
 }
 
-void ARCN_Player::CreateRenderTarget(ARCN_Player* OtherPlayer)
+void ARCN_Player::CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer)
 {
 	ClientRPC_CreateOtherPlayerViewWidget(OtherPlayer);
 }
@@ -266,12 +263,12 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 
 void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
 {
-	ServerRPC_ScrambleCube();
+	NetworkRubikCube->Scramble();
 }
 
 void ARCN_Player::SolveCube(const FInputActionValue& Value)
 {
-	ServerRPC_SolveCube();
+	NetworkRubikCube->Solve();
 }
 
 void ARCN_Player::SpinDragStarted(const FInputActionValue& Value)
@@ -317,7 +314,7 @@ void ARCN_Player::SpinDragTriggered(const FInputActionValue& Value)
 	}
 	
 	UBoxComponent* CurrentBoxComponent;
-	FVector CurrentHitLocation;
+	FVector CurrentHitLocation = FVector::ZeroVector;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
 		FVector CursorLocation, CursorDirection;
@@ -362,7 +359,7 @@ void ARCN_Player::SpinInput(const FInputActionValue& Value)
 {
 	FVector SelectedButtonPosition;
 	FVector InputStartHitLocation;
-	float HitDistance;
+	float HitDistance = 0.0f;
 	if (const ARCN_PlayerController* PlayerController = CastChecked<ARCN_PlayerController>(GetController()))
 	{
 		FVector CursorLocation, CursorDirection;
@@ -511,18 +508,6 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 	NetworkRubikCube->Spin(Command);
 }
 
-void ARCN_Player::FinishScrambleHandle()
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-	
-	if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		GameModeBase->FinishScramble();
-	}
-
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -580,24 +565,6 @@ void ARCN_Player::MulticastRPC_RotateCube_Implementation(const FRotator Rotator)
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::ServerRPC_ScrambleCube_Implementation()
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-
-	NetworkRubikCube->Scramble();
-	
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_Player::ServerRPC_SolveCube_Implementation()
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-	
-	NetworkRubikCube->Solve();
-
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-
 void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
 {
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
@@ -611,7 +578,7 @@ void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Play
 	
 	UTextureRenderTarget2D* NewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	NewRenderTarget->InitAutoFormat(1920, 1080);
-	NewRenderTarget->ClearColor = FLinearColor(0, 0, 0, 0);
+	NewRenderTarget->ClearColor = FLinearColor(0, 0, 0, 1);
 	NewSceneCaptureComponent->TextureTarget = NewRenderTarget;
 	
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))

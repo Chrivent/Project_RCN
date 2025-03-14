@@ -16,6 +16,8 @@ class PROJECT_RCN_API URCN_OtherPlayerViewWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	FORCEINLINE UImage* GetOtherPlayerView() const { return OtherPlayerView; }
+	
 	void SetOtherPlayerView(UTextureRenderTarget2D* RenderTarget) const;
 	
 protected:
