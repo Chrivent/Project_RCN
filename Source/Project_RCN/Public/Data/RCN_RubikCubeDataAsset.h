@@ -31,9 +31,6 @@ public:
 	float TurnSpeed;
 
 	UPROPERTY(EditDefaultsOnly)
-	float TurnTolerance;
-
-	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMesh> StickerMesh;
 
 	UPROPERTY(EditDefaultsOnly)

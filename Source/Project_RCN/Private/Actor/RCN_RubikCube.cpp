@@ -328,7 +328,7 @@ void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& Targ
 	const FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, RubikCubeDataAsset->TurnSpeed);
 	CoreComponent->SetRelativeRotation(NewQuat);
 
-	if (NewQuat.Equals(TargetQuat, RubikCubeDataAsset->TurnTolerance))
+	if (NewQuat.Equals(TargetQuat, 0.01f))
 	{
 		CoreComponent->SetRelativeRotation(TargetQuat);
 		ReleasePieces(SignInfo);

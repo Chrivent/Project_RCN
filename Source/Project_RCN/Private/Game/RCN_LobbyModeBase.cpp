@@ -102,7 +102,7 @@ void ARCN_LobbyModeBase::RequestLogout(AController* Exiting)
 void ARCN_LobbyModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
 {
 	const FVector CurrentCubeScale = RubikCube->GetActorScale3D();
-	const FVector NewCubeScale  = FMath::Lerp(CurrentCubeScale, FVector::ZeroVector, 0.1f);
+	const FVector NewCubeScale  = FMath::Lerp(CurrentCubeScale, FVector::ZeroVector, GameModeBaseDataAsset->CubeDestroySpeed);
 	RubikCube->SetActorScale3D(NewCubeScale);
 
 	if (NewCubeScale.Equals(FVector::ZeroVector, 0.01f))

@@ -164,7 +164,7 @@ void ARCN_Player::UpdateCubeLocation(const FVector& TargetLocation)
 	const FVector NewLocation = FMath::Lerp(CurrentLocation, TargetLocation, PlayerDataAsset->LocationSpeed);
 	MulticastRPC_SetCubeLocation(NewLocation);
 
-	if (NewLocation.Equals(TargetLocation, PlayerDataAsset->LocationTolerance))
+	if (NewLocation.Equals(TargetLocation))
 	{
 		MulticastRPC_SetCubeLocation(TargetLocation);
 		return;
@@ -182,7 +182,7 @@ void ARCN_Player::UpdateCubeRotation(const FRotator& TargetRotation)
 	const FRotator NewRotator = FMath::Lerp(CurrentRotator, TargetRotation, PlayerDataAsset->RotationSpeed);
 	MulticastRPC_SetCubeRotation(NewRotator);
 
-	if (NewRotator.Equals(TargetRotation, PlayerDataAsset->RotationTolerance))
+	if (NewRotator.Equals(TargetRotation))
 	{
 		MulticastRPC_SetCubeRotation(TargetRotation);
 		return;

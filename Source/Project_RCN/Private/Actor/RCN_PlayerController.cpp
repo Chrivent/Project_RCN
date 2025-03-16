@@ -167,10 +167,10 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 void ARCN_PlayerController::UpdateMoveImage(UImage* Image, const FVector2D TargetTranslation)
 {
 	const FVector2D CurrentTranslation = Image->GetRenderTransform().Translation;
-	const FVector2D NewTranslation = FMath::Lerp(CurrentTranslation, TargetTranslation, 0.1f);
+	const FVector2D NewTranslation = FMath::Lerp(CurrentTranslation, TargetTranslation, UIDataAsset->ImageMoveSpeed);
 	Image->SetRenderTranslation(NewTranslation);
 
-	if (NewTranslation.Equals(TargetTranslation, 0.01f))
+	if (NewTranslation.Equals(TargetTranslation))
 	{
 		Image->SetRenderTranslation(TargetTranslation);
 		return;
@@ -185,10 +185,10 @@ void ARCN_PlayerController::UpdateMoveImage(UImage* Image, const FVector2D Targe
 void ARCN_PlayerController::UpdateScaleImage(UImage* Image, const FVector2D TargetScale)
 {
 	const FVector2D CurrentScale = Image->GetRenderTransform().Scale;
-	const FVector2D NewScale = FMath::Lerp(CurrentScale, TargetScale, 0.1f);
+	const FVector2D NewScale = FMath::Lerp(CurrentScale, TargetScale, UIDataAsset->ImageScaleSpeed);
 	Image->SetRenderScale(NewScale);
 
-	if (NewScale.Equals(TargetScale, 0.01f))
+	if (NewScale.Equals(TargetScale))
 	{
 		Image->SetRenderScale(TargetScale);
 		return;
