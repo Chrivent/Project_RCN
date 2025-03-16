@@ -6,7 +6,6 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "Actor/RCN_Player.h"
-#include "Actor/RCN_RubikCube.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"

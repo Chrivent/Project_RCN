@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RCN_UIDataAsset.generated.h"
 
+class URCN_MultiPlayerGreenRoomWidget;
 class URCN_SettingWidget;
 class URCN_SinglePlayerMainMenuWidget;
 class URCN_MultiPlayerMainMenuWidget;
@@ -34,7 +35,7 @@ public:
 	TSubclassOf<URCN_SettingWidget> SettingWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
-	TSubclassOf<URCN_OtherPlayerViewWidget> MultiPlayerGreenRoomWidgetClass;
+	TSubclassOf<URCN_MultiPlayerGreenRoomWidget> MultiPlayerGreenRoomWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
