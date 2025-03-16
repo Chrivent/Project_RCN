@@ -62,7 +62,8 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		ReleasePlayerNumber(PlayerController->GetPlayerNumber());
 		PlayerNumberMap.Remove(PlayerController);
 	}
-	
+
+	// 호스트 마이그레이션 제작중
 	/*if (Exiting->IsLocalController() && Exiting->HasAuthority())
 	{
 		RCN_LOG(LogTemp, Log, TEXT("호스트가 나가므로 호스트 마이그레이션을 실시합니다."))
