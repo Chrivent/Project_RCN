@@ -6,11 +6,10 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "Actor/RCN_Player.h"
-#include "Actor/RCN_RubikCube.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
-#include "Game/RCN_LobbyModeBase.h"
+#include "Game/RCN_GreenRoomModeBase.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
@@ -227,7 +226,7 @@ void ARCN_PlayerController::ServerRPC_DestroyCube_Implementation()
 
 	if (const ARCN_Player* CurrentPlayer = Cast<ARCN_Player>(GetPawn()))
 	{
-		if (ARCN_LobbyModeBase* LobbyModeBase = Cast<ARCN_LobbyModeBase>(GetWorld()->GetAuthGameMode()))
+		if (ARCN_GreenRoomModeBase* LobbyModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode()))
 		{
 			LobbyModeBase->UpdateDestroyCube(CurrentPlayer->GetRubikCube());
 		}

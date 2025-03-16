@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Game/RCN_LobbyModeBase.h"
+#include "Game/RCN_GreenRoomModeBase.h"
 
 #include "Actor/RCN_Player.h"
 #include "Actor/RCN_PlayerController.h"
@@ -11,7 +11,7 @@
 #include "Project_RCN/Project_RCN.h"
 
 
-void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
+void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
@@ -36,10 +36,12 @@ void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 					{
 						PlayerController->SetPlayerNumber(PlayerNumber);
 						PlayerNumberMap.Add(PlayerController, PlayerNumber);
-						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("PlayerNumberMap Added: [%s][%d]"), *PlayerController->GetName(), PlayerNumber));
+						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("PlayerNumberMap Added: [%s][%d]"), *PlayerNumberMap.FindKey(PlayerNumber)->GetName(), PlayerNumberMap[PlayerController]));
 					}
+
 					
-					Player->UpdateCubeLocation(CubeSpawnPosition[PlayerController->GetPlayerNumber()]);
+					//Player->UpdateCubeLocation(CubeSpawnPosition[PlayerController->GetPlayerNumber()]);
+					Player->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[PlayerController]]);
 					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 				}
 			}
@@ -55,7 +57,7 @@ void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 	}), 1.0f, false);
 }
 
-void ARCN_LobbyModeBase::Logout(AController* Exiting)
+void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
 	{
@@ -94,12 +96,12 @@ void ARCN_LobbyModeBase::Logout(AController* Exiting)
 	Super::Logout(Exiting);
 }
 
-void ARCN_LobbyModeBase::RequestLogout(AController* Exiting)
+void ARCN_GreenRoomModeBase::RequestLogout(AController* Exiting)
 {
 	Logout(Exiting);
 }
 
-void ARCN_LobbyModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
+void ARCN_GreenRoomModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
 {
 	const FVector CurrentCubeScale = RubikCube->GetActorScale3D();
 	const FVector NewCubeScale  = FMath::Lerp(CurrentCubeScale, FVector::ZeroVector, 0.1f);
@@ -117,7 +119,7 @@ void ARCN_LobbyModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
 	}));
 }
 
-int32 ARCN_LobbyModeBase::GetAvailablePlayerNumber()
+int32 ARCN_GreenRoomModeBase::GetAvailablePlayerNumber()
 {
 	if (AvailablePlayerNumbers.Num() > 0)
 	{
@@ -129,13 +131,13 @@ int32 ARCN_LobbyModeBase::GetAvailablePlayerNumber()
 	return -1;
 }
 
-void ARCN_LobbyModeBase::ReleasePlayerNumber(int32 PlayerNumber)
+void ARCN_GreenRoomModeBase::ReleasePlayerNumber(int32 PlayerNumber)
 {
 	AvailablePlayerNumbers.Add(PlayerNumber);
 	AvailablePlayerNumbers.Sort();
 }
 
-void ARCN_LobbyModeBase::PromoteClientToHost(APlayerController* NewHostController)
+void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostController)
 {
 	if (!NewHostController)
 	{
