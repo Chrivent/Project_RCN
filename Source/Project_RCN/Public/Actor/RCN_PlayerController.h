@@ -83,4 +83,7 @@ protected:
 	
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_RequestReturnToMenu();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_DestroyCube();
 };

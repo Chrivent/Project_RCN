@@ -5,6 +5,8 @@
 
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
+#include "Actor/RCN_Player.h"
+#include "Actor/RCN_RubikCube.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
@@ -124,6 +126,7 @@ void ARCN_PlayerController::ClientRPC_RequestReturnToMenu_Implementation()
 	{
 		const IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
 
+		ServerRPC_DestroyCube();
 		SessionInterface->DestroySession(NAME_GameSession);
 		
 		ClientTravel(TEXT("/Game/Level/MainMenuLevel"), TRAVEL_Absolute);
@@ -215,6 +218,18 @@ void ARCN_PlayerController::ClientRPC_CreateMultiPlayerGreenRoomWidget_Implement
 
 	MultiPlayerGreenRoomWidget = CreateWidget<URCN_MultiPlayerGreenRoomWidget>(this, UIDataAsset->MultiPlayerGreenRoomWidgetClass);
 	MultiPlayerGreenRoomWidget->AddToViewport();
+	
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ServerRPC_DestroyCube_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (const ARCN_Player* CurrentPlayer = Cast<ARCN_Player>(GetPawn()))
+	{
+		CurrentPlayer->GetRubikCube()->Destroy();
+	}
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

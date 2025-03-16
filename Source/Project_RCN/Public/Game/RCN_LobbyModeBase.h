@@ -39,4 +39,8 @@ protected:
 		FVector(1730.0f, 300.0f, 0.0f),
 		FVector(1730.0f, 1000.0f, 0.0f)
 	};
+
+public:
+	void RequstLogout(AController* Exiting);
+	
 };
