@@ -875,7 +875,7 @@ int16 ParityMove[2][18] = {
     { 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1 },
     { 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 }
 };
-int32 PRUNING_INITED = 0;
+int32 PruningInitialized = 0;
 
 bool CheckCachedTable(const FString& Name, void* Ptr, const int32 Length, const FString& CacheDir)
 {
@@ -1118,7 +1118,7 @@ void InitPruning(const FString& CacheDir)
     ComputePruningTable<N_SLICE1 * N_FLIP / 2, N_FLIP>(
     "Slice_Flip_Prun", Slice_Flip_Pruning, FRtoBR_Move, FlipMove, CacheDir);
 
-    PRUNING_INITED = 1;
+    PruningInitialized = 1;
 }
 
 FString SolutionToString(const FSearch& Search, const int32 Length)
@@ -1259,7 +1259,7 @@ FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const dou
 {
     FSearch Search;
 
-    if (PRUNING_INITED == 0)
+    if (PruningInitialized == 0)
     {
         InitPruning(CacheDir);
     }
