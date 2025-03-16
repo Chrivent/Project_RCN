@@ -36,6 +36,7 @@ void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 					{
 						PlayerController->SetPlayerNumber(PlayerNumber);
 						PlayerNumberMap.Add(PlayerController, PlayerNumber);
+						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("PlayerNumberMap Added: [%s][%d]"), *PlayerController->GetName(), PlayerNumber));
 					}
 					
 					Player->UpdateCubeLocation(CubeSpawnPosition[PlayerController->GetPlayerNumber()]);
@@ -56,20 +57,11 @@ void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 
 void ARCN_LobbyModeBase::Logout(AController* Exiting)
 {
-	Super::Logout(Exiting);
-
-	/*if (const ARCN_Player* Player = Cast<ARCN_Player>(Exiting->GetPawn()))
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
 	{
-		if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
-		{
-			const int32 ExitingPlayerNumber = PlayerController->GetPlayerNumber();
-			if (ExitingPlayerNumber != -1)
-			{
-				ReleasePlayerNumber(ExitingPlayerNumber);
-				PlayerNumberMap.Remove(PlayerController);
-			}
-		}
-	}*/
+		ReleasePlayerNumber(PlayerController->GetPlayerNumber());
+		PlayerNumberMap.Remove(PlayerController);
+	}
 	
 	/*if (Exiting->IsLocalController() && Exiting->HasAuthority())
 	{
@@ -96,6 +88,10 @@ void ARCN_LobbyModeBase::Logout(AController* Exiting)
 			RCN_LOG(LogTemp, Log, TEXT("남은 플레이어가 없어서 호스트 마이그레이션 불가능"));
 		}
 	}*/
+	
+	RCN_LOG(LogTemp, Log, TEXT("Logout"))
+	
+	Super::Logout(Exiting);
 }
 
 int32 ARCN_LobbyModeBase::GetAvailablePlayerNumber()
@@ -129,10 +125,4 @@ void ARCN_LobbyModeBase::PromoteClientToHost(APlayerController* NewHostControlle
 	{
 		GameInstance->MigrateToHost(NewHostController);
 	}
-	
-}
-
-void ARCN_LobbyModeBase::RequstLogout(AController* Exiting)
-{
-	Logout(Exiting);
 }
