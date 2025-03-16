@@ -16,8 +16,4 @@ class PROJECT_RCN_API ARCN_MainMenuModeBase : public ARCN_GameModeBase
 
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-
-public:
-	void StartSingle() const;
-	void StartLobby() const;
 };

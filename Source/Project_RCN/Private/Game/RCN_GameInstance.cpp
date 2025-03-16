@@ -7,7 +7,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "Game/RCN_MainMenuModeBase.h"
-#include "Online/OnlineSessionNames.h"
+#include "Kismet/GameplayStatics.h"
 
 void URCN_GameInstance::Init()
 {
@@ -111,11 +111,7 @@ void URCN_GameInstance::OnCreateSessionCompleteHandle(const FName SessionName, c
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session created successfully: %s"), *SessionName.ToString()));
 
-		// 세션을 성공적으로 생성하면 게임 시작
-		if (ARCN_MainMenuModeBase* MainMenuModeBase = Cast<ARCN_MainMenuModeBase>(GetWorld()->GetAuthGameMode()))
-		{
-			MainMenuModeBase->StartLobby();
-		}
+		UGameplayStatics::OpenLevel(this, "LobbyLevel", true, "listen");
 	}
 	else
 	{

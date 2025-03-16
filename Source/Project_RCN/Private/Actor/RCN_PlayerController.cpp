@@ -102,12 +102,30 @@ void ARCN_PlayerController::CreateTimerWidget()
 
 void ARCN_PlayerController::RequestReturnToMenu()
 {
+	if (HasAuthority())
+	{
+		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Iterator->Get()))
+			{
+				PlayerController->ClientRPC_RequestReturnToMenu();
+			}
+		}
+	}
+	else
+	{
+		ClientRPC_RequestReturnToMenu();
+	}
+}
+
+void ARCN_PlayerController::ClientRPC_RequestReturnToMenu_Implementation()
+{
 	if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
 	{
 		const IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
 
 		SessionInterface->DestroySession(NAME_GameSession);
-				
+		
 		ClientTravel(TEXT("/Game/Level/MainMenuLevel"), TRAVEL_Absolute);
 	}
 }
