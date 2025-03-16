@@ -11,7 +11,6 @@
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Game/RCN_LobbyModeBase.h"
-#include "GameFramework/PlayerState.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
@@ -169,7 +168,7 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 void ARCN_PlayerController::UpdateMoveImage(UImage* Image, const FVector2D TargetTranslation)
 {
 	const FVector2D CurrentTranslation = Image->GetRenderTransform().Translation;
-	const FVector2D NewTranslation = FMath::Lerp(CurrentTranslation, TargetTranslation, 0.5f);
+	const FVector2D NewTranslation = FMath::Lerp(CurrentTranslation, TargetTranslation, 0.1f);
 	Image->SetRenderTranslation(NewTranslation);
 
 	if (NewTranslation.Equals(TargetTranslation, 0.01f))
@@ -187,7 +186,7 @@ void ARCN_PlayerController::UpdateMoveImage(UImage* Image, const FVector2D Targe
 void ARCN_PlayerController::UpdateScaleImage(UImage* Image, const FVector2D TargetScale)
 {
 	const FVector2D CurrentScale = Image->GetRenderTransform().Scale;
-	const FVector2D NewScale = FMath::Lerp(CurrentScale, TargetScale, 0.5f);
+	const FVector2D NewScale = FMath::Lerp(CurrentScale, TargetScale, 0.1f);
 	Image->SetRenderScale(NewScale);
 
 	if (NewScale.Equals(TargetScale, 0.01f))
@@ -228,7 +227,10 @@ void ARCN_PlayerController::ServerRPC_DestroyCube_Implementation()
 
 	if (const ARCN_Player* CurrentPlayer = Cast<ARCN_Player>(GetPawn()))
 	{
-		CurrentPlayer->GetRubikCube()->Destroy();
+		if (ARCN_LobbyModeBase* LobbyModeBase = Cast<ARCN_LobbyModeBase>(GetWorld()->GetAuthGameMode()))
+		{
+			LobbyModeBase->UpdateDestroyCube(CurrentPlayer->GetRubikCube());
+		}
 	}
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));

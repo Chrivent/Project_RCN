@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class ARCN_RubikCube;
 class URCN_MultiPlayerGreenRoomWidget;
 class UImage;
 class URCN_MainMenuWidget;

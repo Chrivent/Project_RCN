@@ -8,6 +8,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FReturnToMainMenu)
 
+class ARCN_RubikCube;
 class ARCN_PlayerController;
 /**
  * 
@@ -20,7 +21,12 @@ class PROJECT_RCN_API ARCN_LobbyModeBase : public ARCN_GameModeBase
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
-	
+
+public:
+	void RequestLogout(AController* Exiting);
+	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
+
+protected:
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
 	
