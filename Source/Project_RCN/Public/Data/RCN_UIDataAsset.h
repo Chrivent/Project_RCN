@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RCN_UIDataAsset.generated.h"
 
+class URCN_MultiPlayerGreenRoomWidget;
 class URCN_SettingWidget;
 class URCN_SinglePlayerMainMenuWidget;
 class URCN_MultiPlayerMainMenuWidget;
