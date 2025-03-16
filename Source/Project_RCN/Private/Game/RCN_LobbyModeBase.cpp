@@ -98,6 +98,29 @@ void ARCN_LobbyModeBase::Logout(AController* Exiting)
 	}*/
 }
 
+void ARCN_LobbyModeBase::RequestLogout(AController* Exiting)
+{
+	Logout(Exiting);
+}
+
+void ARCN_LobbyModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
+{
+	const FVector CurrentCubeScale = RubikCube->GetActorScale3D();
+	const FVector NewCubeScale  = FMath::Lerp(CurrentCubeScale, FVector::ZeroVector, 0.1f);
+	RubikCube->SetActorScale3D(NewCubeScale);
+
+	if (NewCubeScale.Equals(FVector::ZeroVector, 0.01f))
+	{
+		RubikCube->Destroy();
+		return;
+	}
+	
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		UpdateDestroyCube(RubikCube);
+	}));
+}
+
 int32 ARCN_LobbyModeBase::GetAvailablePlayerNumber()
 {
 	if (AvailablePlayerNumbers.Num() > 0)
@@ -130,9 +153,4 @@ void ARCN_LobbyModeBase::PromoteClientToHost(APlayerController* NewHostControlle
 		GameInstance->MigrateToHost(NewHostController);
 	}
 	
-}
-
-void ARCN_LobbyModeBase::RequstLogout(AController* Exiting)
-{
-	Logout(Exiting);
 }
