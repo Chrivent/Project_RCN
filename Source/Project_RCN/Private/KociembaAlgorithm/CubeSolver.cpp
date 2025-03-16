@@ -1,5 +1,7 @@
 #include "KociembaAlgorithm/CubeSolver.h"
 
+DEFINE_LOG_CATEGORY(LogCubeSolver)
+
 #define CORNER_COUNT 8
 #define EDGE_COUNT 12
 
@@ -73,7 +75,7 @@ struct FSearch
 struct FCubieCube
 {
     FCubieCube();
-    explicit FCubieCube(const FString& CubeString);
+    explicit FCubieCube(const FString& Facelets);
 
     void InitializeSearch(FSearch& Search);
     
@@ -251,7 +253,7 @@ FCubieCube::FCubieCube()
     Eo = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 }
 
-FCubieCube::FCubieCube(const FString& CubeString)
+FCubieCube::FCubieCube(const FString& Facelets)
 {
     Cp.SetNum(CORNER_COUNT);
     Co.SetNum(CORNER_COUNT);
@@ -261,7 +263,7 @@ FCubieCube::FCubieCube(const FString& CubeString)
     Colors.SetNum(54);
     for (int32 i = 0; i < 54; ++i)
     {
-        switch (CubeString[i])
+        switch (Facelets[i])
         {
         case 'U': Colors[i] = EColorType::U; break;
         case 'R': Colors[i] = EColorType::R; break;
@@ -887,11 +889,11 @@ bool CheckCachedTable(const FString& Name, void* Ptr, const int32 Length, const 
         }
         else
         {
-            UE_LOG(LogTemp, Error, TEXT("Failed to read file: %s"), *FilePath);
+            UE_LOG(LogCubeSolver, Error, TEXT("Failed to read file: %s"), *FilePath);
         }
         return true;
     }
-    UE_LOG(LogTemp, Warning, TEXT("Cache table %s was not found. Recalculating."), *FilePath);
+    UE_LOG(LogCubeSolver, Warning, TEXT("Cache table %s was not found. Recalculating."), *FilePath);
     return false;
 }
 
@@ -906,16 +908,16 @@ void DumpToFile(void* Ptr, const int32 Length, const FString& Name, const FStrin
 
         if (FFileHelper::SaveArrayToFile(FileData, *FilePath))
         {
-            UE_LOG(LogTemp, Log, TEXT("Successfully wrote cache table: %s"), *FilePath);
+            UE_LOG(LogCubeSolver, Log, TEXT("Successfully wrote cache table: %s"), *FilePath);
         }
         else
         {
-            UE_LOG(LogTemp, Error, TEXT("Failed to write cache table: %s"), *FilePath);
+            UE_LOG(LogCubeSolver, Error, TEXT("Failed to write cache table: %s"), *FilePath);
         }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Cannot create cache tables directory: %s"), *CacheDir);
+        UE_LOG(LogCubeSolver, Error, TEXT("Cannot create cache tables directory: %s"), *CacheDir);
     }
 }
 
@@ -1253,7 +1255,7 @@ int32 TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth)
     return DepthPhase1 + DepthPhase2;
 }
 
-FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
+FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
 {
     FSearch Search;
 
@@ -1262,7 +1264,6 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         InitPruning(CacheDir);
     }
 
-    FString CubeString = Facelets;
     TMap<TCHAR, TCHAR> ReplacementInfo = {
         { Facelets[4], TEXT('U') },
         { Facelets[13], TEXT('R') },
@@ -1271,14 +1272,14 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         { Facelets[40], TEXT('L') },
         { Facelets[49], TEXT('B') }
     };
-    for (auto& CubeStringChar : CubeString)
+    for (auto& Facelet : Facelets)
     {
-        CubeStringChar = ReplacementInfo[CubeStringChar];
+        Facelet = ReplacementInfo[Facelet];
     }
 
     TArray<int32> Count;
     Count.SetNum(6);
-    for (const auto Facelet : CubeString)
+    for (const auto Facelet : Facelets)
     {
         if (Facelet == 'U') { Count[0]++; }
         else if (Facelet == 'R') { Count[1]++; }
@@ -1290,29 +1291,29 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
     
     if (Count.ContainsByPredicate([](const int32 C) { return C != 9; }))
     {
-        return FString("ERROR 1: There is not exactly one facelet of each colour");
+        return TEXT("ERROR 1: There is not exactly one facelet of each colour");
     }
     
-    FCubieCube Cc(CubeString);
+    FCubieCube Cc(Facelets);
     switch (Cc.Verify())
     {
     case 2:
-        return FString("ERROR 2: Not all 12 edges exist exactly once");
+        return TEXT("ERROR 2: Not all 12 edges exist exactly once");
     case 3:
-        return FString("ERROR 3: Flip error: One edge has to be flipped");
+        return TEXT("ERROR 3: Flip error: One edge has to be flipped");
     case 4:
-        return FString("ERROR 4: Not all corners exist exactly once");
+        return TEXT("ERROR 4: Not all corners exist exactly once");
     case 5:
-        return FString("ERROR 5: Twist error: One corner has to be twisted");
+        return TEXT("ERROR 5: Twist error: One corner has to be twisted");
     case 6:
-        return FString("ERROR 6: Parity error: Two corners or two edges have to be exchanged");
+        return TEXT("ERROR 6: Parity error: Two corners or two edges have to be exchanged");
     default:
         break;
     }
     Cc.InitializeSearch(Search);
     
     int32 N = 0, Busy = 0, DepthPhase1 = 1;
-    const double Time = FPlatformTime::Seconds();
+    const double StartTime = FPlatformTime::Seconds();
     
     do
     {
@@ -1336,16 +1337,16 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
                 {
                     if (++Search.Ax[N] > 5)
                     {
-                        if (FPlatformTime::Seconds() - Time > TimeOut)
+                        if (FPlatformTime::Seconds() - StartTime > TimeOut)
                         {
-                            return FString("ERROR 7: Timeout, no solution within given time");
+                            return TEXT("ERROR 7: Timeout, no solution within given time");
                         }
 
                         if (N == 0)
                         {
                             if (DepthPhase1 >= MaxDepth)
                             {
-                                return FString("ERROR 8: No solution exists for the given maxDepth");
+                                return TEXT("ERROR 8: No solution exists for the given maxDepth");
                             }
                         
                             DepthPhase1++;

@@ -557,12 +557,16 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	}
 	
 	FString Command = TEXT("");
-	
 	Command = UCubeSolver::SolveCube(Pattern);
-	
-	RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
-	
-	ServerRPC_Spin(Command);
+	if (Command.StartsWith(TEXT("ERROR")))
+	{
+		RCN_LOG(LogRubikCube, Error, TEXT("%s"), *Command);
+	}
+	else
+	{
+		RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
+		ServerRPC_Spin(Command);
+	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
