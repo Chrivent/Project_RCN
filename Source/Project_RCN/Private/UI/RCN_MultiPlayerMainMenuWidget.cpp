@@ -18,7 +18,7 @@ void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 
 void URCN_MultiPlayerMainMenuWidget::CreateSessionButtonReleasedHandle()
 {
-	if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
+	if (const URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
 	{
 		GameInstance->CreateSession(4); // 최대 4인 세션 생성
 	}

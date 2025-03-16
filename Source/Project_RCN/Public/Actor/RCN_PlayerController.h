@@ -80,10 +80,4 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateMultiPlayerGreenRoomWidget();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_RequestReturnToMenuFromServer();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_RequestReturnToMenuFromClient();
 };

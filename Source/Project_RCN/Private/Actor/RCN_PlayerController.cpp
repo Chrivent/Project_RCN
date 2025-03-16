@@ -3,10 +3,14 @@
 
 #include "Actor/RCN_PlayerController.h"
 
+#include "OnlineSubsystem.h"
+#include "OnlineSubsystemUtils.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Game/RCN_LobbyModeBase.h"
+#include "GameFramework/PlayerState.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
 #include "UI/RCN_MainMenuWidget.h"
@@ -98,15 +102,14 @@ void ARCN_PlayerController::CreateTimerWidget()
 
 void ARCN_PlayerController::RequestReturnToMenu()
 {
-	if (HasAuthority())
+	if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
 	{
-		ServerRPC_RequestReturnToMenuFromServer();
+		const IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+
+		SessionInterface->DestroySession(NAME_GameSession);
+				
+		ClientTravel(TEXT("/Game/Level/MainMenuLevel"), TRAVEL_Absolute);
 	}
-	else
-	{
-		ServerRPC_RequestReturnToMenuFromClient();
-	}
-	
 }
 
 void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget)
@@ -194,30 +197,6 @@ void ARCN_PlayerController::ClientRPC_CreateMultiPlayerGreenRoomWidget_Implement
 
 	MultiPlayerGreenRoomWidget = CreateWidget<URCN_MultiPlayerGreenRoomWidget>(this, UIDataAsset->MultiPlayerGreenRoomWidgetClass);
 	MultiPlayerGreenRoomWidget->AddToViewport();
-	
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_PlayerController::ServerRPC_RequestReturnToMenuFromServer_Implementation()
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-	
-	if (ARCN_LobbyModeBase* LobbyModeBase = Cast<ARCN_LobbyModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		LobbyModeBase->ReturnMultiPlayerMenuFromServer(this);
-	}
-	
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_PlayerController::ServerRPC_RequestReturnToMenuFromClient_Implementation()
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-	
-	if (ARCN_LobbyModeBase* LobbyModeBase = Cast<ARCN_LobbyModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		LobbyModeBase->ReturnMultiPlayerMenuFromClient(this);
-	}
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

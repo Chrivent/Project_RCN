@@ -19,7 +19,6 @@ class PROJECT_RCN_API ARCN_LobbyModeBase : public ARCN_GameModeBase
 
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-	virtual void Logout(AController* Exiting) override;
 
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
@@ -37,13 +36,4 @@ protected:
 		FVector(1730.0f, 300.0f, 0.0f),
 		FVector(1730.0f, 1000.0f, 0.0f)
 	};
-
-	// 네트워크
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_LogoutPlayer(APlayerController* ExitingPlayer);
-	
-public:
-	void ReturnMultiPlayerMenuFromServer(ARCN_PlayerController* PlayerController) const;
-	void ReturnMultiPlayerMenuFromClient(ARCN_PlayerController* PlayerController);
-	
 };
