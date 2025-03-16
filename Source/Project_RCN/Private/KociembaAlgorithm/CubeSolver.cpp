@@ -746,7 +746,7 @@ int32 FCubieCube::Verify()
     {
         if (EdgeCount[i] != 1)
         {
-            return -2;
+            return 2;
         }
     }
     int32 Sum = 0;
@@ -756,7 +756,7 @@ int32 FCubieCube::Verify()
     }
     if (Sum % 2 != 0)
     {
-        return -3;
+        return 3;
     }
     for (int32 i = 0; i < CORNER_COUNT; i++)
     {
@@ -766,7 +766,7 @@ int32 FCubieCube::Verify()
     {
         if (CornerCount[i] != 1)
         {
-            return -4;
+            return 4;
         }
     }
     Sum = 0;
@@ -776,11 +776,11 @@ int32 FCubieCube::Verify()
     }
     if (Sum % 3 != 0)
     {
-        return -5;
+        return 5;
     }
     if (EdgeParity() != CornerParity())
     {
-        return -6;
+        return 6;
     }
     return 0;
 }
@@ -1262,11 +1262,6 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         InitPruning(CacheDir);
     }
 
-    if (Facelets.Len() != 54)
-    {
-        return FString("ERROR: Invalid facelet input");
-    }
-
     FString CubeString = Facelets;
     TMap<TCHAR, TCHAR> ReplacementInfo = {
         { Facelets[4], TEXT('U') },
@@ -1285,28 +1280,34 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
     Count.SetNum(6);
     for (const auto Facelet : CubeString)
     {
-        switch (Facelet)
-        {
-        case 'U': Count[0]++; break;
-        case 'R': Count[1]++; break;
-        case 'F': Count[2]++; break;
-        case 'D': Count[3]++; break;
-        case 'L': Count[4]++; break;
-        case 'B': Count[5]++; break;
-        default:
-            return FString("ERROR: Unrecognized String");
-        }
+        if (Facelet == 'U') { Count[0]++; }
+        else if (Facelet == 'R') { Count[1]++; }
+        else if (Facelet == 'F') { Count[2]++; }
+        else if (Facelet == 'D') { Count[3]++; }
+        else if (Facelet == 'L') { Count[4]++; }
+        else if (Facelet == 'B') { Count[5]++; }
     }
     
     if (Count.ContainsByPredicate([](const int32 C) { return C != 9; }))
     {
-        return FString("ERROR: Invalid cube state");
+        return FString("ERROR 1: There is not exactly one facelet of each colour");
     }
     
     FCubieCube Cc(CubeString);
-    if (Cc.Verify())
+    switch (Cc.Verify())
     {
-        return FString("ERROR: Unsolvable cube");
+    case 2:
+        return FString("ERROR 2: Not all 12 edges exist exactly once");
+    case 3:
+        return FString("ERROR 3: Flip error: One edge has to be flipped");
+    case 4:
+        return FString("ERROR 4: Not all corners exist exactly once");
+    case 5:
+        return FString("ERROR 5: Twist error: One corner has to be twisted");
+    case 6:
+        return FString("ERROR 6: Parity error: Two corners or two edges have to be exchanged");
+    default:
+        break;
     }
     Cc.InitializeSearch(Search);
     
@@ -1337,14 +1338,14 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
                     {
                         if (FPlatformTime::Seconds() - Time > TimeOut)
                         {
-                            return FString("ERROR: Timeout");
+                            return FString("ERROR 7: Timeout, no solution within given time");
                         }
 
                         if (N == 0)
                         {
                             if (DepthPhase1 >= MaxDepth)
                             {
-                                return FString("ERROR: Max depth exceeded");
+                                return FString("ERROR 8: No solution exists for the given maxDepth");
                             }
                         
                             DepthPhase1++;
