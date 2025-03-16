@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Game/RCN_GameModeBase.h"
-#include "RCN_LobbyModeBase.generated.h"
+#include "RCN_GreenRoomModeBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FReturnToMainMenu)
 
@@ -14,7 +14,7 @@ class ARCN_PlayerController;
  * 
  */
 UCLASS()
-class PROJECT_RCN_API ARCN_LobbyModeBase : public ARCN_GameModeBase
+class PROJECT_RCN_API ARCN_GreenRoomModeBase : public ARCN_GameModeBase
 {
 	GENERATED_BODY()
 
@@ -37,12 +37,4 @@ protected:
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
 
 	void PromoteClientToHost(APlayerController* NewHostController);
-	
-	// Todo: 상수 데이터화 필요
-	TArray<FVector> CubeSpawnPosition = {
-		FVector(1730.0f, -1000.0f, 0.0f),
-		FVector(1730.0f, -300.0f, 0.0f),
-		FVector(1730.0f, 300.0f, 0.0f),
-		FVector(1730.0f, 1000.0f, 0.0f)
-	};
 };

@@ -32,5 +32,8 @@ public:
 	FRotator CubeStartRotation;
 
 	UPROPERTY(EditDefaultsOnly)
+	FVector GreenRoomCubeSpawnPosition[4];
+	
+	UPROPERTY(EditDefaultsOnly)
 	float CubeDestroySpeed;
 };

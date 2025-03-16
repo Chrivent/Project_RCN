@@ -5,7 +5,6 @@
 
 #include "Actor/RCN_PlayerController.h"
 #include "Components/Button.h"
-#include "Game/RCN_LobbyModeBase.h"
 
 void URCN_MultiPlayerGreenRoomWidget::NativeConstruct()
 {
