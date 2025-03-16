@@ -38,9 +38,7 @@ void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 						PlayerNumberMap.Add(PlayerController, PlayerNumber);
 						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("PlayerNumberMap Added: [%s][%d]"), *PlayerNumberMap.FindKey(PlayerNumber)->GetName(), PlayerNumberMap[PlayerController]));
 					}
-
 					
-					//Player->UpdateCubeLocation(CubeSpawnPosition[PlayerController->GetPlayerNumber()]);
 					Player->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[PlayerController]]);
 					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 				}
