@@ -27,6 +27,8 @@ public:
 	void FindSessions();
 	void DestroySession() const;
 
+	void MigrateToHost(APlayerController* NewHostController);
+
 protected:
 	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful);
 	void OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful);

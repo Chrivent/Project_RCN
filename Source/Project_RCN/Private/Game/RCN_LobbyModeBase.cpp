@@ -9,7 +9,9 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
+#include "Game/RCN_GameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "Project_RCN/Project_RCN.h"
 
 
 void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
@@ -55,6 +57,37 @@ void ARCN_LobbyModeBase::PostLogin(APlayerController* NewPlayer)
 	}), 1.0f, false);
 }
 
+void ARCN_LobbyModeBase::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	if (Exiting->IsLocalController() && Exiting->HasAuthority())
+	{
+		RCN_LOG(LogTemp, Log, TEXT("호스트가 나가므로 호스트 마이그레이션을 실시합니다."))
+
+		TArray<APlayerController*> RemainingControllers;
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			APlayerController* Playercontroller = Iterator->Get();
+
+			if (Playercontroller && Playercontroller != Exiting)
+			{
+				RemainingControllers.Add(Playercontroller);
+			}
+		}
+
+		if (RemainingControllers.Num() > 0)
+		{
+			APlayerController* NetHost = RemainingControllers[0];
+			PromoteClientToHost(NetHost);
+		}
+		else
+		{
+			RCN_LOG(LogTemp, Log, TEXT("남은 플레이어가 없어서 호스트 마이그레이션 불가능"));
+		}
+	}
+}
+
 int32 ARCN_LobbyModeBase::GetAvailablePlayerNumber()
 {
 	if (AvailablePlayerNumbers.Num() > 0)
@@ -71,4 +104,20 @@ void ARCN_LobbyModeBase::ReleasePlayerNumber(int32 PlayerNumber)
 {
 	AvailablePlayerNumbers.Add(PlayerNumber);
 	AvailablePlayerNumbers.Sort();
+}
+
+void ARCN_LobbyModeBase::PromoteClientToHost(APlayerController* NewHostController)
+{
+	if (!NewHostController)
+	{
+		return;
+	}
+
+	RCN_LOG(LogTemp, Log, TEXT("새 호스트 후보 : %s"), *NewHostController->GetName())
+	
+	if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
+	{
+		GameInstance->MigrateToHost(NewHostController);
+	}
+	
 }

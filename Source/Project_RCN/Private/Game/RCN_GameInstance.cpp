@@ -105,6 +105,13 @@ void URCN_GameInstance::DestroySession() const
 	SessionInterface.Pin()->DestroySession(NAME_GameSession);
 }
 
+void URCN_GameInstance::MigrateToHost(APlayerController* NewHostController)
+{
+	if (NewHostController) return;
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("MigrateToHost New Host: %s"), *NewHostController->GetName()));
+}
+
 void URCN_GameInstance::OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful)
 {
 	if (bWasSuccessful)

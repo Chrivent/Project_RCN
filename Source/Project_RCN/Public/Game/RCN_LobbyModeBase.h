@@ -19,7 +19,8 @@ class PROJECT_RCN_API ARCN_LobbyModeBase : public ARCN_GameModeBase
 
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-
+	virtual void Logout(AController* Exiting) override;
+	
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
 	
@@ -29,6 +30,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
 
+	void PromoteClientToHost(APlayerController* NewHostController);
+	
 	// Todo: 상수 데이터화 필요
 	TArray<FVector> CubeSpawnPosition = {
 		FVector(1730.0f, -1000.0f, 0.0f),
