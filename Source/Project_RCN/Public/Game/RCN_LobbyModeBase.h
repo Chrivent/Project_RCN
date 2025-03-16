@@ -6,6 +6,8 @@
 #include "Game/RCN_GameModeBase.h"
 #include "RCN_LobbyModeBase.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FReturnToMainMenu)
+
 class ARCN_PlayerController;
 /**
  * 
@@ -35,4 +37,13 @@ protected:
 		FVector(1730.0f, 300.0f, 0.0f),
 		FVector(1730.0f, 1000.0f, 0.0f)
 	};
+
+	// 네트워크
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_LogoutPlayer(APlayerController* ExitingPlayer);
+	
+public:
+	void ReturnMultiPlayerMenuFromServer(ARCN_PlayerController* PlayerController) const;
+	void ReturnMultiPlayerMenuFromClient(ARCN_PlayerController* PlayerController);
+	
 };

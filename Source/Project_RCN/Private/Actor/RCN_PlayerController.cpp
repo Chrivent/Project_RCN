@@ -6,9 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
+#include "Game/RCN_LobbyModeBase.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
 #include "UI/RCN_MainMenuWidget.h"
+#include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 
 ARCN_PlayerController::ARCN_PlayerController()
@@ -78,15 +80,33 @@ void ARCN_PlayerController::OnPossess(APawn* InPawn)
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_PlayerController::CreateMainMenu()
+void ARCN_PlayerController::CreateMainMenuWidget()
 {
 	MainMenuWidget = CreateWidget<URCN_MainMenuWidget>(this, UIDataAsset->MainMenuWidgetClass);
 	MainMenuWidget->AddToViewport();
 }
 
+void ARCN_PlayerController::CreateMultiPlayerGreenRoomWidget()
+{
+	ClientRPC_CreateMultiPlayerGreenRoomWidget();
+}
+
 void ARCN_PlayerController::CreateTimerWidget()
 {
 	ClientRPC_CreateTimerWidget();
+}
+
+void ARCN_PlayerController::RequestReturnToMenu()
+{
+	if (HasAuthority())
+	{
+		ServerRPC_RequestReturnToMenuFromServer();
+	}
+	else
+	{
+		ServerRPC_RequestReturnToMenuFromClient();
+	}
+	
 }
 
 void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget)
@@ -165,5 +185,39 @@ void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
 	TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
 	TimerWidget->AddToViewport();
 
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ClientRPC_CreateMultiPlayerGreenRoomWidget_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	MultiPlayerGreenRoomWidget = CreateWidget<URCN_MultiPlayerGreenRoomWidget>(this, UIDataAsset->MultiPlayerGreenRoomWidgetClass);
+	MultiPlayerGreenRoomWidget->AddToViewport();
+	
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ServerRPC_RequestReturnToMenuFromServer_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	
+	if (ARCN_LobbyModeBase* LobbyModeBase = Cast<ARCN_LobbyModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		LobbyModeBase->ReturnMultiPlayerMenuFromServer(this);
+	}
+	
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ServerRPC_RequestReturnToMenuFromClient_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	
+	if (ARCN_LobbyModeBase* LobbyModeBase = Cast<ARCN_LobbyModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		LobbyModeBase->ReturnMultiPlayerMenuFromClient(this);
+	}
+	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

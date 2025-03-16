@@ -32,6 +32,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
 	TSubclassOf<URCN_SettingWidget> SettingWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
+	TSubclassOf<URCN_OtherPlayerViewWidget> MultiPlayerGreenRoomWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;

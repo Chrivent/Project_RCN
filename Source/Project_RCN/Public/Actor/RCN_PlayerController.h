@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_MultiPlayerGreenRoomWidget;
 class UImage;
 class URCN_MainMenuWidget;
 class URCN_OtherPlayerViewWidget;
@@ -24,6 +25,9 @@ public:
 	ARCN_PlayerController();
 	
 	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player Info")
+	int32 PlayerNumber;
 	
 	FORCEINLINE void SetPlayerNumber(const int32 InPlayerNumber) { PlayerNumber = InPlayerNumber; }
 	FORCEINLINE int32 GetPlayerNumber() const { return PlayerNumber; }
@@ -41,13 +45,12 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 public:
-	void CreateMainMenu();
+	void CreateMainMenuWidget();
+	void CreateMultiPlayerGreenRoomWidget();
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player Info")
-	int32 PlayerNumber;
-
+	void RequestReturnToMenu();
 	
 protected:
 	void UpdateMoveImage(UImage* Image, FVector2D TargetTranslation);
@@ -59,6 +62,10 @@ protected:
 	// MainMenu UI Section
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MainMenu")
 	TObjectPtr<URCN_MainMenuWidget> MainMenuWidget;
+
+	// MultiPlayerGreenRoom UI Section
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MainMenu")
+	TObjectPtr<URCN_MultiPlayerGreenRoomWidget> MultiPlayerGreenRoomWidget;
 	
 	// Game UI Section
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GameUI")
@@ -70,4 +77,13 @@ protected:
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateTimerWidget();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_CreateMultiPlayerGreenRoomWidget();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_RequestReturnToMenuFromServer();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_RequestReturnToMenuFromClient();
 };

@@ -13,7 +13,7 @@ void ARCN_MainMenuModeBase::PostLogin(APlayerController* NewPlayer)
 
 	if (ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
-		NewPlayerController->CreateMainMenu();
+		NewPlayerController->CreateMainMenuWidget();
 	}
 }
 
