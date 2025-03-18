@@ -36,7 +36,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCubeSolver, Log, All)
  * L5, L6, L7, L8, L9, B1, B2, B3, B4, B5, B6, B7, B8, B9 of the enum constants.
  */
 UCLASS()
-class UCubeSolver : public UGameInstanceSubsystem
+class UCubeSolver : public UObject
 {
     GENERATED_BODY()
 

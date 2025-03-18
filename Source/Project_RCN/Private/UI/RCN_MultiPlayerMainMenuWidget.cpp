@@ -8,7 +8,7 @@
 #include "Components/Button.h"
 #include "Components/ListView.h"
 #include "Kismet/GameplayStatics.h"
-#include "Subsystem/SessionManager.h"
+#include "Project_RCN/Public/Utility/SessionManager.h"
 #include "UI/RCN_SessionListEntryWidget.h"
 
 void URCN_MultiPlayerMainMenuWidget::NativeConstruct()

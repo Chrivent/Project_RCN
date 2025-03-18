@@ -6,7 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
-#include "Subsystem/CubeSolver.h"
+#include "Project_RCN/Public/Utility/CubeSolver.h"
 
 const TArray<FSignInfo> ARCN_RubikCube::SignInfos = {
 	{"L", ECubeAxisType::X, -1, false, 1}, {"L'", ECubeAxisType::X, -1, true, 1}, {"L2", ECubeAxisType::X, -1, false, 2},
@@ -549,18 +549,15 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	}
 	
 	FString Command = TEXT("");
-	if (const UCubeSolver* CubeSolver =  GetGameInstance()->GetSubsystem<UCubeSolver>())
+	Command = UCubeSolver::SolveCube(Pattern);
+	if (Command.StartsWith(TEXT("ERROR")))
 	{
-		Command = CubeSolver->SolveCube(Pattern);
-		if (Command.StartsWith(TEXT("ERROR")))
-		{
-			RCN_LOG(LogRubikCube, Error, TEXT("%s"), *Command);
-		}
-		else
-		{
-			RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
-			ServerRPC_Spin(Command);
-		}
+		RCN_LOG(LogRubikCube, Error, TEXT("%s"), *Command);
+	}
+	else
+	{
+		RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
+		ServerRPC_Spin(Command);
 	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));

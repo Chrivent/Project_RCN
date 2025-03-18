@@ -9,7 +9,7 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Game/RCN_GameInstance.h"
 #include "Project_RCN/Project_RCN.h"
-#include "Subsystem/SessionManager.h"
+#include "Project_RCN/Public/Utility/SessionManager.h"
 
 
 void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
