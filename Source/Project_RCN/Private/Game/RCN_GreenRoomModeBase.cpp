@@ -9,6 +9,7 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Game/RCN_GameInstance.h"
 #include "Project_RCN/Project_RCN.h"
+#include "Subsystem/SessionManager.h"
 
 
 void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
@@ -144,8 +145,8 @@ void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostContr
 
 	RCN_LOG(LogTemp, Log, TEXT("새 호스트 후보 : %s"), *NewHostController->GetName())
 	
-	if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
+	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		GameInstance->MigrateToHost(NewHostController);
+		SessionManager->MigrateToHost(NewHostController);
 	}
 }

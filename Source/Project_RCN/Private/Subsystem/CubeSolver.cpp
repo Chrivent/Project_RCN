@@ -1,4 +1,4 @@
-#include "KociembaAlgorithm/CubeSolver.h"
+#include "Subsystem//CubeSolver.h"
 
 DEFINE_LOG_CATEGORY(LogCubeSolver)
 

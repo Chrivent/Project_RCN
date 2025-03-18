@@ -5,7 +5,7 @@
 
 #include "OnlineSessionSettings.h"
 #include "Components/Button.h"
-#include "Game/RCN_GameInstance.h"
+#include "Subsystem/SessionManager.h"
 
 void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 {
@@ -18,27 +18,27 @@ void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 
 void URCN_MultiPlayerMainMenuWidget::CreateSessionButtonReleasedHandle()
 {
-	if (const URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
+	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		GameInstance->CreateSession(4); // 최대 4인 세션 생성
+		SessionManager->CreateSession(4); // 최대 4인 세션 생성
 	}
 }
 
 void URCN_MultiPlayerMainMenuWidget::FindSessionButtonReleasedHandle()
 {
-	if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
+	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		GameInstance->FindSessions();
+		SessionManager->FindSessions();
 	}
 }
 
 void URCN_MultiPlayerMainMenuWidget::JoinSessionButtonReleasedHandle()
 {
-	if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetGameInstance()))
+	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		if (GameInstance->GetSessionSearch().IsValid() && GameInstance->GetSessionSearch()->SearchResults.Num() > 0)
+		if (SessionManager->GetSessionSearch().IsValid() && SessionManager->GetSessionSearch()->SearchResults.Num() > 0)
 		{
-			GameInstance->JoinSession(GameInstance->GetFirstGamePlayer(), GameInstance->GetSessionSearch()->SearchResults[0]); // 첫 번째 세션 참가
+			SessionManager->JoinSession(SessionManager->GetSessionSearch()->SearchResults[0]); // 첫 번째 세션 참가
 		}
 		else
 		{
