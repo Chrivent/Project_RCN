@@ -5,6 +5,7 @@ DEFINE_LOG_CATEGORY(LogCubeSolver)
 #define CORNER_COUNT 8
 #define EDGE_COUNT 12
 
+UENUM()
 enum class EFaceletType : uint8
 {
     U1, U2, U3, U4, U5, U6, U7, U8, U9,
@@ -15,6 +16,7 @@ enum class EFaceletType : uint8
     B1, B2, B3, B4, B5, B6, B7, B8, B9
 };
 
+UENUM()
 enum class EColorType : uint8
 {
     U,
@@ -25,6 +27,7 @@ enum class EColorType : uint8
     B
 };
 
+UENUM()
 enum class ECornerType : uint8
 {
     URF,
@@ -37,6 +40,7 @@ enum class ECornerType : uint8
     DRB
 };
 
+UENUM()
 enum class EEdgeType : uint8
 {
     UR,
@@ -53,6 +57,7 @@ enum class EEdgeType : uint8
     BR
 };
 
+USTRUCT()
 struct FSearch
 {
     FSearch();
@@ -72,6 +77,7 @@ struct FSearch
     TArray<int32> MinDistPhase2;
 };
 
+USTRUCT()
 struct FCubieCube
 {
     FCubieCube();
