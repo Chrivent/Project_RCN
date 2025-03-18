@@ -6,6 +6,9 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "SessionManager.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnCreatedSessionDelegate)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnFoundSessionsDelegate, const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
+
 /**
  * 
  */
@@ -17,6 +20,9 @@ class PROJECT_RCN_API USessionManager : public UGameInstanceSubsystem
 public:
 	FORCEINLINE TSharedPtr<FOnlineSessionSearch> GetSessionSearch() const { return SessionSearch; }
 
+	FOnCreatedSessionDelegate OnCreatedSessionDelegate;
+	FOnFoundSessionsDelegate OnFoundSessionsDelegate;
+
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
@@ -26,7 +32,7 @@ public:
 	void FindSessions();
 	void DestroySession() const;
 
-	void MigrateToHost(APlayerController* NewHostController);
+	static void MigrateToHost(const APlayerController* NewHostController);
 
 protected:
 	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful);

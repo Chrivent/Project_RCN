@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RCN_UIDataAsset.generated.h"
 
+class URCN_SessionListEntryWidget;
 class URCN_MultiPlayerGreenRoomWidget;
 class URCN_SettingWidget;
 class URCN_SinglePlayerMainMenuWidget;
@@ -45,6 +46,9 @@ public:
 	TSubclassOf<URCN_OtherPlayerViewWidget> OtherPlayerViewWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
+	TSubclassOf<URCN_SessionListEntryWidget> SessionListEntryWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	float ImageMoveSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
@@ -54,5 +58,5 @@ public:
 	float CubeOtherPlayerViewWidgetHeightMoveDistance;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float CubeOtherPlayerViewWidgetWightMoveDistance;
+	float CubeOtherPlayerViewWidgetWidthMoveDistance;
 };

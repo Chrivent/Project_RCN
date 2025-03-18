@@ -4,8 +4,12 @@
 #include "UI/RCN_MultiPlayerMainMenuWidget.h"
 
 #include "OnlineSessionSettings.h"
+#include "Actor/RCN_PlayerController.h"
 #include "Components/Button.h"
+#include "Components/ListView.h"
+#include "Kismet/GameplayStatics.h"
 #include "Subsystem/SessionManager.h"
+#include "UI/RCN_SessionListEntryWidget.h"
 
 void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 {
@@ -13,7 +17,13 @@ void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 
 	CreateSessionButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerMainMenuWidget::CreateSessionButtonReleasedHandle);
 	FindSessionButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerMainMenuWidget::FindSessionButtonReleasedHandle);
-	JoinSessionButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerMainMenuWidget::JoinSessionButtonReleasedHandle);
+	SessionListView->OnItemClicked().AddUObject(this, &URCN_MultiPlayerMainMenuWidget::SessionSelectedHandle);
+	
+	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
+	{
+		SessionManager->OnCreatedSessionDelegate.AddUObject(this, &URCN_MultiPlayerMainMenuWidget::OnCreatedSessionsHandle);
+		SessionManager->OnFoundSessionsDelegate.AddUObject(this, &URCN_MultiPlayerMainMenuWidget::OnFoundSessionsHandle);
+	}
 }
 
 void URCN_MultiPlayerMainMenuWidget::CreateSessionButtonReleasedHandle()
@@ -32,17 +42,33 @@ void URCN_MultiPlayerMainMenuWidget::FindSessionButtonReleasedHandle()
 	}
 }
 
-void URCN_MultiPlayerMainMenuWidget::JoinSessionButtonReleasedHandle()
+void URCN_MultiPlayerMainMenuWidget::OnCreatedSessionsHandle()
 {
-	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
+	UGameplayStatics::OpenLevel(this, "LobbyLevel", true, "listen");
+}
+
+void URCN_MultiPlayerMainMenuWidget::OnFoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
+{
+	LastSessionSearch = SessionSearch.Get();
+	SessionListView->ClearListItems();
+
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
 	{
-		if (SessionManager->GetSessionSearch().IsValid() && SessionManager->GetSessionSearch()->SearchResults.Num() > 0)
+		PlayerController->CreateSessionListEntryWidget(SessionListView, SessionSearch);
+	}
+}
+
+void URCN_MultiPlayerMainMenuWidget::SessionSelectedHandle(UObject* SelectedItem) const
+{
+	if (const URCN_SessionListEntryWidget* SessionItem = Cast<URCN_SessionListEntryWidget>(SelectedItem))
+	{
+		const int32 SelectedIndex = SessionItem->GetSessionIndex();
+		if (LastSessionSearch->SearchResults.IsValidIndex(SelectedIndex))
 		{
-			SessionManager->JoinSession(SessionManager->GetSessionSearch()->SearchResults[0]); // 첫 번째 세션 참가
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("No available sessions to join"));
+			if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
+			{
+				SessionManager->JoinSession(LastSessionSearch->SearchResults[SelectedIndex]);
+			}
 		}
 	}
 }

@@ -176,15 +176,7 @@ void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
 
 FVector ARCN_RubikCube::GetButtonPosition(UBoxComponent* ButtonBoxComponent)
 {
-	for (const auto ButtonPosition : ButtonPositions)
-	{
-		if (ButtonPosition.Key == ButtonBoxComponent)
-		{
-			return ButtonPosition.Value;
-		}
-	}
-
-	return FVector::ZeroVector;
+	return ButtonPositions.Contains(ButtonBoxComponent) ? ButtonPositions[ButtonBoxComponent] : FVector::ZeroVector;
 }
 
 void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType)

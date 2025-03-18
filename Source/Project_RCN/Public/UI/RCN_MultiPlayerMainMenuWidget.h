@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_MultiPlayerMainMenuWidget.generated.h"
 
+class FOnlineSessionSearch;
+class URCN_UIDataAsset;
+class UListView;
 class UButton;
 /**
  * 
@@ -24,8 +27,12 @@ protected:
 	UFUNCTION()
 	void FindSessionButtonReleasedHandle();
 
-	UFUNCTION()
-	void JoinSessionButtonReleasedHandle();
+	void OnCreatedSessionsHandle();
+	void OnFoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
+	void SessionSelectedHandle(UObject* SelectedItem) const;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> CreateSessionButton;
@@ -33,6 +40,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> FindSessionButton;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
-	TObjectPtr<UButton> JoinSessionButton;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UListView> SessionListView;
+
+	TObjectPtr<FOnlineSessionSearch> LastSessionSearch;
 };

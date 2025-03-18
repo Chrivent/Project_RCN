@@ -3,11 +3,13 @@
 
 #include "Actor/RCN_PlayerController.h"
 
+#include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "Actor/RCN_Player.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
+#include "Components/ListView.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Game/RCN_GreenRoomModeBase.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -16,6 +18,7 @@
 #include "UI/RCN_MainMenuWidget.h"
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
+#include "UI/RCN_SessionListEntryWidget.h"
 
 ARCN_PlayerController::ARCN_PlayerController()
 {
@@ -100,6 +103,16 @@ void ARCN_PlayerController::CreateTimerWidget()
 	ClientRPC_CreateTimerWidget();
 }
 
+void ARCN_PlayerController::CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
+{
+	for (int32 i = 0; i < SessionSearch->SearchResults.Num(); i++)
+	{
+		URCN_SessionListEntryWidget* SessionItem = CreateWidget<URCN_SessionListEntryWidget>(GetWorld(), UIDataAsset->SessionListEntryWidgetClass);
+		SessionItem->Setup(i, SessionSearch->SearchResults[i].Session.OwningUserName, SessionSearch->SearchResults[i].PingInMs);
+		SessionListView->AddItem(SessionItem);
+	}
+}
+
 void ARCN_PlayerController::RequestReturnToMenu()
 {
 	if (HasAuthority())
@@ -144,7 +157,7 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
 	FVector2D CurrentTranslation = OtherPlayerViewWidget->GetOtherPlayerView()->GetRenderTransform().Translation;
 
-	CurrentTranslation.X += UIDataAsset->CubeOtherPlayerViewWidgetWightMoveDistance;
+	CurrentTranslation.X += UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
 	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderTranslation(CurrentTranslation);
 	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderScale(FVector2D::ZeroVector);
 
@@ -155,7 +168,7 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 		UpdateMoveImage(ExistingOtherPlayerViewWidget->GetOtherPlayerView(), ExistingCurrentTranslation);
 	}
 
-	CurrentTranslation.X -= UIDataAsset->CubeOtherPlayerViewWidgetWightMoveDistance;
+	CurrentTranslation.X -= UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
 	UpdateMoveImage(OtherPlayerViewWidget->GetOtherPlayerView(), CurrentTranslation);
 	UpdateScaleImage(OtherPlayerViewWidget->GetOtherPlayerView(), FVector2D(1.0f, 1.0f));
 	

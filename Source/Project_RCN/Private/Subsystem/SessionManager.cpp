@@ -101,7 +101,7 @@ void USessionManager::DestroySession() const
 	SessionInterface.Pin()->DestroySession(NAME_GameSession);
 }
 
-void USessionManager::MigrateToHost(APlayerController* NewHostController)
+void USessionManager::MigrateToHost(const APlayerController* NewHostController)
 {
 	if (NewHostController)
 	{
@@ -116,8 +116,8 @@ void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, con
 	if (bWasSuccessful)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session created successfully: %s"), *SessionName.ToString()));
-
-		UGameplayStatics::OpenLevel(this, "LobbyLevel", true, "listen");
+		
+		OnCreatedSessionDelegate.Broadcast();
 	}
 	else
 	{
@@ -154,6 +154,8 @@ void USessionManager::OnFindSessionsCompleteHandle(const bool bWasSuccessful)
 			const FOnlineSessionSearchResult& Result = SessionSearch->SearchResults[i];
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session %d: Owner=%s, Ping=%d"), i, *Result.Session.OwningUserName, Result.PingInMs));
 		}
+		
+		OnFoundSessionsDelegate.Broadcast(SessionSearch);
 	}
 	else
 	{

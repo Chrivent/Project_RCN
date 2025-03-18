@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class FOnlineSessionSearch;
+class UListView;
 class ARCN_RubikCube;
 class URCN_MultiPlayerGreenRoomWidget;
 class UImage;
@@ -49,6 +51,7 @@ public:
 	void CreateMainMenuWidget();
 	void CreateMultiPlayerGreenRoomWidget();
 	void CreateTimerWidget();
+	void CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
 	void RequestReturnToMenu();
