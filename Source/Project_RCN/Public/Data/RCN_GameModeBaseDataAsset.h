@@ -30,7 +30,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	FRotator CubeStartRotation;
-
+	
 	UPROPERTY(EditDefaultsOnly)
 	FVector GreenRoomCubeSpawnPosition[4];
 	

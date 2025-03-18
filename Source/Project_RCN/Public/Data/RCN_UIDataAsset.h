@@ -43,10 +43,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_OtherPlayerViewWidget> OtherPlayerViewWidgetClass;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	float ImageMoveSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	float ImageScaleSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CubeOtherPlayerViewWidgetHeightMoveDistance;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float CubeOtherPlayerViewWidgetWightMoveDistance;
 };

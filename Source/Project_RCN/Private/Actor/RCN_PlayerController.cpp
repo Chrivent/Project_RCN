@@ -143,21 +143,19 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 	OtherPlayerViewWidget->AddToViewport();
 	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
 	FVector2D CurrentTranslation = OtherPlayerViewWidget->GetOtherPlayerView()->GetRenderTransform().Translation;
-	// Todo: 상수 데이터화 필요
-	CurrentTranslation.X += 500.0f;
+
+	CurrentTranslation.X += UIDataAsset->CubeOtherPlayerViewWidgetWightMoveDistance;
 	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderTranslation(CurrentTranslation);
 	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderScale(FVector2D::ZeroVector);
 
 	for (const auto ExistingOtherPlayerViewWidget : OtherPlayerViewWidgets)
 	{
 		FVector2D ExistingCurrentTranslation = OtherPlayerViewWidget->GetOtherPlayerView()->GetRenderTransform().Translation;
-		// Todo: 상수 데이터화 필요
-		ExistingCurrentTranslation.Y += 200.0f;
+		ExistingCurrentTranslation.Y += UIDataAsset->CubeOtherPlayerViewWidgetHeightMoveDistance;
 		UpdateMoveImage(ExistingOtherPlayerViewWidget->GetOtherPlayerView(), ExistingCurrentTranslation);
 	}
 
-	// Todo: 상수 데이터화 필요
-	CurrentTranslation.X -= 500.0f;
+	CurrentTranslation.X -= UIDataAsset->CubeOtherPlayerViewWidgetWightMoveDistance;
 	UpdateMoveImage(OtherPlayerViewWidget->GetOtherPlayerView(), CurrentTranslation);
 	UpdateScaleImage(OtherPlayerViewWidget->GetOtherPlayerView(), FVector2D(1.0f, 1.0f));
 	
