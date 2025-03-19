@@ -9,7 +9,6 @@
 #include "Actor/RCN_Player.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
-#include "Components/ListView.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Game/RCN_GreenRoomModeBase.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -18,7 +17,7 @@
 #include "UI/RCN_MainMenuWidget.h"
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
-#include "UI/RCN_SessionListEntryWidget.h"
+#include "UI/RCN_SessionListButtonWidget.h"
 
 ARCN_PlayerController::ARCN_PlayerController()
 {
@@ -103,13 +102,44 @@ void ARCN_PlayerController::CreateTimerWidget()
 	ClientRPC_CreateTimerWidget();
 }
 
-void ARCN_PlayerController::CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch) const
+void ARCN_PlayerController::CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
 {
+	for (const auto SessionListButtonWidget : SessionListButtonWidgets)
+	{
+		SessionListButtonWidget->RemoveFromParent();
+	}
+	
 	for (int32 i = 0; i < SessionSearch->SearchResults.Num(); i++)
 	{
-		URCN_SessionListEntryWidget* SessionItem = CreateWidget<URCN_SessionListEntryWidget>(GetWorld(), UIDataAsset->SessionListEntryWidgetClass);
-		SessionItem->Setup(i, SessionSearch->SearchResults[i].Session.OwningUserName, SessionSearch->SearchResults[i].PingInMs);
-		SessionListView->AddItem(SessionItem);
+		URCN_SessionListButtonWidget* SessionListButtonWidget = CreateWidget<URCN_SessionListButtonWidget>(GetWorld(), UIDataAsset->SessionListButtonWidgetClass);
+		if (!IsValid(SessionListButtonWidget))
+		{
+			RCN_LOG(LogPlayer, Error, TEXT("새로운 UI 위젯 생성 실패"))
+			return;
+		}
+		
+		SessionListButtonWidget->AddToViewport();
+		SessionListButtonWidget->SetSessionSearchResult2(SessionSearch->SearchResults[i]);
+		
+		FVector2D CurrentTranslation = SessionListButtonWidget->GetRenderTransform().Translation;
+		// Todo: 상수화 필요
+		CurrentTranslation.X += 500.0f;
+		CurrentTranslation.Y += 100.0f * i;
+		SessionListButtonWidget->SetRenderTranslation(CurrentTranslation);
+		SessionListButtonWidget->SetRenderOpacity(0.0f);
+
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+		{
+			FVector2D NewTranslation = SessionListButtonWidget->GetRenderTransform().Translation;
+			// Todo: 상수화 필요
+			NewTranslation.X -= 500.0f;
+			UpdateMoveWidget(SessionListButtonWidget, NewTranslation);
+			UpdateOpacityWidget(SessionListButtonWidget, 1.0f);
+			// Todo: 상수화 필요
+		}), i * 0.1f + 0.01f, false);
+
+		SessionListButtonWidgets.Emplace(SessionListButtonWidget);
 	}
 }
 

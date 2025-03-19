@@ -9,7 +9,7 @@
 #include "Components/ListView.h"
 #include "Kismet/GameplayStatics.h"
 #include "Project_RCN/Public/Utility/SessionManager.h"
-#include "UI/RCN_SessionListEntryWidget.h"
+#include "UI/RCN_SessionListButtonWidget.h"
 
 void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 {
@@ -17,7 +17,6 @@ void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 
 	CreateSessionButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerMainMenuWidget::CreateSessionButtonReleasedHandle);
 	FindSessionButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerMainMenuWidget::FindSessionButtonReleasedHandle);
-	SessionListView->OnItemClicked().AddUObject(this, &URCN_MultiPlayerMainMenuWidget::SessionSelectedHandle);
 	
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
@@ -49,26 +48,8 @@ void URCN_MultiPlayerMainMenuWidget::OnCreatedSessionsHandle()
 
 void URCN_MultiPlayerMainMenuWidget::OnFoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
 {
-	LastSessionSearch = SessionSearch.Get();
-	SessionListView->ClearListItems();
-
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
 	{
-		PlayerController->CreateSessionListEntryWidget(SessionListView, SessionSearch);
-	}
-}
-
-void URCN_MultiPlayerMainMenuWidget::SessionSelectedHandle(UObject* SelectedItem) const
-{
-	if (const URCN_SessionListEntryWidget* SessionItem = Cast<URCN_SessionListEntryWidget>(SelectedItem))
-	{
-		const int32 SelectedIndex = SessionItem->GetSessionIndex();
-		if (LastSessionSearch->SearchResults.IsValidIndex(SelectedIndex))
-		{
-			if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
-			{
-				SessionManager->JoinSession(LastSessionSearch->SearchResults[SelectedIndex]);
-			}
-		}
+		PlayerController->CreateSessionListButtonWidget(SessionSearch);
 	}
 }

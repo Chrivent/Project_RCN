@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_SessionListButtonWidget;
 class UWidget;
 class FOnlineSessionSearch;
 class UListView;
@@ -52,7 +53,7 @@ public:
 	void CreateMainMenuWidget();
 	void CreateMultiPlayerGreenRoomWidget();
 	void CreateTimerWidget();
-	void CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch) const;
+	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
 	void RequestReturnToMenu();
@@ -78,6 +79,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category="GameUI")
 	TArray<URCN_OtherPlayerViewWidget*> OtherPlayerViewWidgets;
+
+	UPROPERTY(VisibleAnywhere, Category="GameUI")
+	TArray<URCN_SessionListButtonWidget*> SessionListButtonWidgets;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)

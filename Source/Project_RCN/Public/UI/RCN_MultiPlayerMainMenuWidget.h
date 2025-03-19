@@ -29,7 +29,6 @@ protected:
 
 	void OnCreatedSessionsHandle();
 	void OnFoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
-	void SessionSelectedHandle(UObject* SelectedItem) const;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
@@ -39,9 +38,4 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> FindSessionButton;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UListView> SessionListView;
-
-	TObjectPtr<FOnlineSessionSearch> LastSessionSearch;
 };

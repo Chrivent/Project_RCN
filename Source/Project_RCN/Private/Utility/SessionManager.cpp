@@ -6,7 +6,6 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
-#include "Kismet/GameplayStatics.h"
 
 void USessionManager::Initialize(FSubsystemCollectionBase& Collection)
 {
