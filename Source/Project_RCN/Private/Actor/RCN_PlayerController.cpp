@@ -18,6 +18,7 @@
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_SessionListButtonWidget.h"
+#include "Utility/SessionManager.h"
 
 ARCN_PlayerController::ARCN_PlayerController()
 {
@@ -145,32 +146,11 @@ void ARCN_PlayerController::CreateSessionListButtonWidget(const TSharedPtr<FOnli
 
 void ARCN_PlayerController::RequestReturnToMenu()
 {
-	if (HasAuthority())
+	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Iterator->Get()))
-			{
-				PlayerController->ClientRPC_RequestReturnToMenu();
-			}
-		}
-	}
-	else
-	{
-		ClientRPC_RequestReturnToMenu();
-	}
-}
-
-void ARCN_PlayerController::ClientRPC_RequestReturnToMenu_Implementation()
-{
-	if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
-	{
-		const IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-
 		ServerRPC_DestroyCube();
-		SessionInterface->DestroySession(NAME_GameSession);
 		
-		ClientTravel(TEXT("/Game/Level/MainMenuLevel"), TRAVEL_Absolute);
+		SessionManager->DestroySession(this);
 	}
 }
 
@@ -264,9 +244,9 @@ void ARCN_PlayerController::ServerRPC_DestroyCube_Implementation()
 
 	if (const ARCN_Player* CurrentPlayer = Cast<ARCN_Player>(GetPawn()))
 	{
-		if (ARCN_GreenRoomModeBase* LobbyModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode()))
+		if (ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode()))
 		{
-			LobbyModeBase->UpdateDestroyCube(CurrentPlayer->GetRubikCube());
+			GreenRoomModeBase->UpdateDestroyCube(CurrentPlayer->GetRubikCube());
 		}
 	}
 	

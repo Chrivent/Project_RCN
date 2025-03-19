@@ -21,6 +21,8 @@ protected:
 	UFUNCTION()
 	void BackButtonReleasedHandle();
 
+	void OnDestroyedSessionsHandle();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UButton> BackButton;
 };

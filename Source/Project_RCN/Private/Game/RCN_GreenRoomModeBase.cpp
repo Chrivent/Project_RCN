@@ -96,11 +96,6 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 	Super::Logout(Exiting);
 }
 
-void ARCN_GreenRoomModeBase::RequestLogout(AController* Exiting)
-{
-	Logout(Exiting);
-}
-
 void ARCN_GreenRoomModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
 {
 	const FVector CurrentCubeScale = RubikCube->GetActorScale3D();

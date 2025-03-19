@@ -78,10 +78,10 @@ protected:
 	TObjectPtr<URCN_TimerWidget> TimerWidget;
 
 	UPROPERTY(VisibleAnywhere, Category="GameUI")
-	TArray<URCN_OtherPlayerViewWidget*> OtherPlayerViewWidgets;
+	TArray<TObjectPtr<URCN_OtherPlayerViewWidget>> OtherPlayerViewWidgets;
 
 	UPROPERTY(VisibleAnywhere, Category="GameUI")
-	TArray<URCN_SessionListButtonWidget*> SessionListButtonWidgets;
+	TArray<TObjectPtr<URCN_SessionListButtonWidget>> SessionListButtonWidgets;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
@@ -89,9 +89,6 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateMultiPlayerGreenRoomWidget();
-	
-	UFUNCTION(Client, Reliable)
-	void ClientRPC_RequestReturnToMenu();
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_DestroyCube();

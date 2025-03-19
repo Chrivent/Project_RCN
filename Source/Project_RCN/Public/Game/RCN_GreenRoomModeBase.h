@@ -23,7 +23,6 @@ protected:
 	virtual void Logout(AController* Exiting) override;
 
 public:
-	void RequestLogout(AController* Exiting);
 	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
 
 protected:

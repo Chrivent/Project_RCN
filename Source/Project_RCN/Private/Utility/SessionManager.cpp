@@ -35,19 +35,6 @@ void USessionManager::Initialize(FSubsystemCollectionBase& Collection)
 	}
 }
 
-void USessionManager::JoinSession(const FOnlineSessionSearchResult& SearchResult) const
-{
-	if (!SessionInterface.IsValid())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
-		return;
-	}
-	
-	// 세션 참가 요청
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Attempting to join session: %s"), *SearchResult.Session.OwningUserName));
-	SessionInterface.Pin()->JoinSession(0, NAME_GameSession, SearchResult);
-}
-
 void USessionManager::CreateSession(const int32 NumPlayers) const
 {
 	if (!SessionInterface.IsValid())
@@ -89,7 +76,7 @@ void USessionManager::FindSessions()
 	SessionInterface.Pin()->FindSessions(0, SessionSearch.ToSharedRef());
 }
 
-void USessionManager::DestroySession() const
+void USessionManager::JoinSession(const FOnlineSessionSearchResult& SearchResult) const
 {
 	if (!SessionInterface.IsValid())
 	{
@@ -97,7 +84,24 @@ void USessionManager::DestroySession() const
 		return;
 	}
 	
-	SessionInterface.Pin()->DestroySession(NAME_GameSession);
+	// 세션 참가 요청
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Attempting to join session: %s"), *SearchResult.Session.OwningUserName));
+	SessionInterface.Pin()->JoinSession(0, NAME_GameSession, SearchResult);
+}
+
+void USessionManager::DestroySession(const APlayerController* PlayerController)
+{
+	if (PlayerController->HasAuthority())
+	{
+		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			ClientRPC_DestroySession();
+		}
+	}
+	else
+	{
+		ClientRPC_DestroySession();
+	}
 }
 
 void USessionManager::MigrateToHost(const APlayerController* NewHostController)
@@ -121,18 +125,6 @@ void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, con
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to create session: %s"), *SessionName.ToString()));
-	}
-}
-
-void USessionManager::OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful)
-{
-	if (bWasSuccessful)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session destroyed successfully: %s"), *SessionName.ToString()));
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to destroy session: %s"), *SessionName.ToString()));
 	}
 }
 
@@ -206,4 +198,29 @@ void USessionManager::OnJoinSessionCompleteHandle(const FName SessionName, const
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Client traveling to: %s"), *ConnectionInfo));
 		PlayerController->ClientTravel(ConnectionInfo, TRAVEL_Absolute);
 	}
+}
+
+void USessionManager::OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session destroyed successfully: %s"), *SessionName.ToString()));
+
+		OnDestroyedSessionDelegate.Broadcast();
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Failed to destroy session: %s"), *SessionName.ToString()));
+	}
+}
+
+void USessionManager::ClientRPC_DestroySession_Implementation()
+{
+	if (!SessionInterface.IsValid())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
+		return;
+	}
+	
+	SessionInterface.Pin()->DestroySession(NAME_GameSession);
 }
