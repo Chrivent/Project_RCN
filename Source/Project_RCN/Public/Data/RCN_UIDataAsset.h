@@ -49,10 +49,10 @@ public:
 	TSubclassOf<URCN_SessionListEntryWidget> SessionListEntryWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
-	float ImageMoveSpeed;
+	float WidgetMoveSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
-	float ImageScaleSpeed;
+	float WidgetOpacitySpeed;
 
 	UPROPERTY(EditDefaultsOnly)
 	float CubeOtherPlayerViewWidgetHeightMoveDistance;

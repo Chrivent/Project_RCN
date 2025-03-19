@@ -103,7 +103,7 @@ void ARCN_PlayerController::CreateTimerWidget()
 	ClientRPC_CreateTimerWidget();
 }
 
-void ARCN_PlayerController::CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
+void ARCN_PlayerController::CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch) const
 {
 	for (int32 i = 0; i < SessionSearch->SearchResults.Num(); i++)
 	{
@@ -154,60 +154,57 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 	}
 
 	OtherPlayerViewWidget->AddToViewport();
-	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget);
-	FVector2D CurrentTranslation = OtherPlayerViewWidget->GetOtherPlayerView()->GetRenderTransform().Translation;
-
+	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget, UIDataAsset->WidgetOpacitySpeed);
+	
+	FVector2D CurrentTranslation = OtherPlayerViewWidget->GetRenderTransform().Translation;
 	CurrentTranslation.X += UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
-	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderTranslation(CurrentTranslation);
-	OtherPlayerViewWidget->GetOtherPlayerView()->SetRenderScale(FVector2D::ZeroVector);
+	OtherPlayerViewWidget->SetRenderTranslation(CurrentTranslation);
 
 	for (const auto ExistingOtherPlayerViewWidget : OtherPlayerViewWidgets)
 	{
-		FVector2D ExistingCurrentTranslation = OtherPlayerViewWidget->GetOtherPlayerView()->GetRenderTransform().Translation;
+		FVector2D ExistingCurrentTranslation = OtherPlayerViewWidget->GetRenderTransform().Translation;
 		ExistingCurrentTranslation.Y += UIDataAsset->CubeOtherPlayerViewWidgetHeightMoveDistance;
-		UpdateMoveImage(ExistingOtherPlayerViewWidget->GetOtherPlayerView(), ExistingCurrentTranslation);
+		UpdateMoveWidget(ExistingOtherPlayerViewWidget, ExistingCurrentTranslation);
 	}
 
 	CurrentTranslation.X -= UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
-	UpdateMoveImage(OtherPlayerViewWidget->GetOtherPlayerView(), CurrentTranslation);
-	UpdateScaleImage(OtherPlayerViewWidget->GetOtherPlayerView(), FVector2D(1.0f, 1.0f));
-	
+	UpdateMoveWidget(OtherPlayerViewWidget, CurrentTranslation);
 	OtherPlayerViewWidgets.Add(OtherPlayerViewWidget);
 }
 
-void ARCN_PlayerController::UpdateMoveImage(UImage* Image, const FVector2D TargetTranslation)
+void ARCN_PlayerController::UpdateMoveWidget(UWidget* Widget, const FVector2D TargetTranslation)
 {
-	const FVector2D CurrentTranslation = Image->GetRenderTransform().Translation;
-	const FVector2D NewTranslation = FMath::Lerp(CurrentTranslation, TargetTranslation, UIDataAsset->ImageMoveSpeed);
-	Image->SetRenderTranslation(NewTranslation);
+	const FVector2D CurrentTranslation = Widget->GetRenderTransform().Translation;
+	const FVector2D NewTranslation = FMath::Lerp(CurrentTranslation, TargetTranslation, UIDataAsset->WidgetMoveSpeed);
+	Widget->SetRenderTranslation(NewTranslation);
 
 	if (NewTranslation.Equals(TargetTranslation))
 	{
-		Image->SetRenderTranslation(TargetTranslation);
+		Widget->SetRenderTranslation(TargetTranslation);
 		return;
 	}
 	
 	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
-		UpdateMoveImage(Image, TargetTranslation);
+		UpdateMoveWidget(Widget, TargetTranslation);
 	}));
 }
 
-void ARCN_PlayerController::UpdateScaleImage(UImage* Image, const FVector2D TargetScale)
+void ARCN_PlayerController::UpdateOpacityWidget(UWidget* Widget, const float TargetOpacity)
 {
-	const FVector2D CurrentScale = Image->GetRenderTransform().Scale;
-	const FVector2D NewScale = FMath::Lerp(CurrentScale, TargetScale, UIDataAsset->ImageScaleSpeed);
-	Image->SetRenderScale(NewScale);
+	const float CurrentOpacity = Widget->GetRenderOpacity();
+	const float NewOpacity = FMath::Lerp(CurrentOpacity, TargetOpacity, 0.1f);
+	Widget->SetRenderOpacity(NewOpacity);
 
-	if (NewScale.Equals(TargetScale))
+	if (FMath::IsNearlyEqual(CurrentOpacity, TargetOpacity))
 	{
-		Image->SetRenderScale(TargetScale);
+		Widget->SetRenderOpacity(TargetOpacity);
 		return;
 	}
-
+	
 	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
 	{
-		UpdateScaleImage(Image, TargetScale);
+		UpdateOpacityWidget(Widget, TargetOpacity);
 	}));
 }
 

@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class UWidget;
 class FOnlineSessionSearch;
 class UListView;
 class ARCN_RubikCube;
@@ -51,14 +52,14 @@ public:
 	void CreateMainMenuWidget();
 	void CreateMultiPlayerGreenRoomWidget();
 	void CreateTimerWidget();
-	void CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
+	void CreateSessionListEntryWidget(UListView* SessionListView, const TSharedPtr<FOnlineSessionSearch>& SessionSearch) const;
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
 	void RequestReturnToMenu();
 	
 protected:
-	void UpdateMoveImage(UImage* Image, FVector2D TargetTranslation);
-	void UpdateScaleImage(UImage* Image, FVector2D TargetScale);
+	void UpdateMoveWidget(UWidget* Widget, FVector2D TargetTranslation);
+	void UpdateOpacityWidget(UWidget* Widget, float TargetOpacity);
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;

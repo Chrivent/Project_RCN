@@ -16,11 +16,11 @@ class PROJECT_RCN_API URCN_OtherPlayerViewWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE UImage* GetOtherPlayerView() const { return OtherPlayerView; }
-	
-	void SetOtherPlayerView(UTextureRenderTarget2D* RenderTarget) const;
+	void SetOtherPlayerView(UTextureRenderTarget2D* RenderTarget, float OpacitySpeed);
 	
 protected:
+	void UpdateOpacity(UMaterialInstanceDynamic* DynamicMaterial, float TargetOpacity, float OpacitySpeed);
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UImage> OtherPlayerView;
 	
