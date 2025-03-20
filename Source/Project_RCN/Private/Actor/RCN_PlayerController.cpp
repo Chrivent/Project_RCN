@@ -4,18 +4,16 @@
 #include "Actor/RCN_PlayerController.h"
 
 #include "OnlineSessionSettings.h"
-#include "OnlineSubsystem.h"
-#include "OnlineSubsystemUtils.h"
 #include "Actor/RCN_Player.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Game/RCN_GreenRoomModeBase.h"
-#include "Interfaces/OnlineSessionInterface.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
 #include "UI/RCN_MainMenuWidget.h"
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
+#include "UI/RCN_MultiPlayerMainMenuWidget.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_SessionListButtonWidget.h"
 #include "Utility/SessionManager.h"
@@ -119,8 +117,10 @@ void ARCN_PlayerController::CreateSessionListButtonWidget(const TSharedPtr<FOnli
 			return;
 		}
 		
-		SessionListButtonWidget->AddToViewport();
-		SessionListButtonWidget->SetSessionSearchResult2(SessionSearch->SearchResults[i]);
+		SessionListButtonWidget->AddToViewport(-1);
+		SessionListButtonWidget->SetSessionSearchResult(SessionSearch->SearchResults[i]);
+		SessionListButtonWidget->SessionListButtonReleasedDelegate.AddUObject(this, &ARCN_PlayerController::SessionListButtonReleasedHandle);
+		MainMenuWidget->SetSessionListButtonWidgets(SessionListButtonWidgets);
 		
 		FVector2D CurrentTranslation = SessionListButtonWidget->GetRenderTransform().Translation;
 		// Todo: 상수화 필요
@@ -216,6 +216,12 @@ void ARCN_PlayerController::UpdateOpacityWidget(UWidget* Widget, const float Tar
 	{
 		UpdateOpacityWidget(Widget, TargetOpacity);
 	}));
+}
+
+void ARCN_PlayerController::SessionListButtonReleasedHandle(const FOnlineSessionSearchResult& SessionSearchResult)
+{
+	MainMenuWidget->GetMultiPlayerMainMenuWidget()->SetSessionSearchResult(SessionSearchResult);
+	MainMenuWidget->GetMultiPlayerMainMenuWidget()->VisibleOnNoticeOverlay();
 }
 
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()

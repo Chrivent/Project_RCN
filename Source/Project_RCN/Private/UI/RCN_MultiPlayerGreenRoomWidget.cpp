@@ -15,7 +15,7 @@ void URCN_MultiPlayerGreenRoomWidget::NativeConstruct()
 	
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		SessionManager->OnDestroyedSessionDelegate.AddUObject(this, &URCN_MultiPlayerGreenRoomWidget::OnDestroyedSessionsHandle);
+		SessionManager->DestroyedSessionDelegate.AddUObject(this, &URCN_MultiPlayerGreenRoomWidget::DestroyedSessionsHandle);
 	}
 }
 
@@ -27,7 +27,7 @@ void URCN_MultiPlayerGreenRoomWidget::BackButtonReleasedHandle()
 	}
 }
 
-void URCN_MultiPlayerGreenRoomWidget::OnDestroyedSessionsHandle()
+void URCN_MultiPlayerGreenRoomWidget::DestroyedSessionsHandle()
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
 	{

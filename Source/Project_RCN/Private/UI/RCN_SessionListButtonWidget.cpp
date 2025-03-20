@@ -14,7 +14,7 @@ void URCN_SessionListButtonWidget::NativeConstruct()
 	JoinSessionButton->OnReleased.AddDynamic(this, &URCN_SessionListButtonWidget::JoinSessionButtonReleasedHandle);
 }
 
-void URCN_SessionListButtonWidget::SetSessionSearchResult2(const FOnlineSessionSearchResult& InSessionSearchResult)
+void URCN_SessionListButtonWidget::SetSessionSearchResult(const FOnlineSessionSearchResult& InSessionSearchResult)
 {
 	SessionSearchResult = InSessionSearchResult;
 
@@ -24,8 +24,5 @@ void URCN_SessionListButtonWidget::SetSessionSearchResult2(const FOnlineSessionS
 
 void URCN_SessionListButtonWidget::JoinSessionButtonReleasedHandle()
 {
-	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
-	{
-		SessionManager->JoinSession(SessionSearchResult);
-	}
+	SessionListButtonReleasedDelegate.Broadcast(SessionSearchResult);
 }

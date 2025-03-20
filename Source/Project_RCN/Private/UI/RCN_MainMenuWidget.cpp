@@ -3,12 +3,15 @@
 
 #include "UI/RCN_MainMenuWidget.h"
 
+#include "Actor/RCN_PlayerController.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "GameFramework/GameUserSettings.h"
 #include "UI/RCN_MultiPlayerMainMenuWidget.h"
 #include "UI/RCN_SettingWidget.h"
 #include "UI/RCN_SinglePlayerMainMenuWidget.h"
 #include "Kismet\KismetSystemLibrary.h"
+#include "UI/RCN_SessionListButtonWidget.h"
 
 void URCN_MainMenuWidget::NativeConstruct()
 {
@@ -21,12 +24,30 @@ void URCN_MainMenuWidget::NativeConstruct()
 	GameOutButton->OnReleased.AddDynamic(this, &URCN_MainMenuWidget::GameOutButtonReleasedHandle);
 	
 	BackButton->SetVisibility(ESlateVisibility::Hidden);
+
+	
+	// Todo : 추후 수정 필요
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this] {
+		UGameUserSettings* Settings = UGameUserSettings::GetGameUserSettings();
+		Settings->SetScreenResolution(FIntPoint(1920, 1080));
+		
+		Settings->ApplySettings(false);
+	}), 0.1f, false);
 }
 
 void URCN_MainMenuWidget::BackButtonReleasedHandle()
 {
 	MainMenuWidgetSwitcher->SetActiveWidgetIndex(0);
 
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
+	{
+		for (auto SessionListButtonWidget : PlayerController->GetSessionListButtonWidgets())
+		{
+			SessionListButtonWidget->RemoveFromParent();
+		}
+	}
+	
 	BackButton->SetVisibility(ESlateVisibility::Hidden);
 }
 

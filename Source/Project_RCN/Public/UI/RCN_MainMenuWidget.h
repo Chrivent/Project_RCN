@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_MainMenuWidget.generated.h"
 
+class URCN_SessionListButtonWidget;
 class URCN_SettingWidget;
 class UWidgetSwitcher;
 class URCN_MultiPlayerMainMenuWidget;
@@ -19,6 +20,10 @@ class PROJECT_RCN_API URCN_MainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	FORCEINLINE URCN_MultiPlayerMainMenuWidget* GetMultiPlayerMainMenuWidget() const { return MultiPlayerMainMenuWidget; }
+	FORCEINLINE void SetSessionListButtonWidgets(const TArray<TObjectPtr<URCN_SessionListButtonWidget>>& InSessionListButtonWidgets) { SessionListButtonWidgets = InSessionListButtonWidgets; }
+	
 protected:
  	virtual void NativeConstruct() override;
 
@@ -63,4 +68,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<URCN_SettingWidget> SettingMainMenuWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<TObjectPtr<URCN_SessionListButtonWidget>> SessionListButtonWidgets;
 };

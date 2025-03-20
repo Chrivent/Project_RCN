@@ -82,7 +82,7 @@ void URCN_SettingWidget::ChangeScreenSize(FString SelectedItem)
 	}
 	
 	Settings->ApplySettings(false);
-	Settings->ConfirmVideoMode();
+	//Settings->ConfirmVideoMode();
 	
 	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Setting Complete Resolution: %s"), *SelectedItem));
 }

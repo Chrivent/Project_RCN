@@ -120,7 +120,7 @@ void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, con
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session created successfully: %s"), *SessionName.ToString()));
 		
-		OnCreatedSessionDelegate.Broadcast();
+		CreatedSessionDelegate.Broadcast();
 	}
 	else
 	{
@@ -146,7 +146,7 @@ void USessionManager::OnFindSessionsCompleteHandle(const bool bWasSuccessful)
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session %d: Owner=%s, Ping=%d"), i, *Result.Session.OwningUserName, Result.PingInMs));
 		}
 		
-		OnFoundSessionsDelegate.Broadcast(SessionSearch);
+		FoundSessionsDelegate.Broadcast(SessionSearch);
 	}
 	else
 	{
@@ -206,7 +206,7 @@ void USessionManager::OnDestroySessionCompleteHandle(const FName SessionName, co
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Session destroyed successfully: %s"), *SessionName.ToString()));
 
-		OnDestroyedSessionDelegate.Broadcast();
+		DestroyedSessionDelegate.Broadcast();
 	}
 	else
 	{

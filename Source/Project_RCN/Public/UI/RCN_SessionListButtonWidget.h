@@ -7,6 +7,8 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_SessionListButtonWidget.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FSessionListButtonReleasedDelegate, const FOnlineSessionSearchResult&)
+
 class UButton;
 class UTextBlock;
 /**
@@ -17,15 +19,14 @@ class PROJECT_RCN_API URCN_SessionListButtonWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
-	FORCEINLINE void SetSessionSearchResult(const FOnlineSessionSearchResult& InSessionSearchResult) { SessionSearchResult = InSessionSearchResult; }
-
 protected:
 	virtual void NativeConstruct() override;
 
 public:
-	void SetSessionSearchResult2(const FOnlineSessionSearchResult& InSessionSearchResult);
+	void SetSessionSearchResult(const FOnlineSessionSearchResult& InSessionSearchResult);
 
+	FSessionListButtonReleasedDelegate SessionListButtonReleasedDelegate;
+	
 protected:
 	UFUNCTION()
 	void JoinSessionButtonReleasedHandle();
