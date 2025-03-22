@@ -9,6 +9,7 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Project_RCN/Public/Utility/SessionManager.h"
+#include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 
 void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
@@ -47,6 +48,11 @@ void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
 				{
 					PlayerController->CreateMultiPlayerGreenRoomWidget();
+
+					if (URCN_MultiPlayerGreenRoomWidget* GreenRoomWidget = PlayerController->GetMultiPlayerGreenRoomWidget())
+					{
+						GreenRoomWidget->StartOrReadyDelegate.AddUObject(this, &ARCN_GreenRoomModeBase::StartGame);
+					}
 					
 					PlayerNumberMap.Emplace(PlayerController, GetAvailablePlayerNumber());
 					PlayerCubeMap.Emplace(PlayerController, RubikCube);
@@ -77,7 +83,8 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		PlayerNumberMap.Remove(PlayerController);
 		PlayerCubeMap.Remove(PlayerController);
 	}
-
+	
+	
 	// 호스트 마이그레이션 제작중
 	/*if (Exiting->IsLocalController() && Exiting->HasAuthority())
 	{
@@ -86,11 +93,11 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		TArray<APlayerController*> RemainingControllers;
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
-			APlayerController* Playercontroller = Iterator->Get();
+			APlayerController* PlayerController = Iterator->Get();
 
-			if (Playercontroller && Playercontroller != Exiting)
+			if (PlayerController && PlayerController != Exiting)
 			{
-				RemainingControllers.Add(Playercontroller);
+				RemainingControllers.Add(PlayerController);
 			}
 		}
 
@@ -158,5 +165,16 @@ void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostContr
 	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
 		SessionManager->MigrateToHost(NewHostController);
+	}
+}
+
+void ARCN_GreenRoomModeBase::StartGame()
+{
+	if (HasAuthority())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
+		
+		FString URL = TEXT("/Game/Level/MultiLevel?listen");
+		GetWorld()->ServerTravel(URL);
 	}
 }

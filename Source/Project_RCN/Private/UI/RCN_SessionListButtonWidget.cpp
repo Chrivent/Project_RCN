@@ -5,7 +5,6 @@
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
-#include "Utility/SessionManager.h"
 
 void URCN_SessionListButtonWidget::NativeConstruct()
 {
