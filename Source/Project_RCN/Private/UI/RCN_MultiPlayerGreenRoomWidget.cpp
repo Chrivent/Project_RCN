@@ -12,7 +12,7 @@ void URCN_MultiPlayerGreenRoomWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	BackButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerGreenRoomWidget::BackButtonReleasedHandle);
-	StartOrReadButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerGreenRoomWidget::StartOrReadyButtonReleasedHandle);
+	StartOrReadyButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerGreenRoomWidget::StartOrReadyButtonReleasedHandle);
 	
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
