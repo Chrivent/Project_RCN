@@ -29,7 +29,6 @@ void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
 			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 			{
 				Player->SetRubikCube(RubikCube);
-				Player->InitCube();
 
 				Player->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
 				Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);

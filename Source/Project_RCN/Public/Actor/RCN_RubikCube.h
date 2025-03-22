@@ -74,8 +74,6 @@ public:
 	// Sets default values for this actor's properties
 	ARCN_RubikCube();
 
-	FORCEINLINE FString GetPattern() const { return Pattern; }
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -87,7 +85,6 @@ public:
 	void Spin(const FString& Command);
 	void Scramble();
 	void Solve();
-	void ChangePattern(const FString& NewPattern);
 	FVector GetButtonPosition(UBoxComponent* ButtonBoxComponent);
 
 	FFinishScramble FinishScrambleDelegate;
@@ -100,6 +97,7 @@ protected:
 	void UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& TargetQuat);
 	void GrabPieces(const FSignInfo& SignInfo);
 	void ReleasePieces(const FSignInfo& SignInfo);
+	void ChangePattern(const FString& NewPattern);
 	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);
 	
 	UPROPERTY(VisibleAnywhere)
@@ -136,13 +134,18 @@ protected:
 	uint8 bIsScrambling : 1;
 
 	UPROPERTY(VisibleAnywhere)
-	FString Pattern;
+	uint8 bIsSolved : 1;
 
 	static const TArray<FSignInfo> SignInfos;
 	static const TArray<FVector> PatternOrderPositions;
 	TQueue<FSignInfo> SignQueue;
 
 	// 네트워크 로직
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void OnRep_Pattern();
+	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_Spin(const FString& Command);
 
@@ -156,5 +159,8 @@ protected:
 	void ServerRPC_Solve();
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastRPC_ChangePattern(const FString& NewPattern);
+	void MulticastRPC_RenewalPattern(const FString& NewPattern);
+
+	UPROPERTY(ReplicatedUsing=OnRep_Pattern)
+	FString Pattern;
 };

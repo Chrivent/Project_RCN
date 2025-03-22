@@ -30,8 +30,6 @@ ARCN_PlayerController::ARCN_PlayerController()
 		RCN_LOG(LogPlayer, Error, TEXT("UI 데이터 에셋 로드 실패"))
 		return;
 	}
-
-	PlayerNumber = -1;
 }
 
 void ARCN_PlayerController::PostInitializeComponents()
@@ -148,8 +146,6 @@ void ARCN_PlayerController::RequestReturnToMenu()
 {
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		ServerRPC_DestroyCube();
-		
 		SessionManager->DestroySession(this);
 	}
 }
@@ -240,21 +236,6 @@ void ARCN_PlayerController::ClientRPC_CreateMultiPlayerGreenRoomWidget_Implement
 
 	MultiPlayerGreenRoomWidget = CreateWidget<URCN_MultiPlayerGreenRoomWidget>(this, UIDataAsset->MultiPlayerGreenRoomWidgetClass);
 	MultiPlayerGreenRoomWidget->AddToViewport();
-	
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ARCN_PlayerController::ServerRPC_DestroyCube_Implementation()
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-
-	if (const ARCN_Player* CurrentPlayer = Cast<ARCN_Player>(GetPawn()))
-	{
-		if (ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode()))
-		{
-			GreenRoomModeBase->UpdateDestroyCube(CurrentPlayer->GetRubikCube());
-		}
-	}
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

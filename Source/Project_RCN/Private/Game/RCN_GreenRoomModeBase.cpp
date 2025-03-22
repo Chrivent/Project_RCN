@@ -11,6 +11,20 @@
 #include "Project_RCN/Public/Utility/SessionManager.h"
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 
+void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		for (const auto PlayerCube : PlayerCubeMap)
+		{
+			PlayerCube.Value->Scramble();
+		}
+	}), 4.0f, true);
+}
+
 void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
@@ -25,7 +39,6 @@ void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
 			{
 				Player->SetRubikCube(RubikCube);
-				Player->InitCube();
 
 				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
 				{
@@ -36,13 +49,8 @@ void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 						GreenRoomWidget->StartOrReadyDelegate.AddUObject(this, &ARCN_GreenRoomModeBase::StartGame);
 					}
 					
-					int32 PlayerNumber = GetAvailablePlayerNumber();
-					if (PlayerNumber != -1)
-					{
-						PlayerController->SetPlayerNumber(PlayerNumber);
-						PlayerNumberMap.Emplace(PlayerController, PlayerNumber);
-						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("PlayerNumberMap Added: [%s][%d]"), *PlayerNumberMap.FindKey(PlayerNumber)->GetName(), PlayerNumberMap[PlayerController]));
-					}
+					PlayerNumberMap.Emplace(PlayerController, GetAvailablePlayerNumber());
+					PlayerCubeMap.Emplace(PlayerController, RubikCube);
 					
 					Player->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[PlayerController]]);
 					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
@@ -64,8 +72,11 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
 	{
-		ReleasePlayerNumber(PlayerController->GetPlayerNumber());
+		ReleasePlayerNumber(PlayerNumberMap[PlayerController]);
+		UpdateDestroyCube(PlayerCubeMap[PlayerController]);
+		
 		PlayerNumberMap.Remove(PlayerController);
+		PlayerCubeMap.Remove(PlayerController);
 	}
 	
 	
@@ -146,7 +157,7 @@ void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostContr
 
 	RCN_LOG(LogTemp, Log, TEXT("새 호스트 후보 : %s"), *NewHostController->GetName())
 	
-	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
+	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
 		SessionManager->MigrateToHost(NewHostController);
 	}
