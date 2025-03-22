@@ -31,7 +31,7 @@ protected:
 	void ReleasePlayerNumber(int32 PlayerNumber);
 	
 	UPROPERTY(VisibleAnywhere)
-	TArray<int32> AvailablePlayerNumbers = { 0, 1, 2, 3 };
+	TArray<int32> AvailablePlayerNumbers;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;

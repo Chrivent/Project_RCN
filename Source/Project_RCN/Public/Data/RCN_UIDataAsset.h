@@ -6,15 +6,9 @@
 #include "Engine/DataAsset.h"
 #include "RCN_UIDataAsset.generated.h"
 
-class URCN_SessionListButtonWidget;
-class URCN_MultiPlayerGreenRoomWidget;
 class URCN_SettingWidget;
 class URCN_SinglePlayerMainMenuWidget;
 class URCN_MultiPlayerMainMenuWidget;
-class URCN_MultiPlayerGreenRoomWidget;
-class URCN_MainMenuWidget;
-class URCN_OtherPlayerViewWidget;
-class URCN_TimerWidget;
 /**
  * 
  */

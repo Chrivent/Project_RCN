@@ -22,6 +22,11 @@ void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Opt
 			PlayerCube.Value->Scramble();
 		}
 	}), 4.0f, true);
+
+	for (int32 i = 0; i < 4; i++)
+	{
+		AvailablePlayerNumbers.Emplace(i);
+	}
 }
 
 void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
