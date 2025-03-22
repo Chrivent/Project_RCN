@@ -32,8 +32,9 @@ public:
 	FORCEINLINE void SetPlayerNumber(const int32 InPlayerNumber) { PlayerNumber = InPlayerNumber; }
 	FORCEINLINE int32 GetPlayerNumber() const { return PlayerNumber; }
 	
-	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
-	FORCEINLINE TArray<TObjectPtr<URCN_SessionListButtonWidget>> GetSessionListButtonWidgets() const { return SessionListButtonWidgets; }
+	FORCEINLINE URCN_TimerWidget* GetTimerWidget() const { return TimerWidget; }
+	FORCEINLINE TArray<URCN_SessionListButtonWidget*> GetSessionListButtonWidgets() const { return SessionListButtonWidgets; }
+	FORCEINLINE URCN_MultiPlayerGreenRoomWidget* GetMultiPlayerGreenRoomWidget() const { return MultiPlayerGreenRoomWidget; }
 	
 protected:
 	// 게임과 무관한 액터 초기화

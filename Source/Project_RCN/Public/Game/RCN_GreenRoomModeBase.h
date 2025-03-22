@@ -6,8 +6,6 @@
 #include "Game/RCN_GameModeBase.h"
 #include "RCN_GreenRoomModeBase.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FReturnToMainMenu)
-
 class ARCN_RubikCube;
 class ARCN_PlayerController;
 /**
@@ -17,7 +15,7 @@ UCLASS()
 class PROJECT_RCN_API ARCN_GreenRoomModeBase : public ARCN_GameModeBase
 {
 	GENERATED_BODY()
-
+	
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
@@ -36,4 +34,5 @@ protected:
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
 
 	void PromoteClientToHost(APlayerController* NewHostController);
+	void StartGame();
 };

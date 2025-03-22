@@ -9,7 +9,7 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Project_RCN/Public/Utility/SessionManager.h"
-
+#include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 
 void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -30,12 +30,17 @@ void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
 				{
 					PlayerController->CreateMultiPlayerGreenRoomWidget();
+
+					if (URCN_MultiPlayerGreenRoomWidget* GreenRoomWidget = PlayerController->GetMultiPlayerGreenRoomWidget())
+					{
+						GreenRoomWidget->StartOrReadyDelegate.AddUObject(this, &ARCN_GreenRoomModeBase::StartGame);
+					}
 					
 					int32 PlayerNumber = GetAvailablePlayerNumber();
 					if (PlayerNumber != -1)
 					{
 						PlayerController->SetPlayerNumber(PlayerNumber);
-						PlayerNumberMap.Add(PlayerController, PlayerNumber);
+						PlayerNumberMap.Emplace(PlayerController, PlayerNumber);
 						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("PlayerNumberMap Added: [%s][%d]"), *PlayerNumberMap.FindKey(PlayerNumber)->GetName(), PlayerNumberMap[PlayerController]));
 					}
 					
@@ -62,7 +67,8 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		ReleasePlayerNumber(PlayerController->GetPlayerNumber());
 		PlayerNumberMap.Remove(PlayerController);
 	}
-
+	
+	
 	// 호스트 마이그레이션 제작중
 	/*if (Exiting->IsLocalController() && Exiting->HasAuthority())
 	{
@@ -71,11 +77,11 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		TArray<APlayerController*> RemainingControllers;
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
-			APlayerController* Playercontroller = Iterator->Get();
+			APlayerController* PlayerController = Iterator->Get();
 
-			if (Playercontroller && Playercontroller != Exiting)
+			if (PlayerController && PlayerController != Exiting)
 			{
-				RemainingControllers.Add(Playercontroller);
+				RemainingControllers.Add(PlayerController);
 			}
 		}
 
@@ -127,7 +133,7 @@ int32 ARCN_GreenRoomModeBase::GetAvailablePlayerNumber()
 
 void ARCN_GreenRoomModeBase::ReleasePlayerNumber(int32 PlayerNumber)
 {
-	AvailablePlayerNumbers.Add(PlayerNumber);
+	AvailablePlayerNumbers.Emplace(PlayerNumber);
 	AvailablePlayerNumbers.Sort();
 }
 
@@ -143,5 +149,16 @@ void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostContr
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
 		SessionManager->MigrateToHost(NewHostController);
+	}
+}
+
+void ARCN_GreenRoomModeBase::StartGame()
+{
+	if (HasAuthority())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("ServerTravel : MultiLevel")));
+		
+		FString URL = TEXT("/Game/Level/MultiLevel?listen");
+		GetWorld()->ServerTravel(URL);
 	}
 }
