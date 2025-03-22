@@ -65,7 +65,7 @@ void URCN_MultiPlayerMainMenuWidget::JoinCancelButtonReleasedHandle()
 
 void URCN_MultiPlayerMainMenuWidget::CreatedSessionsHandle()
 {
-	UGameplayStatics::OpenLevel(this, "LobbyLevel", true, "listen");
+	UGameplayStatics::OpenLevel(this, "GreenRoomLevel", true, "listen");
 }
 
 void URCN_MultiPlayerMainMenuWidget::FoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
