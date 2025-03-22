@@ -524,7 +524,7 @@ void ARCN_RubikCube::ServerRPC_Spin_Implementation(const FString& Command)
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 	
 	MulticastRPC_Spin(Command);
-	MulticastRPC_RenewalPattern(Pattern);
+	ClientRPC_RenewalPattern(Pattern);
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
@@ -616,7 +616,7 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_RubikCube::MulticastRPC_RenewalPattern_Implementation(const FString& NewPattern)
+void ARCN_RubikCube::ClientRPC_RenewalPattern_Implementation(const FString& NewPattern)
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 

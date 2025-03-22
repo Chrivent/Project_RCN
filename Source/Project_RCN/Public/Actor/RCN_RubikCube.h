@@ -158,8 +158,8 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_Solve();
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastRPC_RenewalPattern(const FString& NewPattern);
+	UFUNCTION(Client, Unreliable)
+	void ClientRPC_RenewalPattern(const FString& NewPattern);
 
 	UPROPERTY(ReplicatedUsing=OnRep_Pattern)
 	FString Pattern;
