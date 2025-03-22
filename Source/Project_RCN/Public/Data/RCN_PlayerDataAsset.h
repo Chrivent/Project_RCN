@@ -54,11 +54,5 @@ public:
 	float LocationSpeed;
 
 	UPROPERTY(EditDefaultsOnly)
-	float LocationTolerance;
-
-	UPROPERTY(EditDefaultsOnly)
 	float RotationSpeed;
-
-	UPROPERTY(EditDefaultsOnly)
-	float RotationTolerance;
 };

@@ -22,9 +22,8 @@ class PROJECT_RCN_API ARCN_Player : public APawn
 public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
-
-	FORCEINLINE void SetRubikCube(ARCN_RubikCube* InRubikCube) { NetworkRubikCube = InRubikCube; }
-	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return NetworkRubikCube; }
+	
+	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return RubikCube; }
 	FORCEINLINE USpringArmComponent* GetSpringArmComponent() const { return SpringArmComponent; }
 
 protected:
@@ -39,9 +38,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	void InitCube() const;
+	void SetRubikCube(ARCN_RubikCube* InRubikCube);
 	void UpdateCubeLocation(const FVector& TargetLocation);
 	void UpdateCubeRotation(const FRotator& TargetRotation);
 	void RenewalCube();
@@ -79,9 +78,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> YawComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<ARCN_RubikCube> RubikCube;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> SelectedButtonBoxComponent;
@@ -118,6 +114,6 @@ protected:
 	void ClientRPC_CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 
 	UPROPERTY(Replicated)
-	TObjectPtr<ARCN_RubikCube> NetworkRubikCube;
+	TObjectPtr<ARCN_RubikCube> RubikCube;
 };
 

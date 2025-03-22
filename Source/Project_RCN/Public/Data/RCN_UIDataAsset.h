@@ -9,9 +9,6 @@
 class URCN_SettingWidget;
 class URCN_SinglePlayerMainMenuWidget;
 class URCN_MultiPlayerMainMenuWidget;
-class URCN_MainMenuWidget;
-class URCN_OtherPlayerViewWidget;
-class URCN_TimerWidget;
 /**
  * 
  */
@@ -32,10 +29,28 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
 	TSubclassOf<URCN_SettingWidget> SettingWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="MainMenu")
+	TSubclassOf<URCN_MultiPlayerGreenRoomWidget> MultiPlayerGreenRoomWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_TimerWidget> TimerWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_OtherPlayerViewWidget> OtherPlayerViewWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Game UI")
+	TSubclassOf<URCN_SessionListButtonWidget> SessionListButtonWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Game UI")
+	float WidgetMoveSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category="Game UI")
+	float WidgetOpacitySpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CubeOtherPlayerViewWidgetHeightMoveDistance;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float CubeOtherPlayerViewWidgetWidthMoveDistance;
 };

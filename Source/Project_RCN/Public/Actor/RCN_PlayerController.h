@@ -6,6 +6,12 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_SessionListButtonWidget;
+class UWidget;
+class FOnlineSessionSearch;
+class UListView;
+class ARCN_RubikCube;
+class URCN_MultiPlayerGreenRoomWidget;
 class UImage;
 class URCN_MainMenuWidget;
 class URCN_OtherPlayerViewWidget;
@@ -23,10 +29,9 @@ class PROJECT_RCN_API ARCN_PlayerController : public APlayerController
 public:
 	ARCN_PlayerController();
 	
-	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
-	
-	FORCEINLINE void SetPlayerNumber(const int32 InPlayerNumber) { PlayerNumber = InPlayerNumber; }
-	FORCEINLINE int32 GetPlayerNumber() const { return PlayerNumber; }
+	FORCEINLINE URCN_TimerWidget* GetTimerWidget() const { return TimerWidget; }
+	FORCEINLINE TArray<URCN_SessionListButtonWidget*> GetSessionListButtonWidgets() const { return SessionListButtonWidgets; }
+	FORCEINLINE URCN_MultiPlayerGreenRoomWidget* GetMultiPlayerGreenRoomWidget() const { return MultiPlayerGreenRoomWidget; }
 	
 protected:
 	// 게임과 무관한 액터 초기화
@@ -41,17 +46,18 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 public:
-	void CreateMainMenu();
+	void CreateMainMenuWidget();
+	void CreateMultiPlayerGreenRoomWidget();
 	void CreateTimerWidget();
+	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player Info")
-	int32 PlayerNumber;
-
+	void RequestReturnToMenu();
 	
 protected:
-	void UpdateMoveImage(UImage* Image, FVector2D TargetTranslation);
-	void UpdateScaleImage(UImage* Image, FVector2D TargetScale);
+	void UpdateMoveWidget(UWidget* Widget, FVector2D TargetTranslation);
+	void UpdateOpacityWidget(UWidget* Widget, float TargetOpacity);
+	void SessionListButtonReleasedHandle(const FOnlineSessionSearchResult& SessionSearchResult);
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
@@ -59,15 +65,25 @@ protected:
 	// MainMenu UI Section
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MainMenu")
 	TObjectPtr<URCN_MainMenuWidget> MainMenuWidget;
+
+	// MultiPlayerGreenRoom UI Section
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MainMenu")
+	TObjectPtr<URCN_MultiPlayerGreenRoomWidget> MultiPlayerGreenRoomWidget;
 	
 	// Game UI Section
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GameUI")
 	TObjectPtr<URCN_TimerWidget> TimerWidget;
 
 	UPROPERTY(VisibleAnywhere, Category="GameUI")
-	TArray<URCN_OtherPlayerViewWidget*> OtherPlayerViewWidgets;
+	TArray<TObjectPtr<URCN_OtherPlayerViewWidget>> OtherPlayerViewWidgets;
+
+	UPROPERTY(VisibleAnywhere, Category="GameUI")
+	TArray<TObjectPtr<URCN_SessionListButtonWidget>> SessionListButtonWidgets;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateTimerWidget();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_CreateMultiPlayerGreenRoomWidget();
 };

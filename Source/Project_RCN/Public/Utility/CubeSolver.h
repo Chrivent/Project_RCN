@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "CubeSolver.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogCubeSolver, Log, All)
+
 /**
  * The names of the facelet positions of the cube
  * <pre>
@@ -67,5 +69,5 @@ public:
      * Error 7: No solution exists for the given maxDepth<br>
      * Error 8: Timeout, no solution within given time
      */
-    static FString SolveCube(const FString& Facelets, const int32 MaxDepth = 24, double TimeOut = 1000.0f, const FString& CacheDir = TEXT("cache"));
+    static FString SolveCube(FString Facelets, const int32 MaxDepth = 24, double TimeOut = 1.000f, const FString& CacheDir = TEXT("cache"));
 };

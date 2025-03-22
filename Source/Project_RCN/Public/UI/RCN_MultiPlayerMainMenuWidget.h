@@ -3,9 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OnlineSessionSettings.h"
 #include "Blueprint/UserWidget.h"
 #include "RCN_MultiPlayerMainMenuWidget.generated.h"
 
+class UOverlay;
+class FOnlineSessionSearch;
+class URCN_UIDataAsset;
+class UListView;
 class UButton;
 /**
  * 
@@ -15,9 +20,16 @@ class PROJECT_RCN_API URCN_MultiPlayerMainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	FORCEINLINE void SetSessionSearchResult(const FOnlineSessionSearchResult& InSessionSearchResult) { SessionSearchResult = InSessionSearchResult; }
+	
 protected:
 	virtual void NativeConstruct() override;
 
+public:
+	void VisibleOnNoticeOverlay();
+	
+protected:
 	UFUNCTION()
 	void CreateSessionButtonReleasedHandle();
 	
@@ -25,7 +37,16 @@ protected:
 	void FindSessionButtonReleasedHandle();
 
 	UFUNCTION()
-	void JoinSessionButtonReleasedHandle();
+	void JoinConfirmButtonReleasedHandle();
+
+	UFUNCTION()
+	void JoinCancelButtonReleasedHandle();
+	
+	void CreatedSessionsHandle();
+	void FoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> CreateSessionButton;
@@ -33,6 +54,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> FindSessionButton;
 
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UOverlay> NoticeOverlay;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
-	TObjectPtr<UButton> JoinSessionButton;
+	TObjectPtr<UButton> JoinConfirmButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> JoinCancelButton;
+
+	FOnlineSessionSearchResult SessionSearchResult;
 };

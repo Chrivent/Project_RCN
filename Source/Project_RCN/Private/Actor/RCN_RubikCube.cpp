@@ -5,8 +5,9 @@
 
 #include "Components/BoxComponent.h"
 #include "Data/RCN_RubikCubeDataAsset.h"
-#include "KociembaAlgorithm/CubeSolver.h"
+#include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
+#include "Project_RCN/Public/Utility/CubeSolver.h"
 
 const TArray<FSignInfo> ARCN_RubikCube::SignInfos = {
 	{"L", ECubeAxisType::X, -1, false, 1}, {"L'", ECubeAxisType::X, -1, true, 1}, {"L2", ECubeAxisType::X, -1, false, 2},
@@ -138,7 +139,7 @@ ARCN_RubikCube::ARCN_RubikCube()
 void ARCN_RubikCube::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 }
 
 // Called every frame
@@ -169,22 +170,9 @@ void ARCN_RubikCube::Solve()
 	ServerRPC_Solve();
 }
 
-void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
-{
-	MulticastRPC_ChangePattern(NewPattern);
-}
-
 FVector ARCN_RubikCube::GetButtonPosition(UBoxComponent* ButtonBoxComponent)
 {
-	for (const auto ButtonPosition : ButtonPositions)
-	{
-		if (ButtonPosition.Key == ButtonBoxComponent)
-		{
-			return ButtonPosition.Value;
-		}
-	}
-
-	return FVector::ZeroVector;
+	return ButtonPositions.Contains(ButtonBoxComponent) ? ButtonPositions[ButtonBoxComponent] : FVector::ZeroVector;
 }
 
 void ARCN_RubikCube::CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType)
@@ -268,7 +256,7 @@ void ARCN_RubikCube::TurnNext()
 				Pattern.Mid(45, 9)
 			};
 
-			bool bIsSolved = true;
+			bIsSolved = true;
 			for (auto FacesPattern : FacesPatterns)
 			{
 				const TCHAR FirstStickerColor = FacesPattern[0];
@@ -328,7 +316,7 @@ void ARCN_RubikCube::UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& Targ
 	const FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, RubikCubeDataAsset->TurnSpeed);
 	CoreComponent->SetRelativeRotation(NewQuat);
 
-	if (NewQuat.Equals(TargetQuat, RubikCubeDataAsset->TurnTolerance))
+	if (NewQuat.Equals(TargetQuat, 0.01f))
 	{
 		CoreComponent->SetRelativeRotation(TargetQuat);
 		ReleasePieces(SignInfo);
@@ -397,8 +385,7 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 		}
 	}
 	
-	Pattern = TEXT("");
-	
+	FString TempPattern = TEXT("");
 	for (auto PatternOrderPosition : PatternOrderPositions)
 	{
 		for (auto StickerPosition : StickerPositions)
@@ -407,36 +394,78 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 			{
 				if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow])
 				{
-					Pattern += 'Y';
+					TempPattern += 'Y';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Red])
 				{
-					Pattern += 'R';
+					TempPattern += 'R';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Blue])
 				{
-					Pattern += 'B';
+					TempPattern += 'B';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::White])
 				{
-					Pattern += 'W';
+					TempPattern += 'W';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Orange])
 				{
-					Pattern += 'O';
+					TempPattern += 'O';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Green])
 				{
-					Pattern += 'G';
+					TempPattern += 'G';
 				}
 				
 				break;
 			}
 		}
 	}
+	Pattern = TempPattern;
 
 	CoreComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	TurnNext();
+}
+
+void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
+{
+	int32 Index = 0;
+	for (auto PatternOrderPosition : PatternOrderPositions)
+	{
+		for (auto StickerPosition : StickerPositions)
+		{
+			if (PatternOrderPosition == StickerPosition.Value)
+			{
+				if (NewPattern[Index] == TEXT('Y'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
+				}
+				else if (NewPattern[Index] == TEXT('R'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
+				}
+				else if (NewPattern[Index] == TEXT('B'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
+				}
+				else if (NewPattern[Index] == TEXT('W'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
+				}
+				else if (NewPattern[Index] == TEXT('O'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
+				}
+				else if (NewPattern[Index] == TEXT('G'))
+				{
+					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
+				}
+
+				Index++;
+				break;
+			}
+		}
+	}
 }
 
 FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
@@ -474,12 +503,28 @@ FMatrix ARCN_RubikCube::GetRotationMatrix(const FSignInfo& SignInfo)
 	return FMatrix::Identity;
 }
 
+void ARCN_RubikCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ARCN_RubikCube, Pattern, COND_InitialOnly)
+}
+
+void ARCN_RubikCube::OnRep_Pattern()
+{
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
+
+	ChangePattern(Pattern);
+
+	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
+
 void ARCN_RubikCube::ServerRPC_Spin_Implementation(const FString& Command)
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 	
 	MulticastRPC_Spin(Command);
-	MulticastRPC_ChangePattern(Pattern);
+	ClientRPC_RenewalPattern(Pattern);
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
@@ -557,17 +602,21 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	}
 	
 	FString Command = TEXT("");
-	
 	Command = UCubeSolver::SolveCube(Pattern);
-	
-	RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
-	
-	ServerRPC_Spin(Command);
+	if (Command.StartsWith(TEXT("ERROR")))
+	{
+		RCN_LOG(LogRubikCube, Error, TEXT("%s"), *Command);
+	}
+	else
+	{
+		RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
+		ServerRPC_Spin(Command);
+	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_RubikCube::MulticastRPC_ChangePattern_Implementation(const FString& NewPattern)
+void ARCN_RubikCube::ClientRPC_RenewalPattern_Implementation(const FString& NewPattern)
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 
@@ -577,43 +626,7 @@ void ARCN_RubikCube::MulticastRPC_ChangePattern_Implementation(const FString& Ne
 		
 		Pattern = NewPattern;
 	
-		int32 Index = 0;
-		for (auto PatternOrderPosition : PatternOrderPositions)
-		{
-			for (auto StickerPosition : StickerPositions)
-			{
-				if (PatternOrderPosition == StickerPosition.Value)
-				{
-					if (NewPattern[Index] == TEXT('Y'))
-					{
-						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
-					}
-					else if (NewPattern[Index] == TEXT('R'))
-					{
-						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
-					}
-					else if (NewPattern[Index] == TEXT('B'))
-					{
-						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
-					}
-					else if (NewPattern[Index] == TEXT('W'))
-					{
-						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
-					}
-					else if (NewPattern[Index] == TEXT('O'))
-					{
-						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
-					}
-					else if (NewPattern[Index] == TEXT('G'))
-					{
-						StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
-					}
-
-					Index++;
-					break;
-				}
-			}
-		}
+		ChangePattern(NewPattern);
 	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));

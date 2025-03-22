@@ -1,8 +1,11 @@
-#include "KociembaAlgorithm/CubeSolver.h"
+#include "Project_RCN/Public/Utility/CubeSolver.h"
+
+DEFINE_LOG_CATEGORY(LogCubeSolver)
 
 #define CORNER_COUNT 8
 #define EDGE_COUNT 12
 
+UENUM()
 enum class EFaceletType : uint8
 {
     U1, U2, U3, U4, U5, U6, U7, U8, U9,
@@ -13,6 +16,7 @@ enum class EFaceletType : uint8
     B1, B2, B3, B4, B5, B6, B7, B8, B9
 };
 
+UENUM()
 enum class EColorType : uint8
 {
     U,
@@ -23,6 +27,7 @@ enum class EColorType : uint8
     B
 };
 
+UENUM()
 enum class ECornerType : uint8
 {
     URF,
@@ -35,6 +40,7 @@ enum class ECornerType : uint8
     DRB
 };
 
+UENUM()
 enum class EEdgeType : uint8
 {
     UR,
@@ -51,6 +57,7 @@ enum class EEdgeType : uint8
     BR
 };
 
+USTRUCT()
 struct FSearch
 {
     FSearch();
@@ -70,10 +77,11 @@ struct FSearch
     TArray<int32> MinDistPhase2;
 };
 
+USTRUCT()
 struct FCubieCube
 {
     FCubieCube();
-    explicit FCubieCube(const FString& CubeString);
+    explicit FCubieCube(const FString& Facelets);
 
     void InitializeSearch(FSearch& Search);
     
@@ -251,7 +259,7 @@ FCubieCube::FCubieCube()
     Eo = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 }
 
-FCubieCube::FCubieCube(const FString& CubeString)
+FCubieCube::FCubieCube(const FString& Facelets)
 {
     Cp.SetNum(CORNER_COUNT);
     Co.SetNum(CORNER_COUNT);
@@ -261,7 +269,7 @@ FCubieCube::FCubieCube(const FString& CubeString)
     Colors.SetNum(54);
     for (int32 i = 0; i < 54; ++i)
     {
-        switch (CubeString[i])
+        switch (Facelets[i])
         {
         case 'U': Colors[i] = EColorType::U; break;
         case 'R': Colors[i] = EColorType::R; break;
@@ -746,7 +754,7 @@ int32 FCubieCube::Verify()
     {
         if (EdgeCount[i] != 1)
         {
-            return -2;
+            return 2;
         }
     }
     int32 Sum = 0;
@@ -756,7 +764,7 @@ int32 FCubieCube::Verify()
     }
     if (Sum % 2 != 0)
     {
-        return -3;
+        return 3;
     }
     for (int32 i = 0; i < CORNER_COUNT; i++)
     {
@@ -766,7 +774,7 @@ int32 FCubieCube::Verify()
     {
         if (CornerCount[i] != 1)
         {
-            return -4;
+            return 4;
         }
     }
     Sum = 0;
@@ -776,11 +784,11 @@ int32 FCubieCube::Verify()
     }
     if (Sum % 3 != 0)
     {
-        return -5;
+        return 5;
     }
     if (EdgeParity() != CornerParity())
     {
-        return -6;
+        return 6;
     }
     return 0;
 }
@@ -873,7 +881,7 @@ int16 ParityMove[2][18] = {
     { 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1 },
     { 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 }
 };
-int32 PRUNING_INITED = 0;
+int32 PruningInitialized = 0;
 
 bool CheckCachedTable(const FString& Name, void* Ptr, const int32 Length, const FString& CacheDir)
 {
@@ -887,11 +895,11 @@ bool CheckCachedTable(const FString& Name, void* Ptr, const int32 Length, const 
         }
         else
         {
-            UE_LOG(LogTemp, Error, TEXT("Failed to read file: %s"), *FilePath);
+            UE_LOG(LogCubeSolver, Error, TEXT("Failed to read file: %s"), *FilePath);
         }
         return true;
     }
-    UE_LOG(LogTemp, Warning, TEXT("Cache table %s was not found. Recalculating."), *FilePath);
+    UE_LOG(LogCubeSolver, Warning, TEXT("Cache table %s was not found. Recalculating."), *FilePath);
     return false;
 }
 
@@ -906,16 +914,16 @@ void DumpToFile(void* Ptr, const int32 Length, const FString& Name, const FStrin
 
         if (FFileHelper::SaveArrayToFile(FileData, *FilePath))
         {
-            UE_LOG(LogTemp, Log, TEXT("Successfully wrote cache table: %s"), *FilePath);
+            UE_LOG(LogCubeSolver, Log, TEXT("Successfully wrote cache table: %s"), *FilePath);
         }
         else
         {
-            UE_LOG(LogTemp, Error, TEXT("Failed to write cache table: %s"), *FilePath);
+            UE_LOG(LogCubeSolver, Error, TEXT("Failed to write cache table: %s"), *FilePath);
         }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Cannot create cache tables directory: %s"), *CacheDir);
+        UE_LOG(LogCubeSolver, Error, TEXT("Cannot create cache tables directory: %s"), *CacheDir);
     }
 }
 
@@ -1116,7 +1124,7 @@ void InitPruning(const FString& CacheDir)
     ComputePruningTable<N_SLICE1 * N_FLIP / 2, N_FLIP>(
     "Slice_Flip_Prun", Slice_Flip_Pruning, FRtoBR_Move, FlipMove, CacheDir);
 
-    PRUNING_INITED = 1;
+    PruningInitialized = 1;
 }
 
 FString SolutionToString(const FSearch& Search, const int32 Length)
@@ -1253,21 +1261,15 @@ int32 TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth)
     return DepthPhase1 + DepthPhase2;
 }
 
-FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
+FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
 {
     FSearch Search;
 
-    if (PRUNING_INITED == 0)
+    if (PruningInitialized == 0)
     {
         InitPruning(CacheDir);
     }
 
-    if (Facelets.Len() != 54)
-    {
-        return FString("ERROR: Invalid facelet input");
-    }
-
-    FString CubeString = Facelets;
     TMap<TCHAR, TCHAR> ReplacementInfo = {
         { Facelets[4], TEXT('U') },
         { Facelets[13], TEXT('R') },
@@ -1276,42 +1278,48 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
         { Facelets[40], TEXT('L') },
         { Facelets[49], TEXT('B') }
     };
-    for (auto& CubeStringChar : CubeString)
+    for (auto& Facelet : Facelets)
     {
-        CubeStringChar = ReplacementInfo[CubeStringChar];
+        Facelet = ReplacementInfo[Facelet];
     }
 
     TArray<int32> Count;
     Count.SetNum(6);
-    for (const auto Facelet : CubeString)
+    for (const auto Facelet : Facelets)
     {
-        switch (Facelet)
-        {
-        case 'U': Count[0]++; break;
-        case 'R': Count[1]++; break;
-        case 'F': Count[2]++; break;
-        case 'D': Count[3]++; break;
-        case 'L': Count[4]++; break;
-        case 'B': Count[5]++; break;
-        default:
-            return FString("ERROR: Unrecognized String");
-        }
+        if (Facelet == 'U') { Count[0]++; }
+        else if (Facelet == 'R') { Count[1]++; }
+        else if (Facelet == 'F') { Count[2]++; }
+        else if (Facelet == 'D') { Count[3]++; }
+        else if (Facelet == 'L') { Count[4]++; }
+        else if (Facelet == 'B') { Count[5]++; }
     }
     
     if (Count.ContainsByPredicate([](const int32 C) { return C != 9; }))
     {
-        return FString("ERROR: Invalid cube state");
+        return TEXT("ERROR 1: There is not exactly one facelet of each colour");
     }
     
-    FCubieCube Cc(CubeString);
-    if (Cc.Verify())
+    FCubieCube Cc(Facelets);
+    switch (Cc.Verify())
     {
-        return FString("ERROR: Unsolvable cube");
+    case 2:
+        return TEXT("ERROR 2: Not all 12 edges exist exactly once");
+    case 3:
+        return TEXT("ERROR 3: Flip error: One edge has to be flipped");
+    case 4:
+        return TEXT("ERROR 4: Not all corners exist exactly once");
+    case 5:
+        return TEXT("ERROR 5: Twist error: One corner has to be twisted");
+    case 6:
+        return TEXT("ERROR 6: Parity error: Two corners or two edges have to be exchanged");
+    default:
+        break;
     }
     Cc.InitializeSearch(Search);
     
     int32 N = 0, Busy = 0, DepthPhase1 = 1;
-    const double Time = FPlatformTime::Seconds();
+    const double StartTime = FPlatformTime::Seconds();
     
     do
     {
@@ -1335,16 +1343,16 @@ FString UCubeSolver::SolveCube(const FString& Facelets, const int32 MaxDepth, co
                 {
                     if (++Search.Ax[N] > 5)
                     {
-                        if (FPlatformTime::Seconds() - Time > TimeOut)
+                        if (FPlatformTime::Seconds() - StartTime > TimeOut)
                         {
-                            return FString("ERROR: Timeout");
+                            return TEXT("ERROR 7: Timeout, no solution within given time");
                         }
 
                         if (N == 0)
                         {
                             if (DepthPhase1 >= MaxDepth)
                             {
-                                return FString("ERROR: Max depth exceeded");
+                                return TEXT("ERROR 8: No solution exists for the given maxDepth");
                             }
                         
                             DepthPhase1++;

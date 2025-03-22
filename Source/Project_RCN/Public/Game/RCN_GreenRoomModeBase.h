@@ -4,35 +4,39 @@
 
 #include "CoreMinimal.h"
 #include "Game/RCN_GameModeBase.h"
-#include "RCN_LobbyModeBase.generated.h"
+#include "RCN_GreenRoomModeBase.generated.h"
 
+class ARCN_RubikCube;
 class ARCN_PlayerController;
 /**
  * 
  */
 UCLASS()
-class PROJECT_RCN_API ARCN_LobbyModeBase : public ARCN_GameModeBase
+class PROJECT_RCN_API ARCN_GreenRoomModeBase : public ARCN_GameModeBase
 {
 	GENERATED_BODY()
-
+	
 protected:
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
+public:
+	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
+
+protected:
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
 	
 	UPROPERTY(VisibleAnywhere)
-	TArray<int32> AvailablePlayerNumbers = { 0, 1, 2, 3 };
+	TArray<int32> AvailablePlayerNumbers;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
 
-	// Todo: 상수 데이터화 필요
-	TArray<FVector> CubeSpawnPosition = {
-		FVector(1730.0f, -1000.0f, 0.0f),
-		FVector(1730.0f, -300.0f, 0.0f),
-		FVector(1730.0f, 300.0f, 0.0f),
-		FVector(1730.0f, 1000.0f, 0.0f)
-	};
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARCN_RubikCube>> PlayerCubeMap;
+
+	void PromoteClientToHost(APlayerController* NewHostController);
+	void StartGame();
 };

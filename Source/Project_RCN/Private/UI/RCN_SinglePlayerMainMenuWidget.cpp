@@ -4,7 +4,7 @@
 #include "UI/RCN_SinglePlayerMainMenuWidget.h"
 
 #include "Components/Button.h"
-#include "Game/RCN_MainMenuModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 void URCN_SinglePlayerMainMenuWidget::NativeConstruct()
 {
@@ -15,8 +15,5 @@ void URCN_SinglePlayerMainMenuWidget::NativeConstruct()
 
 void URCN_SinglePlayerMainMenuWidget::SinglePlayerStartButtonReleasedHandle()
 {
-	if (ARCN_MainMenuModeBase* MainMenuModeBase = Cast<ARCN_MainMenuModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		MainMenuModeBase->StartSingle();
-	}
+	UGameplayStatics::OpenLevel(GetWorld(), FName("SingleLevel"));
 }
