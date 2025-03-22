@@ -34,6 +34,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UButton> BackButton;
 
-	UPROPERTY(EditAnywhere, blueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UButton> StartOrReadButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UButton> StartOrReadyButton;
 };
