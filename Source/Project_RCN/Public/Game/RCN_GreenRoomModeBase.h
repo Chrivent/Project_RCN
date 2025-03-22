@@ -19,6 +19,7 @@ class PROJECT_RCN_API ARCN_GreenRoomModeBase : public ARCN_GameModeBase
 	GENERATED_BODY()
 
 protected:
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
@@ -34,6 +35,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARCN_RubikCube>> PlayerCubeMap;
 
 	void PromoteClientToHost(APlayerController* NewHostController);
 };

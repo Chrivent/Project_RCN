@@ -151,11 +151,10 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputRightAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
 }
 
-void ARCN_Player::InitCube() const
+void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
 {
-	NetworkRubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::KeepWorldTransform);
-	NetworkRubikCube->SetActorRelativeLocation(FVector::ZeroVector);
-	NetworkRubikCube->SetActorRelativeRotation(GetActorRotation());
+	RubikCube = InRubikCube;
+	RubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 void ARCN_Player::UpdateCubeLocation(const FVector& TargetLocation)
@@ -203,8 +202,6 @@ void ARCN_Player::RenewalCube()
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw;
 	
 	MulticastRPC_SetCubeRotation(Rotator);
-	
-	NetworkRubikCube->ChangePattern(NetworkRubikCube->GetPattern());
 }
 
 void ARCN_Player::CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer)
@@ -263,12 +260,12 @@ void ARCN_Player::RotateCube(const FInputActionValue& Value)
 
 void ARCN_Player::ScrambleCube(const FInputActionValue& Value)
 {
-	NetworkRubikCube->Scramble();
+	RubikCube->Scramble();
 }
 
 void ARCN_Player::SolveCube(const FInputActionValue& Value)
 {
-	NetworkRubikCube->Solve();
+	RubikCube->Solve();
 }
 
 void ARCN_Player::SpinDragStarted(const FInputActionValue& Value)
@@ -307,7 +304,7 @@ void ARCN_Player::SpinDragTriggered(const FInputActionValue& Value)
 		return;
 	}
 	
-	FVector SelectedButtonPosition = NetworkRubikCube->GetButtonPosition(SelectedButtonBoxComponent);
+	FVector SelectedButtonPosition = RubikCube->GetButtonPosition(SelectedButtonBoxComponent);
 	if (SelectedButtonPosition == FVector::ZeroVector)
 	{
 		return;
@@ -379,7 +376,7 @@ void ARCN_Player::SpinInput(const FInputActionValue& Value)
 			{
 				if (UBoxComponent* ButtonBoxComponent = Cast<UBoxComponent>(HitResult.GetComponent()))
 				{
-					SelectedButtonPosition = NetworkRubikCube->GetButtonPosition(ButtonBoxComponent);
+					SelectedButtonPosition = RubikCube->GetButtonPosition(ButtonBoxComponent);
 					InputStartHitLocation = HitResult.Location;
 					HitDistance = HitResult.Distance;
 				}
@@ -418,20 +415,20 @@ FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedButtonPositi
 	TMap<FVector, FVector> CubeVectors;
 	if (FMath::Abs(SelectedButtonPosition.X) != 2)
 	{
-		CubeVectors.Emplace(FVector(1, 0, 0), NetworkRubikCube->GetActorForwardVector());
-		CubeVectors.Emplace(FVector(-1, 0, 0), NetworkRubikCube->GetActorForwardVector() * -1);
+		CubeVectors.Emplace(FVector(1, 0, 0), RubikCube->GetActorForwardVector());
+		CubeVectors.Emplace(FVector(-1, 0, 0), RubikCube->GetActorForwardVector() * -1);
 	}
 		
 	if (FMath::Abs(SelectedButtonPosition.Y) != 2)
 	{
-		CubeVectors.Emplace(FVector(0, 1, 0), NetworkRubikCube->GetActorRightVector());
-		CubeVectors.Emplace(FVector(0, -1, 0), NetworkRubikCube->GetActorRightVector() * -1);
+		CubeVectors.Emplace(FVector(0, 1, 0), RubikCube->GetActorRightVector());
+		CubeVectors.Emplace(FVector(0, -1, 0), RubikCube->GetActorRightVector() * -1);
 	}
 		
 	if (FMath::Abs(SelectedButtonPosition.Z) != 2)
 	{
-		CubeVectors.Emplace(FVector(0, 0, 1), NetworkRubikCube->GetActorUpVector());
-		CubeVectors.Emplace(FVector(0, 0, -1), NetworkRubikCube->GetActorUpVector() * -1);
+		CubeVectors.Emplace(FVector(0, 0, 1), RubikCube->GetActorUpVector());
+		CubeVectors.Emplace(FVector(0, 0, -1), RubikCube->GetActorUpVector() * -1);
 	}
 
 	FVector SpinDirection = FVector::ZeroVector;
@@ -505,14 +502,14 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 		}
 	}
 	
-	NetworkRubikCube->Spin(Command);
+	RubikCube->Spin(Command);
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ARCN_Player, NetworkRubikCube)
+	DOREPLIFETIME(ARCN_Player, RubikCube)
 }
 
 void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection)

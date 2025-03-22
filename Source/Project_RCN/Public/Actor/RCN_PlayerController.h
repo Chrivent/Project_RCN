@@ -29,9 +29,6 @@ class PROJECT_RCN_API ARCN_PlayerController : public APlayerController
 public:
 	ARCN_PlayerController();
 	
-	FORCEINLINE void SetPlayerNumber(const int32 InPlayerNumber) { PlayerNumber = InPlayerNumber; }
-	FORCEINLINE int32 GetPlayerNumber() const { return PlayerNumber; }
-	
 	FORCEINLINE URCN_TimerWidget* GetTimerWidget() { return TimerWidget; }
 	FORCEINLINE TArray<TObjectPtr<URCN_SessionListButtonWidget>> GetSessionListButtonWidgets() const { return SessionListButtonWidgets; }
 	
@@ -61,9 +58,6 @@ protected:
 	void UpdateOpacityWidget(UWidget* Widget, float TargetOpacity);
 	void SessionListButtonReleasedHandle(const FOnlineSessionSearchResult& SessionSearchResult);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player Info")
-	int32 PlayerNumber;
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;
 	
@@ -91,7 +85,4 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateMultiPlayerGreenRoomWidget();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_DestroyCube();
 };
