@@ -1137,6 +1137,7 @@ FString SolutionToString(const FSearch& Search, const int32 Length)
         TArray MovePower = { TEXT(" "), TEXT("2 "), TEXT("' ") };
         SolutionString += MovePower[Search.Po[i] - 1];
     }
+    SolutionString.RemoveAt(SolutionString.Len() - 1);
     return SolutionString;
 }
 
@@ -1401,4 +1402,68 @@ FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const dou
             }
         }
     } while (true);
+}
+
+const TArray<FString> SignArray = {
+    "L", "L'", "L2",
+    "M", "M'", "M2",
+    "R", "R'", "R2",
+
+    "B", "B'", "B2",
+    "S", "S'", "S2",
+    "F", "F'", "F2",
+
+    "D", "D'", "D2",
+    "E", "E'", "E2",
+    "U", "U'", "U2"
+};
+
+FString UCubeSolver::GenerateScrambleCommand(const int32 ScrambleCount)
+{
+    FString Command;
+    FString LastSign = TEXT(" ");
+    for (int32 i = 0; i < ScrambleCount; ++i)
+    {
+        FString CurrentSign;
+
+        do
+        {
+            CurrentSign = SignArray[FMath::RandRange(0, SignArray.Num() - 1)];
+        }
+        while (LastSign[0] == CurrentSign[0]);
+
+        LastSign = CurrentSign;
+        Command += CurrentSign + TEXT(" ");
+    }
+    Command.RemoveAt(Command.Len() - 1);
+    return Command;
+}
+
+bool UCubeSolver::CheckSolved(const FString& Facelets)
+{
+    if (Facelets.Len() < 54)
+    {
+        UE_LOG(LogCubeSolver, Error, TEXT("Facelets length is less than 54 (current: %d)"), Facelets.Len());
+        return false;
+    }
+    TArray FaceFacelets = {
+        Facelets.Mid(0, 9),
+        Facelets.Mid(9, 9),
+        Facelets.Mid(18, 9),
+        Facelets.Mid(27, 9),
+        Facelets.Mid(36, 9),
+        Facelets.Mid(45, 9)
+    };
+    for (auto FaceFacelet : FaceFacelets)
+    {
+        const TCHAR FirstFaceFacelet = FaceFacelet[0];
+        for (const auto OtherFaceFacelet : FaceFacelet)
+        {
+            if (OtherFaceFacelet != FirstFaceFacelet)
+            {
+                return false;
+            }
+        }
+    }
+    return true; 
 }

@@ -38,5 +38,5 @@ protected:
 	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARCN_RubikCube>> PlayerCubeMap;
 
 	void PromoteClientToHost(APlayerController* NewHostController);
-	void StartGame();
+	void StartGame() const;
 };

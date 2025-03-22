@@ -57,7 +57,7 @@ public:
 protected:
 	void UpdateMoveWidget(UWidget* Widget, FVector2D TargetTranslation);
 	void UpdateOpacityWidget(UWidget* Widget, float TargetOpacity);
-	void SessionListButtonReleasedHandle(const FOnlineSessionSearchResult& SessionSearchResult);
+	void SessionListButtonReleasedHandle(const FOnlineSessionSearchResult& SessionSearchResult) const;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;

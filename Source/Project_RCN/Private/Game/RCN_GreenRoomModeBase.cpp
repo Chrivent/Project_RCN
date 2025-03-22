@@ -15,19 +15,34 @@ void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Opt
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		for (const auto PlayerCube : PlayerCubeMap)
-		{
-			PlayerCube.Value->Scramble();
-		}
-	}), 4.0f, true);
-
 	for (int32 i = 0; i < 4; i++)
 	{
 		AvailablePlayerNumbers.Emplace(i);
 	}
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		bool bAllCubeScrambled = true;
+		for (const auto PlayerCube : PlayerCubeMap)
+		{
+			if (PlayerCube.Value->IsSolved())
+			{
+				bAllCubeScrambled = false;
+			}
+		}
+		for (const auto PlayerCube : PlayerCubeMap)
+		{
+			if (bAllCubeScrambled)
+			{
+				PlayerCube.Value->Solve();
+			}
+			else
+			{
+				PlayerCube.Value->Scramble();
+			}
+		}
+	}), 5.0f, true);
 }
 
 void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
@@ -168,13 +183,11 @@ void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostContr
 	}
 }
 
-void ARCN_GreenRoomModeBase::StartGame()
+void ARCN_GreenRoomModeBase::StartGame() const
 {
 	if (HasAuthority())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
-		
-		FString URL = TEXT("/Game/Level/MultiLevel?listen");
-		GetWorld()->ServerTravel(URL);
+		GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
 	}
 }

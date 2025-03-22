@@ -42,8 +42,8 @@ protected:
 	UFUNCTION()
 	void JoinCancelButtonReleasedHandle();
 	
-	void CreatedSessionsHandle();
-	void FoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
+	void CreatedSessionsHandle() const;
+	void FoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch) const;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_UIDataAsset> UIDataAsset;

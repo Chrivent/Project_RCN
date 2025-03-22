@@ -214,7 +214,7 @@ void ARCN_PlayerController::UpdateOpacityWidget(UWidget* Widget, const float Tar
 	}));
 }
 
-void ARCN_PlayerController::SessionListButtonReleasedHandle(const FOnlineSessionSearchResult& SessionSearchResult)
+void ARCN_PlayerController::SessionListButtonReleasedHandle(const FOnlineSessionSearchResult& SessionSearchResult) const
 {
 	MainMenuWidget->GetMultiPlayerMainMenuWidget()->SetSessionSearchResult(SessionSearchResult);
 	MainMenuWidget->GetMultiPlayerMainMenuWidget()->VisibleOnNoticeOverlay();

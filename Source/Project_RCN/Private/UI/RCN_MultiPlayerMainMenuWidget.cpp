@@ -63,12 +63,12 @@ void URCN_MultiPlayerMainMenuWidget::JoinCancelButtonReleasedHandle()
 	NoticeOverlay->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void URCN_MultiPlayerMainMenuWidget::CreatedSessionsHandle()
+void URCN_MultiPlayerMainMenuWidget::CreatedSessionsHandle() const
 {
 	UGameplayStatics::OpenLevel(this, "GreenRoomLevel", true, "listen");
 }
 
-void URCN_MultiPlayerMainMenuWidget::FoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
+void URCN_MultiPlayerMainMenuWidget::FoundSessionsHandle(const TSharedPtr<FOnlineSessionSearch>& SessionSearch) const
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
 	{

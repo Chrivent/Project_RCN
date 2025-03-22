@@ -29,7 +29,7 @@ protected:
 	UFUNCTION()
 	void StartOrReadyButtonReleasedHandle();
 	
-	void DestroyedSessionsHandle();
+	void DestroyedSessionsHandle() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UButton> BackButton;
