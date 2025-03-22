@@ -167,7 +167,7 @@ void ARCN_GreenRoomModeBase::StartGame()
 {
 	if (HasAuthority())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("ServerTravel : MultiLevel")));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
 		
 		FString URL = TEXT("/Game/Level/MultiLevel?listen");
 		GetWorld()->ServerTravel(URL);
