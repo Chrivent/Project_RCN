@@ -65,7 +65,7 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 	{
 		for (const auto PlayerController : PlayerControllers)
 		{
-			if (IsValid(PlayerController) && PlayerController != NewPlayerController)
+			if (PlayerController != NewPlayerController)
 			{
 				ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn());
 				ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController->GetPawn());

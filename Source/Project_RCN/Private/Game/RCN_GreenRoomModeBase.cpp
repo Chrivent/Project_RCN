@@ -96,9 +96,11 @@ void ARCN_GreenRoomModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
 	}));
 }
 
-void ARCN_GreenRoomModeBase::StartGame()
+void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerController)
 {
-	if (!PlayerReadyMap.IsEmpty() && PlayerAllReadCheck())
+	PlayerReadyMap[PressedPlayerController] = true;
+	
+	if (PlayerReadyMap.Num() > 1 && PlayerAllReadCheck())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
 		
@@ -108,18 +110,20 @@ void ARCN_GreenRoomModeBase::StartGame()
 
 void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerController)
 {
-	/*if (PlayerReadyMap[PressedPlayerController] == true)
+	if (PlayerReadyMap[PressedPlayerController] == true)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Not Read")));
-		PressedPlayerController->GetMultiPlayerGreenRoomWidget()->SetStartOrReadyButtonColor(FLinearColor::Black);
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Not Read")));
+		PlayerReadyMap[PressedPlayerController] = false;
+		
+		PressedPlayerController->SetGreenRoomReady(false);
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Ready")));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Ready")));
 		PlayerReadyMap[PressedPlayerController] = true;
-
-		PressedPlayerController->GetMultiPlayerGreenRoomWidget()->SetStartOrReadyButtonColor(FLinearColor::Blue);
-	}*/
+		
+		PressedPlayerController->SetGreenRoomReady(true);
+	}
 }
 
 void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerController)
@@ -172,8 +176,9 @@ bool ARCN_GreenRoomModeBase::PlayerAllReadCheck()
 {
 	for (const auto Players : PlayerReadyMap)
 	{
-		if (!Players.Value)
+		if (Players.Value == false)
         {
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Player Not All Ready")));
         	return false;
         }
 	}

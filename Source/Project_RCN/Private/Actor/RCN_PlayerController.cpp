@@ -8,6 +8,7 @@
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Game/RCN_GreenRoomModeBase.h"
+#include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
 #include "UI/RCN_MainMenuWidget.h"
@@ -181,12 +182,14 @@ void ARCN_PlayerController::GreenRoomStartOrReady()
 {
 	if (HasAuthority())
 	{
-		ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode());
-		GreenRoomModeBase->StartGame();
+		if (ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode()))
+		{
+			GreenRoomModeBase->StartGame(this);
+		}
 	}
 	else
 	{
-		ServerRPC_GreenRoomReady_Implementation();
+		ServerRPC_GreenRoomReady();
 	}
 }
 
@@ -232,6 +235,22 @@ void ARCN_PlayerController::SessionListButtonReleasedHandle(const FOnlineSession
 	MainMenuWidget->GetMultiPlayerMainMenuWidget()->VisibleOnNoticeOverlay();
 }
 
+void ARCN_PlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARCN_PlayerController, bGreenRoomReady)
+}
+
+void ARCN_PlayerController::OnRep_GreenRoomReady() const
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	MultiPlayerGreenRoomWidget->SetStartOrReadyButtonColor(bGreenRoomReady ? FLinearColor::Blue : FLinearColor::Black);
+	
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
 {
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
@@ -266,6 +285,12 @@ void ARCN_PlayerController::ClientRPC_CreateMultiPlayerGreenRoomWidget_Implement
 
 void ARCN_PlayerController::ServerRPC_GreenRoomReady_Implementation()
 {
-	ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode());
-	GreenRoomModeBase->PlayerReady(this);
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	
+	if (ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		GreenRoomModeBase->PlayerReady(this);
+	}
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

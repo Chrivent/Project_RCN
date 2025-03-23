@@ -140,7 +140,7 @@ protected:
 	TQueue<FSignInfo> SignQueue;
 
 	// 네트워크 로직
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
 	void OnRep_Facelets();

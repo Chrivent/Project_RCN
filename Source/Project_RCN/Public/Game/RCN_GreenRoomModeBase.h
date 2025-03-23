@@ -22,7 +22,7 @@ protected:
 
 public:
 	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
-	void StartGame();
+	void StartGame(ARCN_PlayerController* PressedPlayerController);
 	void PlayerReady(ARCN_PlayerController* PressedPlayerController);
 
 protected:
