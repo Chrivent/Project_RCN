@@ -49,8 +49,8 @@ public:
 	void CreateMainMenuWidget();
 	void CreateMultiPlayerGreenRoomWidget();
 	void CreateTimerWidget();
+	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
-	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);
 	
@@ -85,6 +85,9 @@ protected:
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateTimerWidget();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateMultiPlayerGreenRoomWidget();

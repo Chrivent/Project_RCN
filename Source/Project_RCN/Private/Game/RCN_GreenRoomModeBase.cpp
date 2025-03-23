@@ -25,6 +25,13 @@ void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Opt
 		bool bAllCubeScrambled = true;
 		for (const auto PlayerCube : PlayerCubeMap)
 		{
+			if (PlayerCube.Value->IsSolved())
+			{
+				bAllCubeScrambled = false;
+			}
+		}
+		for (const auto PlayerCube : PlayerCubeMap)
+		{
 			if (bAllCubeScrambled)
 			{
 				PlayerCube.Value->Solve();

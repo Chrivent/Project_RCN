@@ -9,6 +9,7 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Project_RCN/Project_RCN.h"
 
 AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
@@ -65,13 +66,11 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 		{
 			if (PlayerController != NewPlayerController)
 			{
-				ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn());
-				ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController->GetPawn());
-				if (IsValid(NewPlayer) && IsValid(OtherPlayer))
+				if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController->GetPawn()))
 				{
-					NewPlayer->CreateOtherPlayerViewWidget(OtherPlayer);
+					NewPlayerController->CreateOtherPlayerViewWidget(OtherPlayer);
 				}
 			}
-		} 
-	}), 2.0f, false);
+		}
+	}), 3.0f, false);
 }
