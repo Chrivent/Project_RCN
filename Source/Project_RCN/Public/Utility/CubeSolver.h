@@ -70,4 +70,31 @@ public:
      * Error 8: Timeout, no solution within given time
      */
     static FString SolveCube(FString Facelets, const int32 MaxDepth = 24, double TimeOut = 1.000f, const FString& CacheDir = TEXT("cache"));
+
+    /**
+	 * Generates a randomized scramble command string for the Rubik's Cube.
+     *
+     * @param ScrambleCount
+     * The number of turns to include in the scramble sequence. Common values range from 20 to 25 for a standard scramble.
+     * Each move will be randomly selected and avoids repeating the same face (e.g., "R" followed immediately by "R2").
+     *
+     * @return A whitespace-separated string of cube rotation commands, such as "R U R' F2 D L' B".
+     */
+    static FString GenerateScrambleCommand(const int32 ScrambleCount);
+
+    /**
+	 * Checks if a given Rubik's Cube facelet string represents a solved cube.
+	 *
+	 * The cube is considered solved if all six faces consist of identical characters,
+	 * meaning each face has 9 stickers of the same color.
+	 *
+	 * @param Facelets
+	 * A 54-character string representing the cube's current state. Each character corresponds
+	 * to a sticker on the cube, in the order:
+	 * U1–U9, R1–R9, F1–F9, D1–D9, L1–L9, B1–B9.
+	 * For example: "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
+	 *
+	 * @return true if the cube is in a solved state; false otherwise.
+	 */
+    static bool CheckSolved(const FString& Facelets);
 };

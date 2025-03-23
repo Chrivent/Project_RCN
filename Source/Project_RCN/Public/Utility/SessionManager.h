@@ -37,10 +37,10 @@ public:
 	static void MigrateToHost(const APlayerController* NewHostController);
 
 protected:
-	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful);
-	void OnFindSessionsCompleteHandle(const bool bWasSuccessful);
-	void OnJoinSessionCompleteHandle(const FName SessionName, const EOnJoinSessionCompleteResult::Type JoinResult);
-	void OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful);
+	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const;
+	void OnFindSessionsCompleteHandle(const bool bWasSuccessful) const;
+	void OnJoinSessionCompleteHandle(const FName SessionName, const EOnJoinSessionCompleteResult::Type JoinResult) const;
+	void OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const;
 	
 	TWeakPtr<IOnlineSession> SessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;

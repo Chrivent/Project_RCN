@@ -12,6 +12,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Data/RCN_PlayerDataAsset.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "Game/RCN_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
@@ -63,6 +64,8 @@ void ARCN_Player::BeginPlay()
 	}
 
 	SetControl();
+
+	ServerRPC_LoginComplete();
 
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
@@ -517,6 +520,21 @@ void ARCN_Player::OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connecti
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::OnActorChannelOpen(InBunch, Connection);
+	
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_LoginComplete_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
+	{
+		if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
+		{
+			GameModeBase->LoginComplete(PlayerController);
+		}
+	}
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

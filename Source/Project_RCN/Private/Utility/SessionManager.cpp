@@ -114,7 +114,7 @@ void USessionManager::MigrateToHost(const APlayerController* NewHostController)
 	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("MigrateToHost New Host: %s"), *NewHostController->GetName()));
 }
 
-void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful)
+void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const
 {
 	if (bWasSuccessful)
 	{
@@ -128,7 +128,7 @@ void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, con
 	}
 }
 
-void USessionManager::OnFindSessionsCompleteHandle(const bool bWasSuccessful)
+void USessionManager::OnFindSessionsCompleteHandle(const bool bWasSuccessful) const
 {
 	if (!SessionInterface.IsValid() || !SessionSearch.IsValid())
 	{
@@ -154,7 +154,7 @@ void USessionManager::OnFindSessionsCompleteHandle(const bool bWasSuccessful)
 	}
 }
 
-void USessionManager::OnJoinSessionCompleteHandle(const FName SessionName, const EOnJoinSessionCompleteResult::Type JoinResult)
+void USessionManager::OnJoinSessionCompleteHandle(const FName SessionName, const EOnJoinSessionCompleteResult::Type JoinResult) const
 {
 	if (!SessionInterface.IsValid())
 	{
@@ -200,7 +200,7 @@ void USessionManager::OnJoinSessionCompleteHandle(const FName SessionName, const
 	}
 }
 
-void USessionManager::OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful)
+void USessionManager::OnDestroySessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const
 {
 	if (bWasSuccessful)
 	{

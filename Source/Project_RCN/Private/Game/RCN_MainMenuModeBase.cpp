@@ -5,12 +5,9 @@
 
 #include "Actor/RCN_PlayerController.h"
 
-void ARCN_MainMenuModeBase::PostLogin(APlayerController* NewPlayer)
+void ARCN_MainMenuModeBase::LoginComplete(ARCN_PlayerController* NewPlayerController)
 {
-	Super::PostLogin(NewPlayer);
+	Super::LoginComplete(NewPlayerController);
 
-	if (ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		NewPlayerController->CreateMainMenuWidget();
-	}
+	NewPlayerController->CreateMainMenuWidget();
 }

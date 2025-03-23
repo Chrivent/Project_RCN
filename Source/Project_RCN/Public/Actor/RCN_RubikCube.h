@@ -74,6 +74,8 @@ public:
 	// Sets default values for this actor's properties
 	ARCN_RubikCube();
 
+	FORCEINLINE bool IsSolved() const { return bIsSolved; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -97,7 +99,7 @@ protected:
 	void UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& TargetQuat);
 	void GrabPieces(const FSignInfo& SignInfo);
 	void ReleasePieces(const FSignInfo& SignInfo);
-	void ChangePattern(const FString& NewPattern);
+	void ChangeFacelets(const FString& NewFacelets);
 	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);
 	
 	UPROPERTY(VisibleAnywhere)
@@ -133,18 +135,15 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsScrambling : 1;
 
-	UPROPERTY(VisibleAnywhere)
-	uint8 bIsSolved : 1;
-
 	static const TArray<FSignInfo> SignInfos;
-	static const TArray<FVector> PatternOrderPositions;
+	static const TArray<FVector> FaceletOrderPositions;
 	TQueue<FSignInfo> SignQueue;
 
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
-	void OnRep_Pattern();
+	void OnRep_Facelets();
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_Spin(const FString& Command);
@@ -158,9 +157,12 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_Solve();
 
-	UFUNCTION(Client, Unreliable)
-	void ClientRPC_RenewalPattern(const FString& NewPattern);
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastRPC_RenewalPattern(const FString& NewPattern);
 
-	UPROPERTY(ReplicatedUsing=OnRep_Pattern)
-	FString Pattern;
+	UPROPERTY(Replicated)
+	uint8 bIsSolved : 1;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Facelets)
+	FString Facelets;
 };

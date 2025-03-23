@@ -10,35 +10,35 @@
 #include "Project_RCN/Public/Utility/CubeSolver.h"
 
 const TArray<FSignInfo> ARCN_RubikCube::SignInfos = {
-	{"L", ECubeAxisType::X, -1, false, 1}, {"L'", ECubeAxisType::X, -1, true, 1}, {"L2", ECubeAxisType::X, -1, false, 2},
-	{"M", ECubeAxisType::X, 0, false, 1},  {"M'", ECubeAxisType::X, 0, true, 1},  {"M2", ECubeAxisType::X, 0, false, 2},
-	{"R", ECubeAxisType::X, 1, true, 1},   {"R'", ECubeAxisType::X, 1, false, 1}, {"R2", ECubeAxisType::X, 1, true, 2},
+	{ "L", ECubeAxisType::X, -1, false, 1 }, { "L'", ECubeAxisType::X, -1,  true, 1 }, { "L2", ECubeAxisType::X, -1, false, 2 },
+	{ "M", ECubeAxisType::X,  0, false, 1 }, { "M'", ECubeAxisType::X,  0,  true, 1 }, { "M2", ECubeAxisType::X,  0, false, 2 },
+	{ "R", ECubeAxisType::X,  1,  true, 1 }, { "R'", ECubeAxisType::X,  1, false, 1 }, { "R2", ECubeAxisType::X,  1,  true, 2 },
 
-	{"B", ECubeAxisType::Y, -1, false, 1}, {"B'", ECubeAxisType::Y, -1, true, 1}, {"B2", ECubeAxisType::Y, -1, false, 2},
-	{"S", ECubeAxisType::Y, 0, true, 1},   {"S'", ECubeAxisType::Y, 0, false, 1}, {"S2", ECubeAxisType::Y, 0, true, 2},
-	{"F", ECubeAxisType::Y, 1, true, 1},   {"F'", ECubeAxisType::Y, 1, false, 1}, {"F2", ECubeAxisType::Y, 1, true, 2},
+	{ "B", ECubeAxisType::Y, -1, false, 1 }, { "B'", ECubeAxisType::Y, -1,  true, 1 }, { "B2", ECubeAxisType::Y, -1, false, 2 },
+	{ "S", ECubeAxisType::Y,  0,  true, 1 }, { "S'", ECubeAxisType::Y,  0, false, 1 }, { "S2", ECubeAxisType::Y,  0,  true, 2 },
+	{ "F", ECubeAxisType::Y,  1,  true, 1 }, { "F'", ECubeAxisType::Y,  1, false, 1 }, { "F2", ECubeAxisType::Y,  1,  true, 2 },
 
-	{"D", ECubeAxisType::Z, -1, false, 1}, {"D'", ECubeAxisType::Z, -1, true, 1}, {"D2", ECubeAxisType::Z, -1, false, 2},
-	{"E", ECubeAxisType::Z, 0, false, 1},  {"E'", ECubeAxisType::Z, 0, true, 1},  {"E2", ECubeAxisType::Z, 0, false, 2},
-	{"U", ECubeAxisType::Z, 1, true, 1},   {"U'", ECubeAxisType::Z, 1, false, 1}, {"U2", ECubeAxisType::Z, 1, true, 2}
+	{ "D", ECubeAxisType::Z, -1, false, 1 }, { "D'", ECubeAxisType::Z, -1,  true, 1 }, { "D2", ECubeAxisType::Z, -1, false, 2 },
+	{ "E", ECubeAxisType::Z,  0, false, 1 }, { "E'", ECubeAxisType::Z,  0,  true, 1 }, { "E2", ECubeAxisType::Z,  0, false, 2 },
+	{ "U", ECubeAxisType::Z,  1,  true, 1 }, { "U'", ECubeAxisType::Z,  1, false, 1 }, { "U2", ECubeAxisType::Z,  1,  true, 2 }
 };
 
-const TArray<FVector> ARCN_RubikCube::PatternOrderPositions = {
-	FVector(-1, -1, 2), FVector(0, -1, 2), FVector(1, -1, 2),
-	FVector(-1,  0, 2), FVector(0,  0, 2), FVector(1,  0, 2),
-	FVector(-1,  1, 2), FVector(0,  1, 2), FVector(1,  1, 2),
+const TArray<FVector> ARCN_RubikCube::FaceletOrderPositions = {
+	FVector(-1, -1,  2), FVector( 0, -1,  2), FVector( 1, -1,  2),
+	FVector(-1,  0,  2), FVector( 0,  0,  2), FVector( 1,  0,  2),
+	FVector(-1,  1,  2), FVector( 0,  1,  2), FVector( 1,  1,  2),
 
-	FVector(2,  1,  1), FVector(2,  0,  1), FVector(2, -1,  1),
-	FVector(2,  1,  0), FVector(2,  0,  0), FVector(2, -1,  0),
-	FVector(2,  1, -1), FVector(2,  0, -1), FVector(2, -1, -1),
+	FVector( 2,  1,  1), FVector( 2,  0,  1), FVector( 2, -1,  1),
+	FVector( 2,  1,  0), FVector( 2,  0,  0), FVector( 2, -1,  0),
+	FVector( 2,  1, -1), FVector( 2,  0, -1), FVector( 2, -1, -1),
 
-	FVector(-1, 2,  1), FVector(0, 2,  1), FVector(1, 2,  1),
-	FVector(-1, 2,  0), FVector(0, 2,  0), FVector(1, 2,  0),
-	FVector(-1, 2, -1), FVector(0, 2, -1), FVector(1, 2, -1),
+	FVector(-1,  2,  1), FVector( 0,  2,  1), FVector( 1,  2,  1),
+	FVector(-1,  2,  0), FVector( 0,  2,  0), FVector( 1,  2,  0),
+	FVector(-1,  2, -1), FVector( 0,  2, -1), FVector( 1,  2, -1),
 
-	FVector(-1,  1, -2), FVector(0,  1, -2), FVector(1,  1, -2),
-	FVector(-1,  0, -2), FVector(0,  0, -2), FVector(1,  0, -2),
-	FVector(-1, -1, -2), FVector(0, -1, -2), FVector(1, -1, -2),
+	FVector(-1,  1, -2), FVector( 0,  1, -2), FVector( 1,  1, -2),
+	FVector(-1,  0, -2), FVector( 0,  0, -2), FVector( 1,  0, -2),
+	FVector(-1, -1, -2), FVector( 0, -1, -2), FVector( 1, -1, -2),
 
 	FVector(-2, -1,  1), FVector(-2,  0,  1), FVector(-2,  1,  1),
 	FVector(-2, -1,  0), FVector(-2,  0,  0), FVector(-2,  1,  0),
@@ -130,7 +130,8 @@ ARCN_RubikCube::ARCN_RubikCube()
 		}
 	}
 
-	Pattern = TEXT("YYYYYYYYYRRRRRRRRRBBBBBBBBBWWWWWWWWWOOOOOOOOOGGGGGGGGG");
+	bIsSolved = true;
+	Facelets = TEXT("YYYYYYYYYRRRRRRRRRBBBBBBBBBWWWWWWWWWOOOOOOOOOGGGGGGGGG");
 
 	bReplicates = true;
 }
@@ -235,7 +236,7 @@ void ARCN_RubikCube::TurnNext()
 {
 	if (SignQueue.IsEmpty())
 	{
-		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Pattern)
+		RCN_LOG(LogRubikCube, Log, TEXT("회전 완료 및 패턴 : %s"), *Facelets)
 		bIsTurning = false;
 
 		if (HasAuthority())
@@ -247,32 +248,15 @@ void ARCN_RubikCube::TurnNext()
 				FinishScrambleDelegate.Broadcast();
 			}
 
-			TArray FacesPatterns = {
-				Pattern.Mid(0, 9),
-				Pattern.Mid(9, 9),
-				Pattern.Mid(18, 9),
-				Pattern.Mid(27, 9),
-				Pattern.Mid(36, 9),
-				Pattern.Mid(45, 9)
-			};
-
-			bIsSolved = true;
-			for (auto FacesPattern : FacesPatterns)
-			{
-				const TCHAR FirstStickerColor = FacesPattern[0];
-				for (const auto StickerColor : FacesPattern)
-				{
-					if (StickerColor != FirstStickerColor)
-					{
-						bIsSolved = false;
-					}
-				}
-			}
-
-			if (bIsSolved)
+			if (UCubeSolver::CheckSolved(Facelets))
 			{
 				RCN_LOG(LogRubikCube, Log, TEXT("풀기 완료"))
 				FinishSolveDelegate.Broadcast();
+				bIsSolved = true;
+			}
+			else
+			{
+				bIsSolved = false;
 			}
 		}
 		
@@ -385,8 +369,8 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 		}
 	}
 	
-	FString TempPattern = TEXT("");
-	for (auto PatternOrderPosition : PatternOrderPositions)
+	FString TempFacelets = TEXT("");
+	for (auto PatternOrderPosition : FaceletOrderPositions)
 	{
 		for (auto StickerPosition : StickerPositions)
 		{
@@ -394,69 +378,69 @@ void ARCN_RubikCube::ReleasePieces(const FSignInfo& SignInfo)
 			{
 				if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow])
 				{
-					TempPattern += 'Y';
+					TempFacelets += 'Y';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Red])
 				{
-					TempPattern += 'R';
+					TempFacelets += 'R';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Blue])
 				{
-					TempPattern += 'B';
+					TempFacelets += 'B';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::White])
 				{
-					TempPattern += 'W';
+					TempFacelets += 'W';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Orange])
 				{
-					TempPattern += 'O';
+					TempFacelets += 'O';
 				}
 				else if (StickerPosition.Key->GetMaterial(0) == RubikCubeDataAsset->StickerMaterials[EStickerType::Green])
 				{
-					TempPattern += 'G';
+					TempFacelets += 'G';
 				}
 				
 				break;
 			}
 		}
 	}
-	Pattern = TempPattern;
+	Facelets = TempFacelets;
 
 	CoreComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	TurnNext();
 }
 
-void ARCN_RubikCube::ChangePattern(const FString& NewPattern)
+void ARCN_RubikCube::ChangeFacelets(const FString& NewFacelets)
 {
 	int32 Index = 0;
-	for (auto PatternOrderPosition : PatternOrderPositions)
+	for (auto PatternOrderPosition : FaceletOrderPositions)
 	{
 		for (auto StickerPosition : StickerPositions)
 		{
 			if (PatternOrderPosition == StickerPosition.Value)
 			{
-				if (NewPattern[Index] == TEXT('Y'))
+				if (NewFacelets[Index] == TEXT('Y'))
 				{
 					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Yellow]);
 				}
-				else if (NewPattern[Index] == TEXT('R'))
+				else if (NewFacelets[Index] == TEXT('R'))
 				{
 					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Red]);
 				}
-				else if (NewPattern[Index] == TEXT('B'))
+				else if (NewFacelets[Index] == TEXT('B'))
 				{
 					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Blue]);
 				}
-				else if (NewPattern[Index] == TEXT('W'))
+				else if (NewFacelets[Index] == TEXT('W'))
 				{
 					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::White]);
 				}
-				else if (NewPattern[Index] == TEXT('O'))
+				else if (NewFacelets[Index] == TEXT('O'))
 				{
 					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Orange]);
 				}
-				else if (NewPattern[Index] == TEXT('G'))
+				else if (NewFacelets[Index] == TEXT('G'))
 				{
 					StickerPosition.Key->SetMaterial(0, RubikCubeDataAsset->StickerMaterials[EStickerType::Green]);
 				}
@@ -507,14 +491,15 @@ void ARCN_RubikCube::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ARCN_RubikCube, Pattern, COND_InitialOnly)
+	DOREPLIFETIME(ARCN_RubikCube, bIsSolved)
+	DOREPLIFETIME_CONDITION(ARCN_RubikCube, Facelets, COND_InitialOnly)
 }
 
-void ARCN_RubikCube::OnRep_Pattern()
+void ARCN_RubikCube::OnRep_Facelets()
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 
-	ChangePattern(Pattern);
+	ChangeFacelets(Facelets);
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
@@ -524,7 +509,7 @@ void ARCN_RubikCube::ServerRPC_Spin_Implementation(const FString& Command)
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 	
 	MulticastRPC_Spin(Command);
-	ClientRPC_RenewalPattern(Pattern);
+	MulticastRPC_RenewalPattern(Facelets);
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
@@ -567,24 +552,7 @@ void ARCN_RubikCube::ServerRPC_Scramble_Implementation()
 		return;
 	}
 	
-	FString Command = TEXT("");
-
-	FString LastSign = TEXT(" ");
-	for (int32 i = 0; i < RubikCubeDataAsset->ScrambleTurnCount; i++)
-	{
-		FString CurrentSign;
-		do
-		{
-			CurrentSign = SignInfos[FMath::RandRange(0, SignInfos.Num() - 1)].Sign;
-		} while (LastSign[0] == CurrentSign[0]);
-		LastSign = CurrentSign;
-
-		Command += CurrentSign + TEXT(" ");
-	}
-
-	Command.RemoveAt(Command.Len() - 1);
-	
-	ServerRPC_Spin(Command);
+	ServerRPC_Spin(UCubeSolver::GenerateScrambleCommand(RubikCubeDataAsset->ScrambleTurnCount));
 
 	bIsScrambling = true;
 
@@ -602,7 +570,7 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	}
 	
 	FString Command = TEXT("");
-	Command = UCubeSolver::SolveCube(Pattern);
+	Command = UCubeSolver::SolveCube(Facelets);
 	if (Command.StartsWith(TEXT("ERROR")))
 	{
 		RCN_LOG(LogRubikCube, Error, TEXT("%s"), *Command);
@@ -610,23 +578,23 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	else
 	{
 		RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
-		ServerRPC_Spin(Command);
+		ServerRPC_Spin(UCubeSolver::SolveCube(Facelets));
 	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_RubikCube::ClientRPC_RenewalPattern_Implementation(const FString& NewPattern)
+void ARCN_RubikCube::MulticastRPC_RenewalPattern_Implementation(const FString& NewPattern)
 {
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("Begin"));
 
-	if (Pattern != NewPattern)
+	if (Facelets != NewPattern)
 	{
 		RCN_LOG(LogRubikCube, Warning, TEXT("%s"), TEXT("패턴 보정"));
 		
-		Pattern = NewPattern;
+		Facelets = NewPattern;
 	
-		ChangePattern(NewPattern);
+		ChangeFacelets(NewPattern);
 	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));

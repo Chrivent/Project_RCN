@@ -15,5 +15,5 @@ class PROJECT_RCN_API ARCN_MainMenuModeBase : public ARCN_GameModeBase
 	GENERATED_BODY()
 
 protected:
-	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
 };

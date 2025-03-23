@@ -98,6 +98,9 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnActorChannelOpen(FInBunch& InBunch, UNetConnection* Connection) override;
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_LoginComplete();
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_SetCubeRotation(FRotator Rotator);
 
