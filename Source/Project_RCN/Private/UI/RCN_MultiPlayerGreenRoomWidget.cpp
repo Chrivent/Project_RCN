@@ -31,7 +31,10 @@ void URCN_MultiPlayerGreenRoomWidget::BackButtonReleasedHandle()
 
 void URCN_MultiPlayerGreenRoomWidget::StartOrReadyButtonReleasedHandle()
 {
-	StartOrReadyDelegate.Broadcast();
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
+	{
+		PlayerController->GreenRoomStartOrReady();
+	}
 }
 
 void URCN_MultiPlayerGreenRoomWidget::DestroyedSessionsHandle()

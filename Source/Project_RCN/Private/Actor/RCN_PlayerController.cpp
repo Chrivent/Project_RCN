@@ -4,7 +4,6 @@
 #include "Actor/RCN_PlayerController.h"
 
 #include "OnlineSessionSettings.h"
-#include "Actor/RCN_Player.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Data/RCN_UIDataAsset.h"
@@ -178,6 +177,19 @@ void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* 
 	OtherPlayerViewWidgets.Add(OtherPlayerViewWidget);
 }
 
+void ARCN_PlayerController::GreenRoomStartOrReady()
+{
+	if (HasAuthority())
+	{
+		ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode());
+		GreenRoomModeBase->StartGame();
+	}
+	else
+	{
+		ServerRPC_GreenRoomReady_Implementation();
+	}
+}
+
 void ARCN_PlayerController::UpdateMoveWidget(UWidget* Widget, const FVector2D TargetTranslation)
 {
 	const FVector2D CurrentTranslation = Widget->GetRenderTransform().Translation;
@@ -235,7 +247,25 @@ void ARCN_PlayerController::ClientRPC_CreateMultiPlayerGreenRoomWidget_Implement
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
 	MultiPlayerGreenRoomWidget = CreateWidget<URCN_MultiPlayerGreenRoomWidget>(this, UIDataAsset->MultiPlayerGreenRoomWidgetClass);
+
+	if (HasAuthority())
+	{
+		MultiPlayerGreenRoomWidget->SetStartOrReadyButtonText("Start");
+		MultiPlayerGreenRoomWidget->SetColorAndOpacity(FLinearColor::Gray);
+	}
+	else
+	{
+		MultiPlayerGreenRoomWidget->SetStartOrReadyButtonText("Ready");
+		MultiPlayerGreenRoomWidget->SetColorAndOpacity(FLinearColor::Gray);
+	}
+	
 	MultiPlayerGreenRoomWidget->AddToViewport();
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ServerRPC_GreenRoomReady_Implementation()
+{
+	ARCN_GreenRoomModeBase* GreenRoomModeBase = Cast<ARCN_GreenRoomModeBase>(GetWorld()->GetAuthGameMode());
+	GreenRoomModeBase->PlayerReady(this);
 }

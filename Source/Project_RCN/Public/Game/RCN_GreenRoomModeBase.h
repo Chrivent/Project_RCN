@@ -23,10 +23,14 @@ protected:
 
 public:
 	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
+	void StartGame();
+	void PlayerReady(ARCN_PlayerController* PressedPlayerController);
 
 protected:
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
+	void PromoteClientToHost(APlayerController* NewHostController);
+	bool PlayerAllReadCheck();
 	
 	UPROPERTY(VisibleAnywhere)
 	TArray<int32> AvailablePlayerNumbers;
@@ -37,6 +41,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARCN_RubikCube>> PlayerCubeMap;
 
-	void PromoteClientToHost(APlayerController* NewHostController);
-	void StartGame();
+	UPROPERTY(visibleAnywhere)
+	TMap<TObjectPtr<ARCN_PlayerController>, bool> PlayerReadyMap;
 };

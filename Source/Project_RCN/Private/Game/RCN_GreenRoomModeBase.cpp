@@ -48,14 +48,10 @@ void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
 				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
 				{
 					PlayerController->CreateMultiPlayerGreenRoomWidget();
-
-					if (URCN_MultiPlayerGreenRoomWidget* GreenRoomWidget = PlayerController->GetMultiPlayerGreenRoomWidget())
-					{
-						GreenRoomWidget->StartOrReadyDelegate.AddUObject(this, &ARCN_GreenRoomModeBase::StartGame);
-					}
 					
 					PlayerNumberMap.Emplace(PlayerController, GetAvailablePlayerNumber());
 					PlayerCubeMap.Emplace(PlayerController, RubikCube);
+					PlayerReadyMap.Emplace(PlayerController, false);
 					
 					Player->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[PlayerController]]);
 					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
@@ -82,6 +78,7 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		
 		PlayerNumberMap.Remove(PlayerController);
 		PlayerCubeMap.Remove(PlayerController);
+		PlayerReadyMap.Remove(PlayerController);
 	}
 	
 	
@@ -135,6 +132,32 @@ void ARCN_GreenRoomModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
 	}));
 }
 
+void ARCN_GreenRoomModeBase::StartGame()
+{
+	if (!PlayerReadyMap.IsEmpty() && PlayerAllReadCheck())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
+		
+		GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
+	}
+}
+
+void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerController)
+{
+	/*if (PlayerReadyMap[PressedPlayerController] == true)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Not Read")));
+		PressedPlayerController->GetMultiPlayerGreenRoomWidget()->SetStartOrReadyButtonColor(FLinearColor::Black);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Ready")));
+		PlayerReadyMap[PressedPlayerController] = true;
+
+		PressedPlayerController->GetMultiPlayerGreenRoomWidget()->SetStartOrReadyButtonColor(FLinearColor::Blue);
+	}*/
+}
+
 int32 ARCN_GreenRoomModeBase::GetAvailablePlayerNumber()
 {
 	if (AvailablePlayerNumbers.Num() > 0)
@@ -168,13 +191,15 @@ void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostContr
 	}
 }
 
-void ARCN_GreenRoomModeBase::StartGame()
+bool ARCN_GreenRoomModeBase::PlayerAllReadCheck()
 {
-	if (HasAuthority())
+	for (const auto Players : PlayerReadyMap)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
-		
-		FString URL = TEXT("/Game/Level/MultiLevel?listen");
-		GetWorld()->ServerTravel(URL);
+		if (!Players.Value)
+		{
+			return false;
+		}
 	}
+	
+	return true;
 }

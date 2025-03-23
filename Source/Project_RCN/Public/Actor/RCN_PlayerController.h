@@ -51,7 +51,8 @@ public:
 	void CreateTimerWidget();
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
-
+	void GreenRoomStartOrReady();
+	
 	void RequestReturnToMenu();
 	
 protected:
@@ -86,4 +87,7 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateMultiPlayerGreenRoomWidget();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_GreenRoomReady();
 };
