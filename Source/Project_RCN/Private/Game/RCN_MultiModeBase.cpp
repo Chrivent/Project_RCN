@@ -9,6 +9,7 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Project_RCN/Project_RCN.h"
 
 AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
@@ -43,8 +44,6 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 
 			NewPlayer->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
 			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
-
-			PlayerControllers.Emplace(NewPlayerController);
 		}
 
 		// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
