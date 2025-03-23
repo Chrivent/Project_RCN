@@ -33,8 +33,5 @@ void ARCN_SingleModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControll
 
 void ARCN_SingleModeBase::FinishScramble() const
 {
-	if (const ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		PlayerController->GetTimerWidget()->StartTimer();
-	}
+	PlayerControllers[0]->GetTimerWidget()->StartTimer();
 }

@@ -49,13 +49,9 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
 	{
-		ReleasePlayerNumber(PlayerNumberMap[PlayerController]);
 		UpdateDestroyCube(PlayerCubeMap[PlayerController]);
-		
-		PlayerNumberMap.Remove(PlayerController);
 		PlayerCubeMap.Remove(PlayerController);
 	}
-	
 	
 	// 호스트 마이그레이션 제작중
 	/*if (Exiting->IsLocalController() && Exiting->HasAuthority())
@@ -124,8 +120,6 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 				GreenRoomWidget->StartOrReadyDelegate.AddUObject(this, &ARCN_GreenRoomModeBase::StartGame);
 			}
 
-			PlayerControllers.Emplace(NewPlayerController);
-			PlayerNumberMap.Emplace(NewPlayerController, GetAvailablePlayerNumber());
 			PlayerCubeMap.Emplace(NewPlayerController, RubikCube);
 					
 			NewPlayer->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[NewPlayerController]]);
@@ -142,24 +136,6 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 	}
 
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
-}
-
-int32 ARCN_GreenRoomModeBase::GetAvailablePlayerNumber()
-{
-	if (AvailablePlayerNumbers.Num() > 0)
-	{
-		const int32 AssignedPlayerNumber = AvailablePlayerNumbers[0];
-		AvailablePlayerNumbers.RemoveAt(0);
-		return AssignedPlayerNumber;
-	}
-
-	return -1;
-}
-
-void ARCN_GreenRoomModeBase::ReleasePlayerNumber(int32 PlayerNumber)
-{
-	AvailablePlayerNumbers.Emplace(PlayerNumber);
-	AvailablePlayerNumbers.Sort();
 }
 
 void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostController)

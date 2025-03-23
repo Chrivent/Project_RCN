@@ -25,18 +25,6 @@ public:
 
 protected:
 	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
-	
-	int32 GetAvailablePlayerNumber();
-	void ReleasePlayerNumber(int32 PlayerNumber);
-	
-	UPROPERTY(VisibleAnywhere)
-	TArray<int32> AvailablePlayerNumbers;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<ARCN_PlayerController>> PlayerControllers;
-
-	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARCN_RubikCube>> PlayerCubeMap;

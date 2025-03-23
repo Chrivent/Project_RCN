@@ -18,7 +18,4 @@ protected:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<ARCN_PlayerController>> PlayerControllers;
 };
