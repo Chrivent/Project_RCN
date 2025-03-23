@@ -9,34 +9,31 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "UI/RCN_TimerWidget.h"
 
-void ARCN_SingleModeBase::PostLogin(APlayerController* NewPlayer)
+void ARCN_SingleModeBase::LoginComplete(ARCN_PlayerController* NewPlayerController)
 {
-	Super::PostLogin(NewPlayer);
-
-	if (ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		NewPlayerController->CreateTimerWidget();
-	}
+	Super::LoginComplete(NewPlayerController);
 
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
-		RubikCube->SetOwner(NewPlayer->GetPawn());
+		RubikCube->SetOwner(NewPlayerController->GetPawn());
 		
-		if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
+		if (ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn()))
 		{
-			Player->SetRubikCube(RubikCube);
+			NewPlayer->SetRubikCube(RubikCube);
 
-			Player->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
-			Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+			NewPlayer->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
+			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 		}
 
 		RubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_SingleModeBase::FinishScramble);
 	}
+
+	NewPlayerController->CreateTimerWidget();
 }
 
 void ARCN_SingleModeBase::FinishScramble() const
 {
-	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
+	if (const ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
 		PlayerController->GetTimerWidget()->StartTimer();
 	}

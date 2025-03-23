@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "RCN_GameModeBase.generated.h"
 
+class ARCN_PlayerController;
 class URCN_UIDataAsset;
 class URCN_GameModeBaseDataAsset;
 /**
@@ -32,6 +33,9 @@ protected:
 	// 게임의 시작을 지시하는 함수
 	virtual void StartPlay() override;
 
+public:
+	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController);
+	
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_GameModeBaseDataAsset> GameModeBaseDataAsset;

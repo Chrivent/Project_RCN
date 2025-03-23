@@ -10,65 +10,6 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
-void ARCN_MultiModeBase::PostLogin(APlayerController* NewPlayer)
-{
-	Super::PostLogin(NewPlayer);
-	
-	FTimerHandle TimerHandle1;
-	GetWorldTimerManager().SetTimer(TimerHandle1, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
-		{
-			RubikCube->SetOwner(NewPlayer->GetPawn());
-			
-			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
-			{
-				Player->SetRubikCube(RubikCube);
-
-				Player->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
-				Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
-			}
-
-			// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
-		}
-
-		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
-			{
-				MultiPlayer->RenewalCube();
-			}
-		}
-		
-		if (ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(NewPlayer))
-		{
-			NewPlayerController->CreateTimerWidget();
-		}
-	}), 1.0f, false);
-
-	FTimerHandle TimerHandle2;
-	GetWorldTimerManager().SetTimer(TimerHandle2, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			if (Iterator->Get() != NewPlayer)
-			{
-				const ARCN_PlayerController* NewPlayerController = Cast<ARCN_PlayerController>(NewPlayer);
-				const ARCN_PlayerController* OtherPlayerController = Cast<ARCN_PlayerController>(Iterator->Get());
-				if (IsValid(OtherPlayerController) && IsValid(NewPlayerController))
-				{
-					ARCN_Player* Player = Cast<ARCN_Player>(NewPlayerController->GetPawn());
-					ARCN_Player* OtherPlayer = Cast<ARCN_Player>(OtherPlayerController->GetPawn());
-					if (IsValid(Player) && IsValid(OtherPlayer))
-					{
-						Player->CreateOtherPlayerViewWidget(OtherPlayer);
-					}
-				}
-			}
-		}
-	}), 2.0f, false);
-}
-
 AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
 	TArray<AActor*> Actors;
@@ -86,4 +27,53 @@ AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player
 	}
 
 	return Super::ChoosePlayerStart_Implementation(Player);
+}
+
+void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerController)
+{
+	Super::LoginComplete(NewPlayerController);
+
+	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	{
+		RubikCube->SetOwner(NewPlayerController->GetPawn());
+			
+		if (ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn()))
+		{
+			NewPlayer->SetRubikCube(RubikCube);
+
+			NewPlayer->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
+			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+
+			PlayerControllers.Emplace(NewPlayerController);
+		}
+
+		// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
+	}
+
+	for (const auto PlayerController : PlayerControllers)
+	{
+		if (ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
+		{
+			Player->RenewalCube();
+		}
+	}
+	
+	NewPlayerController->CreateTimerWidget();
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		for (const auto PlayerController : PlayerControllers)
+		{
+			if (IsValid(PlayerController) && PlayerController != NewPlayerController)
+			{
+				ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn());
+				ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController->GetPawn());
+				if (IsValid(NewPlayer) && IsValid(OtherPlayer))
+				{
+					NewPlayer->CreateOtherPlayerViewWidget(OtherPlayer);
+				}
+			}
+		}
+	}), 2.0f, false);
 }

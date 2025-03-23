@@ -18,18 +18,22 @@ class PROJECT_RCN_API ARCN_GreenRoomModeBase : public ARCN_GameModeBase
 	
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
 public:
 	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
 
 protected:
+	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
+	
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
 	
 	UPROPERTY(VisibleAnywhere)
 	TArray<int32> AvailablePlayerNumbers;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<TObjectPtr<ARCN_PlayerController>> PlayerControllers;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;

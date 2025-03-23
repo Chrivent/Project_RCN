@@ -45,49 +45,6 @@ void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Opt
 	}), 5.0f, true);
 }
 
-void ARCN_GreenRoomModeBase::PostLogin(APlayerController* NewPlayer)
-{
-	Super::PostLogin(NewPlayer);
-
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
-		{
-			RubikCube->SetOwner(NewPlayer->GetPawn());
-			
-			if (ARCN_Player* Player = Cast<ARCN_Player>(NewPlayer->GetPawn()))
-			{
-				Player->SetRubikCube(RubikCube);
-
-				if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Player->GetController()))
-				{
-					PlayerController->CreateMultiPlayerGreenRoomWidget();
-
-					if (URCN_MultiPlayerGreenRoomWidget* GreenRoomWidget = PlayerController->GetMultiPlayerGreenRoomWidget())
-					{
-						GreenRoomWidget->StartOrReadyDelegate.AddUObject(this, &ARCN_GreenRoomModeBase::StartGame);
-					}
-					
-					PlayerNumberMap.Emplace(PlayerController, GetAvailablePlayerNumber());
-					PlayerCubeMap.Emplace(PlayerController, RubikCube);
-					
-					Player->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[PlayerController]]);
-					Player->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
-				}
-			}
-		}
-
-		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			if (ARCN_Player* MultiPlayer = Cast<ARCN_Player>(Iterator->Get()->GetPawn()))
-			{
-				MultiPlayer->RenewalCube();
-			}
-		}
-	}), 1.0f, false);
-}
-
 void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
@@ -148,6 +105,43 @@ void ARCN_GreenRoomModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
 	{
 		UpdateDestroyCube(RubikCube);
 	}));
+}
+
+void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerController)
+{
+	Super::LoginComplete(NewPlayerController);
+
+	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	{
+		RubikCube->SetOwner(NewPlayerController->GetPawn());
+			
+		if (ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn()))
+		{
+			NewPlayer->SetRubikCube(RubikCube);
+
+			if (URCN_MultiPlayerGreenRoomWidget* GreenRoomWidget = NewPlayerController->GetMultiPlayerGreenRoomWidget())
+			{
+				GreenRoomWidget->StartOrReadyDelegate.AddUObject(this, &ARCN_GreenRoomModeBase::StartGame);
+			}
+
+			PlayerControllers.Emplace(NewPlayerController);
+			PlayerNumberMap.Emplace(NewPlayerController, GetAvailablePlayerNumber());
+			PlayerCubeMap.Emplace(NewPlayerController, RubikCube);
+					
+			NewPlayer->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[NewPlayerController]]);
+			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+		}
+	}
+
+	for (const auto PlayerController : PlayerControllers)
+	{
+		if (ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
+		{
+			Player->RenewalCube();
+		}
+	}
+
+	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
 }
 
 int32 ARCN_GreenRoomModeBase::GetAvailablePlayerNumber()

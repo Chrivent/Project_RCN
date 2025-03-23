@@ -3,6 +3,7 @@
 
 #include "Game/RCN_GameModeBase.h"
 
+#include "Actor/RCN_PlayerController.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Game/RCN_GameState.h"
@@ -85,4 +86,9 @@ void ARCN_GameModeBase::StartPlay()
 	Super::StartPlay();
 
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_GameModeBase::LoginComplete(ARCN_PlayerController* NewPlayerController)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("%s is Login Complete"), *NewPlayerController->GetName()));
 }
