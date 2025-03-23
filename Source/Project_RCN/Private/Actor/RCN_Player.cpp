@@ -207,11 +207,6 @@ void ARCN_Player::RenewalCube()
 	MulticastRPC_SetCubeRotation(Rotator);
 }
 
-void ARCN_Player::CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer)
-{
-	ClientRPC_CreateOtherPlayerViewWidget(OtherPlayer);
-}
-
 void ARCN_Player::SetControl() const
 {
 	if (!IsLocallyControlled())
@@ -579,28 +574,3 @@ void ARCN_Player::MulticastRPC_RotateCube_Implementation(const FRotator Rotator)
 	
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
-
-void ARCN_Player::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-
-	USceneCaptureComponent2D* NewSceneCaptureComponent = NewObject<USceneCaptureComponent2D>(this);
-	NewSceneCaptureComponent->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
-	NewSceneCaptureComponent->RegisterComponent();
-	NewSceneCaptureComponent->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
-	NewSceneCaptureComponent->ShowOnlyActors.Emplace(OtherPlayer->GetRubikCube());
-	SceneCaptureComponents.Emplace(NewSceneCaptureComponent);
-	
-	UTextureRenderTarget2D* NewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
-	NewRenderTarget->InitAutoFormat(1920, 1080);
-	NewRenderTarget->ClearColor = FLinearColor(0, 0, 0, 1);
-	NewSceneCaptureComponent->TextureTarget = NewRenderTarget;
-	
-	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
-	{
-		PlayerController->CreateOtherPlayerViewWidget(NewRenderTarget);
-	}
-
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
-}
-

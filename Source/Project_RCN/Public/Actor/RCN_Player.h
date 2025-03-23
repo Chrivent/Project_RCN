@@ -44,7 +44,6 @@ public:
 	void UpdateCubeLocation(const FVector& TargetLocation);
 	void UpdateCubeRotation(const FRotator& TargetRotation);
 	void RenewalCube();
-	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	
 protected:
 	void SetControl() const;
@@ -83,9 +82,6 @@ protected:
 	TObjectPtr<UBoxComponent> SelectedButtonBoxComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<USceneCaptureComponent2D>> SceneCaptureComponents;
-
-	UPROPERTY(VisibleAnywhere)
 	FVector DragStartHitLocation;
 
 	UPROPERTY(VisibleAnywhere)
@@ -112,9 +108,6 @@ protected:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_RotateCube(const FRotator Rotator);
-
-	UFUNCTION(Client, Reliable)
-	void ClientRPC_CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> RubikCube;

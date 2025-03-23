@@ -4,10 +4,15 @@
 #include "Actor/RCN_PlayerController.h"
 
 #include "OnlineSessionSettings.h"
+#include "Actor/RCN_Player.h"
+#include "Actor/RCN_RubikCube.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Data/RCN_UIDataAsset.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "Game/RCN_GreenRoomModeBase.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
@@ -99,6 +104,11 @@ void ARCN_PlayerController::CreateTimerWidget()
 	ClientRPC_CreateTimerWidget();
 }
 
+void ARCN_PlayerController::CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer)
+{
+	ClientRPC_CreateOtherPlayerViewWidget(OtherPlayer);
+}
+
 void ARCN_PlayerController::CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch)
 {
 	for (const auto SessionListButtonWidget : SessionListButtonWidgets)
@@ -148,34 +158,6 @@ void ARCN_PlayerController::RequestReturnToMenu()
 	{
 		SessionManager->DestroySession(this);
 	}
-}
-
-void ARCN_PlayerController::CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget)
-{
-	URCN_OtherPlayerViewWidget* OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass);
-	if (!IsValid(OtherPlayerViewWidget))
-	{
-		RCN_LOG(LogPlayer, Error, TEXT("새로운 UI 위젯 생성 실패"))
-		return;
-	}
-
-	OtherPlayerViewWidget->AddToViewport();
-	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget, UIDataAsset->WidgetOpacitySpeed);
-	
-	FVector2D CurrentTranslation = OtherPlayerViewWidget->GetRenderTransform().Translation;
-	CurrentTranslation.X += UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
-	OtherPlayerViewWidget->SetRenderTranslation(CurrentTranslation);
-
-	for (const auto ExistingOtherPlayerViewWidget : OtherPlayerViewWidgets)
-	{
-		FVector2D ExistingCurrentTranslation = OtherPlayerViewWidget->GetRenderTransform().Translation;
-		ExistingCurrentTranslation.Y += UIDataAsset->CubeOtherPlayerViewWidgetHeightMoveDistance;
-		UpdateMoveWidget(ExistingOtherPlayerViewWidget, ExistingCurrentTranslation);
-	}
-
-	CurrentTranslation.X -= UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
-	UpdateMoveWidget(OtherPlayerViewWidget, CurrentTranslation);
-	OtherPlayerViewWidgets.Add(OtherPlayerViewWidget);
 }
 
 void ARCN_PlayerController::GreenRoomStartOrReady()
@@ -257,6 +239,52 @@ void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
 	
 	TimerWidget = CreateWidget<URCN_TimerWidget>(this, UIDataAsset->TimerWidgetClass);
 	TimerWidget->AddToViewport();
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	
+	URCN_OtherPlayerViewWidget* OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass);
+	if (!IsValid(OtherPlayerViewWidget))
+	{
+		RCN_LOG(LogPlayer, Error, TEXT("새로운 UI 위젯 생성 실패"))
+		return;
+	}
+
+	OtherPlayerViewWidget->AddToViewport();
+
+	USceneCaptureComponent2D* SceneCaptureComponent = NewObject<USceneCaptureComponent2D>(this);
+	SceneCaptureComponent->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
+	SceneCaptureComponent->RegisterComponent();
+	SceneCaptureComponent->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+
+	UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>(this);
+	RenderTarget->InitAutoFormat(1920, 1080);
+	RenderTarget->ClearColor = FLinearColor(0, 0, 0, 1);
+	
+	AActor* RubikCube = OtherPlayer->GetRubikCube();
+	SceneCaptureComponent->ShowOnlyActors.Emplace(RubikCube);
+	SceneCaptureComponent->TextureTarget = RenderTarget;
+	
+	OtherPlayerViewWidget->SetOtherPlayerView(RenderTarget, UIDataAsset->WidgetOpacitySpeed);
+	
+	FVector2D CurrentTranslation = OtherPlayerViewWidget->GetRenderTransform().Translation;
+	CurrentTranslation.X += UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
+	OtherPlayerViewWidget->SetRenderTranslation(CurrentTranslation);
+
+	for (const auto ExistingOtherPlayerViewWidget : OtherPlayerViewWidgets)
+	{
+		FVector2D ExistingCurrentTranslation = OtherPlayerViewWidget->GetRenderTransform().Translation;
+		ExistingCurrentTranslation.Y += UIDataAsset->CubeOtherPlayerViewWidgetHeightMoveDistance;
+		UpdateMoveWidget(ExistingOtherPlayerViewWidget, ExistingCurrentTranslation);
+	}
+
+	CurrentTranslation.X -= UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
+	UpdateMoveWidget(OtherPlayerViewWidget, CurrentTranslation);
+	OtherPlayerViewWidgets.Add(OtherPlayerViewWidget);
 
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

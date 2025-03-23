@@ -67,13 +67,11 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 		{
 			if (PlayerController != NewPlayerController)
 			{
-				ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn());
-				ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController->GetPawn());
-				if (IsValid(NewPlayer) && IsValid(OtherPlayer))
+				if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController->GetPawn()))
 				{
-					NewPlayer->CreateOtherPlayerViewWidget(OtherPlayer);
+					NewPlayerController->CreateOtherPlayerViewWidget(OtherPlayer);
 				}
 			}
 		}
-	}), 2.0f, false);
+	}), 3.0f, false);
 }
