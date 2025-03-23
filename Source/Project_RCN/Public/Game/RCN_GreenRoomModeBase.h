@@ -28,7 +28,7 @@ public:
 protected:
 	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
 	void PromoteClientToHost(APlayerController* NewHostController);
-	bool PlayerAllReadCheck();
+	bool PlayerAllReadyCheck();
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARCN_RubikCube>> PlayerCubeMap;

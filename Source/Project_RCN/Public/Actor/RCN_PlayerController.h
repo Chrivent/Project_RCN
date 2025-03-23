@@ -32,7 +32,6 @@ public:
 	FORCEINLINE URCN_TimerWidget* GetTimerWidget() const { return TimerWidget; }
 	FORCEINLINE TArray<URCN_SessionListButtonWidget*> GetSessionListButtonWidgets() const { return SessionListButtonWidgets; }
 	FORCEINLINE URCN_MultiPlayerGreenRoomWidget* GetMultiPlayerGreenRoomWidget() const { return MultiPlayerGreenRoomWidget; }
-	FORCEINLINE void SetGreenRoomReady(const bool bInGreenRoomReady) { bGreenRoomReady = bInGreenRoomReady; }
 	
 protected:
 	// 게임과 무관한 액터 초기화
@@ -53,6 +52,7 @@ public:
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
 	void CreateOtherPlayerViewWidget(UTextureRenderTarget2D* RenderTarget);
 	void GreenRoomStartOrReady();
+	void ChangeGreenRoomReadyButton(const bool bIsReady);
 	
 	void RequestReturnToMenu();
 	
@@ -83,11 +83,6 @@ protected:
 	TArray<TObjectPtr<URCN_SessionListButtonWidget>> SessionListButtonWidgets;
 	
 	// 네트워크 로직
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	UFUNCTION()
-	void OnRep_GreenRoomReady() const;
-	
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateTimerWidget();
 
@@ -97,6 +92,6 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_GreenRoomReady();
 
-	UPROPERTY(ReplicatedUsing=OnRep_GreenRoomReady)
-	uint8 bGreenRoomReady : 1;
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_ChangeGreenRoomReadyButton(const bool bIsReady);
 };

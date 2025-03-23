@@ -43,13 +43,11 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 
 			NewPlayer->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
 			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
-
-			PlayerControllers.Emplace(NewPlayerController);
 		}
 
 		// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
 	}
-
+	
 	for (const auto PlayerController : PlayerControllers)
 	{
 		if (ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
@@ -74,6 +72,6 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 					NewPlayer->CreateOtherPlayerViewWidget(OtherPlayer);
 				}
 			}
-		}
+		} 
 	}), 2.0f, false);
 }
