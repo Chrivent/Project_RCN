@@ -49,7 +49,7 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 
 		// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
 	}
-
+	
 	for (const auto PlayerController : PlayerControllers)
 	{
 		if (ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))

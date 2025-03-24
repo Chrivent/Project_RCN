@@ -142,7 +142,7 @@ void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerContr
 {
 	PlayerReadyMap[PressedPlayerController] = true;
 	
-	if (PlayerReadyMap.Num() > 1 && PlayerAllReadCheck())
+	if (PlayerReadyMap.Num() > 1 && PlayerAllReadyCheck())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
 
@@ -161,14 +161,14 @@ void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerCon
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Not Read")));
 		PlayerReadyMap[PressedPlayerController] = false;
 		
-		PressedPlayerController->SetGreenRoomReady(false);
+		PressedPlayerController->ChangeGreenRoomReadyButton(false);
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Ready")));
 		PlayerReadyMap[PressedPlayerController] = true;
 		
-		PressedPlayerController->SetGreenRoomReady(true);
+		PressedPlayerController->ChangeGreenRoomReadyButton(true);
 	}
 }
 
@@ -203,6 +203,15 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 	}
 
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		for (const auto PlayerController : PlayerControllers)
+		{
+			
+		}
+	}), 3.0f, false);
 }
 
 void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostController)
@@ -220,7 +229,7 @@ void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostContr
 	}
 }
 
-bool ARCN_GreenRoomModeBase::PlayerAllReadCheck()
+bool ARCN_GreenRoomModeBase::PlayerAllReadyCheck()
 {
 	for (const auto Players : PlayerReadyMap)
 	{
@@ -230,6 +239,6 @@ bool ARCN_GreenRoomModeBase::PlayerAllReadCheck()
         	return false;
         }
 	}
-
+	
 	return true;
 }

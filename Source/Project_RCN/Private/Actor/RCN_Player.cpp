@@ -476,7 +476,7 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
+	
 	DOREPLIFETIME(ARCN_Player, RubikCube)
 }
 

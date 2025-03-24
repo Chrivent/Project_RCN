@@ -175,6 +175,11 @@ void ARCN_PlayerController::GreenRoomStartOrReady()
 	}
 }
 
+void ARCN_PlayerController::ChangeGreenRoomReadyButton(const bool bIsReady)
+{
+	ClientRPC_ChangeGreenRoomReadyButton(bIsReady);
+}
+
 void ARCN_PlayerController::UpdateMoveWidget(UWidget* Widget, const FVector2D TargetTranslation)
 {
 	const FVector2D CurrentTranslation = Widget->GetRenderTransform().Translation;
@@ -215,22 +220,6 @@ void ARCN_PlayerController::SessionListButtonReleasedHandle(const FOnlineSession
 {
 	MainMenuWidget->GetMultiPlayerMainMenuWidget()->SetSessionSearchResult(SessionSearchResult);
 	MainMenuWidget->GetMultiPlayerMainMenuWidget()->VisibleOnNoticeOverlay();
-}
-
-void ARCN_PlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ARCN_PlayerController, bGreenRoomReady)
-}
-
-void ARCN_PlayerController::OnRep_GreenRoomReady() const
-{
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
-
-	MultiPlayerGreenRoomWidget->SetStartOrReadyButtonColor(bGreenRoomReady ? FLinearColor::Blue : FLinearColor::Black);
-	
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
@@ -320,5 +309,14 @@ void ARCN_PlayerController::ServerRPC_GreenRoomReady_Implementation()
 		GreenRoomModeBase->PlayerReady(this);
 	}
 
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ClientRPC_ChangeGreenRoomReadyButton_Implementation(const bool bIsReady)
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	MultiPlayerGreenRoomWidget->SetStartOrReadyButtonColor(bIsReady ? FLinearColor::Blue : FLinearColor::Black);
+	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
