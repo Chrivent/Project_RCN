@@ -7,6 +7,7 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
+#include "Game/RCN_GameInstance.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Project_RCN/Public/Utility/SessionManager.h"
 
@@ -92,8 +93,12 @@ void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerContr
 	if (PlayerReadyMap.Num() > 1 && PlayerAllReadCheck())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
-		
-		GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
+
+		if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetWorld()->GetGameInstance()))
+		{
+			GameInstance->SetMultiModeBasePlayerNum(GetWorld()->GetNumPlayerControllers());
+			GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
+		}
 	}
 }
 
