@@ -1262,7 +1262,7 @@ int32 TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth)
     return DepthPhase1 + DepthPhase2;
 }
 
-FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
+FString UCubeSolver::SolveCube(FString Facelets, FString& ErrorMessage, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
 {
     FSearch Search;
 
@@ -1298,22 +1298,28 @@ FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const dou
     
     if (Count.ContainsByPredicate([](const int32 C) { return C != 9; }))
     {
-        return TEXT("ERROR 1: There is not exactly one facelet of each colour");
+        ErrorMessage = TEXT("ERROR 1: There is not exactly one facelet of each colour");
+        return FString();
     }
     
     FCubieCube Cc(Facelets);
     switch (Cc.Verify())
     {
     case 2:
-        return TEXT("ERROR 2: Not all 12 edges exist exactly once");
+        ErrorMessage = TEXT("ERROR 2: Not all 12 edges exist exactly once");
+        return FString();
     case 3:
-        return TEXT("ERROR 3: Flip error: One edge has to be flipped");
+        ErrorMessage = TEXT("ERROR 3: Flip error: One edge has to be flipped");
+        return FString();
     case 4:
-        return TEXT("ERROR 4: Not all corners exist exactly once");
+        ErrorMessage = TEXT("ERROR 4: Not all corners exist exactly once");
+        return FString();
     case 5:
-        return TEXT("ERROR 5: Twist error: One corner has to be twisted");
+        ErrorMessage = TEXT("ERROR 5: Twist error: One corner has to be twisted");
+        return FString();
     case 6:
-        return TEXT("ERROR 6: Parity error: Two corners or two edges have to be exchanged");
+        ErrorMessage = TEXT("ERROR 6: Parity error: Two corners or two edges have to be exchanged");
+        return FString();
     default:
         break;
     }
@@ -1346,14 +1352,16 @@ FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const dou
                     {
                         if (FPlatformTime::Seconds() - StartTime > TimeOut)
                         {
-                            return TEXT("ERROR 7: Timeout, no solution within given time");
+                            ErrorMessage = TEXT("ERROR 7: Timeout, no solution within given time");
+                            return FString();
                         }
 
                         if (N == 0)
                         {
                             if (DepthPhase1 >= MaxDepth)
                             {
-                                return TEXT("ERROR 8: No solution exists for the given maxDepth");
+                                ErrorMessage = TEXT("ERROR 8: No solution exists for the given maxDepth");
+                                return FString();
                             }
                         
                             DepthPhase1++;
@@ -1394,10 +1402,10 @@ FString UCubeSolver::SolveCube(FString Facelets, const int32 MaxDepth, const dou
 
             if (N == DepthPhase1 - 1)
             {
-                int32 S = TotalDepth(Search, DepthPhase1, MaxDepth);
-                if (S >= 0 && (S == DepthPhase1 || (Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] && Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] + 3)))
+                int32 Depth = TotalDepth(Search, DepthPhase1, MaxDepth);
+                if (Depth >= 0 && (Depth == DepthPhase1 || (Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] && Search.Ax[DepthPhase1 - 1] != Search.Ax[DepthPhase1] + 3)))
                 {
-                    return SolutionToString(Search, S);
+                    return SolutionToString(Search, Depth);
                 }
             }
         }
@@ -1439,11 +1447,11 @@ FString UCubeSolver::GenerateScrambleCommand(const int32 ScrambleCount)
     return Command;
 }
 
-bool UCubeSolver::CheckSolved(const FString& Facelets)
+bool UCubeSolver::CheckSolved(const FString& Facelets, FString& ErrorMessage)
 {
     if (Facelets.Len() < 54)
     {
-        UE_LOG(LogCubeSolver, Error, TEXT("Facelets length is less than 54 (current: %d)"), Facelets.Len());
+        ErrorMessage = FString::Printf(TEXT("Facelets length is less than 54 (current: %d)"), Facelets.Len());
         return false;
     }
     TArray FaceFacelets = {
