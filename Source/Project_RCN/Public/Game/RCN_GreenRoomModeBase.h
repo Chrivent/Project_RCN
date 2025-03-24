@@ -21,7 +21,6 @@ protected:
 	virtual void Logout(AController* Exiting) override;
 
 public:
-	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
 	void StartGame(ARCN_PlayerController* PressedPlayerController);
 	void PlayerReady(ARCN_PlayerController* PressedPlayerController);
 

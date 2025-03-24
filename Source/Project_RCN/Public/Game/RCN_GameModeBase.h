@@ -6,6 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "RCN_GameModeBase.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogGameModeBase, Log, All);
+
+class ARCN_RubikCube;
 class ARCN_PlayerController;
 class URCN_UIDataAsset;
 class URCN_GameModeBaseDataAsset;
@@ -41,6 +44,8 @@ public:
 protected:
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
+	void UpdateAppearCube(ARCN_RubikCube* RubikCube);
+	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_GameModeBaseDataAsset> GameModeBaseDataAsset;

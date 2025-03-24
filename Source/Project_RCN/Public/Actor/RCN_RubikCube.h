@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "RCN_RubikCube.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogRubikCube, Log, All);
+
 class UBoxComponent;
 struct FInputActionValue;
 class UInputAction;

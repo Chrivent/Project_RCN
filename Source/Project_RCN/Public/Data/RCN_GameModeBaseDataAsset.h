@@ -33,6 +33,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FVector> GreenRoomCubeSpawnPosition;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CubeAppearSpeed;
 	
 	UPROPERTY(EditDefaultsOnly)
 	float CubeDestroySpeed;

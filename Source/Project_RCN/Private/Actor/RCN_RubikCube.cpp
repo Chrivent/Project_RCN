@@ -9,6 +9,8 @@
 #include "Project_RCN/Project_RCN.h"
 #include "Project_RCN/Public/Utility/CubeSolver.h"
 
+DEFINE_LOG_CATEGORY(LogRubikCube);
+
 const TArray<FSignInfo> ARCN_RubikCube::SignInfos = {
 	{ "L", ECubeAxisType::X, -1, false, 1 }, { "L'", ECubeAxisType::X, -1,  true, 1 }, { "L2", ECubeAxisType::X, -1, false, 2 },
 	{ "M", ECubeAxisType::X,  0, false, 1 }, { "M'", ECubeAxisType::X,  0,  true, 1 }, { "M2", ECubeAxisType::X,  0, false, 2 },

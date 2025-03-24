@@ -16,13 +16,15 @@ void ARCN_SingleModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControll
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		RubikCube->SetOwner(NewPlayerController->GetPawn());
+		RubikCube->SetActorScale3D(FVector::ZeroVector);
+		UpdateAppearCube(RubikCube);
 		
 		if (ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn()))
 		{
 			NewPlayer->SetRubikCube(RubikCube);
 
-			NewPlayer->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
-			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+			NewPlayer->SetCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
+			NewPlayer->SetCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 		}
 
 		RubikCube->FinishScrambleDelegate.AddUObject(this, &ARCN_SingleModeBase::FinishScramble);

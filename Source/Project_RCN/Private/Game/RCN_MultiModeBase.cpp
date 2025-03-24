@@ -37,13 +37,15 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		RubikCube->SetOwner(NewPlayerController->GetPawn());
+		RubikCube->SetActorScale3D(FVector::ZeroVector);
+		UpdateAppearCube(RubikCube);
 			
 		if (ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn()))
 		{
 			NewPlayer->SetRubikCube(RubikCube);
 
-			NewPlayer->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
-			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+			NewPlayer->SetCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
+			NewPlayer->SetCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 		}
 
 		// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음

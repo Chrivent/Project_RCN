@@ -4,9 +4,12 @@
 #include "Game/RCN_GameModeBase.h"
 
 #include "Actor/RCN_PlayerController.h"
+#include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Game/RCN_GameState.h"
+
+DEFINE_LOG_CATEGORY(LogGameModeBase);
 
 ARCN_GameModeBase::ARCN_GameModeBase()
 {
@@ -17,7 +20,7 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 	}
 	else
 	{
-		RCN_LOG(LogPlayer, Error, TEXT("데이터 에셋 로드 실패"))
+		RCN_LOG(LogGameModeBase, Error, TEXT("데이터 에셋 로드 실패"))
 		return;
 	}
 	
@@ -29,30 +32,30 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 
 void ARCN_GameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("========================================"));
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("========================================"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
 	//ErrorMessage = TEXT("접속 차단");
 
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("End"));
 }
 
 APlayerController* ARCN_GameModeBase::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("Begin"));
 
 	APlayerController* NewPlayerController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("End"));
 	
 	return NewPlayerController;
 }
 
 void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 {
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("Begin"));
 
 	Super::PostLogin(NewPlayer);
 
@@ -61,31 +64,31 @@ void ARCN_GameModeBase::PostLogin(APlayerController* NewPlayer)
 	{
 		if (NetDriver->ClientConnections.Num() == 0)
 		{
-			RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("클라이언트 연결 안됨."));
+			RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("클라이언트 연결 안됨."));
 		}
 		else
 		{
 			for (const auto& Connection : NetDriver->ClientConnections)
 			{
-				RCN_LOG(LogPlayer, Log, TEXT("클라이언트 연결됨 : %s"), *Connection->GetName());
+				RCN_LOG(LogGameModeBase, Log, TEXT("클라이언트 연결됨 : %s"), *Connection->GetName());
 			}
 		}
 	}
 	else
 	{
-		RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("NetDriver 없음."));
+		RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("NetDriver 없음."));
 	}
 
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_GameModeBase::StartPlay()
 {
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("Begin"));
 	
 	Super::StartPlay();
 
-	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+	RCN_LOG(LogGameModeBase, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_GameModeBase::Logout(AController* Exiting)
@@ -124,4 +127,40 @@ void ARCN_GameModeBase::ReleasePlayerNumber(int32 PlayerNumber)
 {
 	AvailablePlayerNumbers.Emplace(PlayerNumber);
 	AvailablePlayerNumbers.Sort();
+}
+
+void ARCN_GameModeBase::UpdateAppearCube(ARCN_RubikCube* RubikCube)
+{
+	const FVector CurrentScale = RubikCube->GetActorScale3D();
+	const FVector NewScale = FMath::Lerp(CurrentScale, FVector::OneVector, GameModeBaseDataAsset->CubeAppearSpeed);
+	RubikCube->SetActorScale3D(NewScale);
+
+	if (NewScale.Equals(FVector::OneVector))
+	{
+		RubikCube->SetActorScale3D(FVector::OneVector);
+		return;
+	}
+	
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		UpdateAppearCube(RubikCube);
+	}));
+}
+
+void ARCN_GameModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
+{
+	const FVector CurrentCubeScale = RubikCube->GetActorScale3D();
+	const FVector NewCubeScale  = FMath::Lerp(CurrentCubeScale, FVector::ZeroVector, GameModeBaseDataAsset->CubeDestroySpeed);
+	RubikCube->SetActorScale3D(NewCubeScale);
+
+	if (NewCubeScale.Equals(FVector::ZeroVector))
+	{
+		RubikCube->Destroy();
+		return;
+	}
+	
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		UpdateDestroyCube(RubikCube);
+	}));
 }

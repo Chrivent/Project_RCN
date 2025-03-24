@@ -25,12 +25,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> RotateAction;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> ScrambleAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> SolveAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> SpinDragAction;
@@ -49,10 +43,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateSensitivity;
-
-	UPROPERTY(EditDefaultsOnly)
-	float LocationSpeed;
-
-	UPROPERTY(EditDefaultsOnly)
-	float RotationSpeed;
 };
