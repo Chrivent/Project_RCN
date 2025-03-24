@@ -250,7 +250,8 @@ void ARCN_RubikCube::TurnNext()
 				FinishScrambleDelegate.Broadcast();
 			}
 
-			if (UCubeSolver::CheckSolved(Facelets))
+			FString ErrorMessage;
+			if (UCubeSolver::CheckSolved(Facelets, ErrorMessage))
 			{
 				RCN_LOG(LogRubikCube, Log, TEXT("풀기 완료"))
 				FinishSolveDelegate.Broadcast();
@@ -258,6 +259,10 @@ void ARCN_RubikCube::TurnNext()
 			}
 			else
 			{
+				if (ErrorMessage.StartsWith(TEXT("ERROR")))
+				{
+					RCN_LOG(LogRubikCube, Error, TEXT("%s"), *ErrorMessage);
+				}
 				bIsSolved = false;
 			}
 		}
@@ -554,7 +559,7 @@ void ARCN_RubikCube::ServerRPC_Scramble_Implementation()
 		return;
 	}
 	
-	ServerRPC_Spin(UCubeSolver::GenerateScrambleCommand(RubikCubeDataAsset->ScrambleTurnCount));
+	ServerRPC_Spin(UCubeSolver::GenerateScrambleCommand());
 
 	bIsScrambling = true;
 
@@ -570,17 +575,17 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 		RCN_LOG(LogRubikCube, Warning, TEXT("%s"), TEXT("큐브가 회전 중입니다. 회전이 끝날 때까지 기다려주세요."));
 		return;
 	}
-	
-	FString Command = TEXT("");
-	Command = UCubeSolver::SolveCube(Facelets);
-	if (Command.StartsWith(TEXT("ERROR")))
+
+	FString ErrorMessage;
+	const FString Command =  UCubeSolver::SolveCube(Facelets, ErrorMessage);
+	if (ErrorMessage.StartsWith(TEXT("ERROR")))
 	{
 		RCN_LOG(LogRubikCube, Error, TEXT("%s"), *Command);
 	}
 	else
 	{
 		RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
-		ServerRPC_Spin(UCubeSolver::SolveCube(Facelets));
+		ServerRPC_Spin(Command);
 	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));

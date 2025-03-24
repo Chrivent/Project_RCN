@@ -15,9 +15,13 @@ UCLASS()
 class PROJECT_RCN_API ARCN_GreenRoomModeBase : public ARCN_GameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	ARCN_GreenRoomModeBase();
 	
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void Logout(AController* Exiting) override;
 
 public:
@@ -35,4 +39,7 @@ protected:
 
 	UPROPERTY(visibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, bool> PlayerReadyMap;
+
+	FQuat TargetQuat;
+	float RotationAnglePerSecond;
 };

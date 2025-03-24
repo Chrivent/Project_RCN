@@ -46,6 +46,17 @@ public:
      * 
      * @param Facelets
      * The cube definition string
+     *
+	 * @param ErrorMessage
+	 * If an error occurs, this will be populated with a human-readable explanation.<br>
+	 * Error 1: There is not exactly one facelet of each colour<br>
+	 * Error 2: Not all 12 edges exist exactly once<br>
+	 * Error 3: Flip error: One edge has to be flipped<br>
+	 * Error 4: Not all corners exist exactly once<br>
+	 * Error 5: Twist error: One corner has to be twisted<br>
+	 * Error 6: Parity error: Two corners or two edges have to be exchanged<br>
+	 * Error 7: No solution exists for the given maxDepth<br>
+	 * Error 8: Timeout, no solution within given time
      * 
      * @param MaxDepth
      * defines the maximal allowed maneuver length. For random cubes, a maxDepth of 21 usually will return a
@@ -59,17 +70,9 @@ public:
      * @param CacheDir
      * Directory to cache results
      * 
-     * @return Solution string or error code<br>
-     * Error 1: There is not exactly one facelet of each colour<br>
-     * Error 2: Not all 12 edges exist exactly once<br>
-     * Error 3: Flip error: One edge has to be flipped<br>
-     * Error 4: Not all corners exist exactly once<br>
-     * Error 5: Twist error: One corner has to be twisted<br>
-     * Error 6: Parity error: Two corners or two edges have to be exchanged<br>
-     * Error 7: No solution exists for the given maxDepth<br>
-     * Error 8: Timeout, no solution within given time
+     * @return Solution string
      */
-    static FString SolveCube(FString Facelets, const int32 MaxDepth = 24, double TimeOut = 1.000f, const FString& CacheDir = TEXT("cache"));
+    static FString SolveCube(FString Facelets, FString& ErrorMessage, const int32 MaxDepth = 24, double TimeOut = 1.000f, const FString& CacheDir = TEXT("cache"));
 
     /**
 	 * Generates a randomized scramble command string for the Rubik's Cube.
@@ -80,7 +83,7 @@ public:
      *
      * @return A whitespace-separated string of cube rotation commands, such as "R U R' F2 D L' B".
      */
-    static FString GenerateScrambleCommand(const int32 ScrambleCount);
+    static FString GenerateScrambleCommand(const int32 ScrambleCount = 24);
 
     /**
 	 * Checks if a given Rubik's Cube facelet string represents a solved cube.
@@ -94,7 +97,12 @@ public:
 	 * U1–U9, R1–R9, F1–F9, D1–D9, L1–L9, B1–B9.
 	 * For example: "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
 	 *
+	 * @param ErrorMessage
+	 * If the input is invalid (e.g., too short), this will be set to a descriptive message.
+	 * It will be empty if no error occurred. Note: It is not set if the cube is simply unsolved.
+	 *
 	 * @return true if the cube is in a solved state; false otherwise.
+	 * If the input is invalid, returns false and sets ErrorMessage.
 	 */
-    static bool CheckSolved(const FString& Facelets);
+    static bool CheckSolved(const FString& Facelets, FString& ErrorMessage);
 };

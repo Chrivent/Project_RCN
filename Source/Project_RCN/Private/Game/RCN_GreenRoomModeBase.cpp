@@ -11,6 +11,18 @@
 #include "Project_RCN/Project_RCN.h"
 #include "Project_RCN/Public/Utility/SessionManager.h"
 
+ARCN_GreenRoomModeBase::ARCN_GreenRoomModeBase()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+	TargetQuat = FQuat(
+		FRotator(
+			FMath::FRandRange(-180.f, 180.f),
+			FMath::FRandRange(-180.f, 180.f),
+			FMath::FRandRange(-180.f, 180.f)));
+	RotationAnglePerSecond = 30.0f;
+}
+
 void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
@@ -43,6 +55,46 @@ void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Opt
 			}
 		}
 	}), 5.0f, true);
+}
+
+void ARCN_GreenRoomModeBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	for (const auto PlayerController : PlayerControllers)
+	{
+		if (const ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
+		{
+			FQuat CurrentQuat = Player->GetRubikCube()->GetActorQuat();
+			FQuat DeltaQuat = TargetQuat * CurrentQuat.Inverse();
+
+			FVector Axis;
+			float AngleRad;
+			DeltaQuat.ToAxisAndAngle(Axis, AngleRad);
+
+			float AngleDeg = FMath::RadiansToDegrees(AngleRad);
+			
+			if (AngleDeg > 180.f)
+			{
+				AngleDeg = 360.f - AngleDeg;
+				Axis = -Axis;
+			}
+
+			if (AngleDeg < 0.01f)
+			{
+				TargetQuat = FQuat(FRotator(
+					FMath::FRandRange(-180.f, 180.f),
+					FMath::FRandRange(-180.f, 180.f),
+					FMath::FRandRange(-180.f, 180.f)));
+			}
+			else
+			{
+				float StepDeg = FMath::Min(RotationAnglePerSecond * DeltaSeconds, AngleDeg);
+				FQuat StepQuat = FQuat(Axis, FMath::DegreesToRadians(StepDeg));
+				Player->GetRubikCube()->AddActorLocalRotation(StepQuat);
+			}
+		}
+	}
 }
 
 void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
