@@ -21,12 +21,12 @@ protected:
 	virtual void Logout(AController* Exiting) override;
 
 public:
-	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
 	void StartGame(ARCN_PlayerController* PressedPlayerController);
 	void PlayerReady(ARCN_PlayerController* PressedPlayerController);
 
 protected:
 	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
+	
 	void PromoteClientToHost(APlayerController* NewHostController);
 	bool PlayerAllReadyCheck();
 

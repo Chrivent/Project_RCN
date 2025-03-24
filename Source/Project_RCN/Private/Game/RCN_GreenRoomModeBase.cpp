@@ -7,6 +7,7 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
+#include "Game/RCN_GameInstance.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Project_RCN/Public/Utility/SessionManager.h"
 
@@ -85,24 +86,6 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 	Super::Logout(Exiting);
 }
 
-void ARCN_GreenRoomModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
-{
-	const FVector CurrentCubeScale = RubikCube->GetActorScale3D();
-	const FVector NewCubeScale  = FMath::Lerp(CurrentCubeScale, FVector::ZeroVector, GameModeBaseDataAsset->CubeDestroySpeed);
-	RubikCube->SetActorScale3D(NewCubeScale);
-
-	if (NewCubeScale.Equals(FVector::ZeroVector, 0.01f))
-	{
-		RubikCube->Destroy();
-		return;
-	}
-	
-	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		UpdateDestroyCube(RubikCube);
-	}));
-}
-
 void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerController)
 {
 	PlayerReadyMap[PressedPlayerController] = true;
@@ -110,8 +93,12 @@ void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerContr
 	if (PlayerReadyMap.Num() > 1 && PlayerAllReadyCheck())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
-		
-		GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
+
+		if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetWorld()->GetGameInstance()))
+		{
+			GameInstance->SetMultiModeBasePlayerNum(GetWorld()->GetNumPlayerControllers());
+			GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
+		}
 	}
 }
 
@@ -140,6 +127,8 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		RubikCube->SetOwner(NewPlayerController->GetPawn());
+		RubikCube->SetActorScale3D(FVector::ZeroVector);
+		UpdateAppearCube(RubikCube);
 			
 		if (ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn()))
 		{
@@ -148,8 +137,8 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 			PlayerCubeMap.Emplace(NewPlayerController, RubikCube);
 			PlayerReadyMap.Emplace(NewPlayerController, false);
 					
-			NewPlayer->UpdateCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[NewPlayerController]]);
-			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+			NewPlayer->SetCubeLocation(GameModeBaseDataAsset->GreenRoomCubeSpawnPosition[PlayerNumberMap[NewPlayerController]]);
+			NewPlayer->SetCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 		}
 	}
 

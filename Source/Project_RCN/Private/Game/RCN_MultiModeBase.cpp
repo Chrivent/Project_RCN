@@ -9,7 +9,6 @@
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "Project_RCN/Project_RCN.h"
 
 AActor* ARCN_MultiModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
@@ -37,13 +36,15 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		RubikCube->SetOwner(NewPlayerController->GetPawn());
+		RubikCube->SetActorScale3D(FVector::ZeroVector);
+		UpdateAppearCube(RubikCube);
 			
 		if (ARCN_Player* NewPlayer = Cast<ARCN_Player>(NewPlayerController->GetPawn()))
 		{
 			NewPlayer->SetRubikCube(RubikCube);
 
-			NewPlayer->UpdateCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
-			NewPlayer->UpdateCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
+			NewPlayer->SetCubeLocation(FVector::ForwardVector * GameModeBaseDataAsset->CubeStartDistance);
+			NewPlayer->SetCubeRotation(GameModeBaseDataAsset->CubeStartRotation);
 		}
 
 		// Todo: FinishScrambleDelegate를 어떻게 연결할지 생각할 필요가 있음
@@ -58,19 +59,21 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 	}
 	
 	NewPlayerController->CreateTimerWidget();
-
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	
+	if (GetWorld()->GetNumPlayerControllers() == PlayerControllers.Num())
 	{
-		for (const auto PlayerController : PlayerControllers)
+		for (const auto PlayerController1 : PlayerControllers)
 		{
-			if (PlayerController != NewPlayerController)
+			for (const auto PlayerController2 : PlayerControllers)
 			{
-				if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController->GetPawn()))
+				if (PlayerController1 != PlayerController2)
 				{
-					NewPlayerController->CreateOtherPlayerViewWidget(OtherPlayer);
+					if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController2->GetPawn()))
+					{
+						PlayerController1->CreateOtherPlayerViewWidget(OtherPlayer);
+					}
 				}
 			}
 		}
-	}), 3.0f, false);
+	}
 }

@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "RCN_Player.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogPlayer, Log, All);
+
 class UBoxComponent;
 class ARCN_RubikCube;
 class URCN_PlayerDataAsset;
@@ -41,17 +43,18 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	void SetRubikCube(ARCN_RubikCube* InRubikCube);
-	void UpdateCubeLocation(const FVector& TargetLocation);
-	void UpdateCubeRotation(const FRotator& TargetRotation);
+	void SetCubeLocation(const FVector& Location);
+	void SetCubeRotation(const FRotator& Rotation);
 	void RenewalCube();
+
+	FVector GetCubeLocation() const;
+	FRotator GetCubeRotation() const;
 	
 protected:
 	void SetControl() const;
 	void RotateSwitchStarted(const FInputActionValue& Value);
 	void RotateSwitchCompleted(const FInputActionValue& Value);
 	void RotateCube(const FInputActionValue& Value);
-	void ScrambleCube(const FInputActionValue& Value);
-	void SolveCube(const FInputActionValue& Value);
 	void SpinDragStarted(const FInputActionValue& Value);
 	void SpinDragTriggered(const FInputActionValue& Value);
 	void SpinDragCompleted(const FInputActionValue& Value);
@@ -97,17 +100,20 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_LoginComplete();
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastRPC_SetCubeRotation(FRotator Rotator);
+	UFUNCTION(Server, Unreliable)
+	void ServerRPC_SetCubeLocation(FVector Location);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_SetCubeLocation(FVector Location);
 
 	UFUNCTION(Server, Unreliable)
-	void ServerRPC_RotateCube(const FRotator Rotator);
+	void ServerRPC_SetCubeRotation(FRotator Rotator, const bool bAllowLocal);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastRPC_RotateCube(const FRotator Rotator);
+	void MulticastRPC_SetCubeRotation(FRotator Rotator, bool bAllowLocal);
+
+	UFUNCTION(Server, Unreliable)
+	void ServerRPC_RenewalCube();
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> RubikCube;
