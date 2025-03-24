@@ -162,6 +162,15 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 	}
 
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
+	{
+		for (const auto PlayerController : PlayerControllers)
+		{
+			
+		}
+	}), 3.0f, false);
 }
 
 void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostController)

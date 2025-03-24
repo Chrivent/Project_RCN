@@ -51,9 +51,9 @@ public:
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
+	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);
-	
 	void RequestReturnToMenu();
 	
 protected:
