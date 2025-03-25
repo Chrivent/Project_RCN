@@ -7,20 +7,11 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
-#include "Game/RCN_GameInstance.h"
 #include "Project_RCN/Project_RCN.h"
-#include "Project_RCN/Public/Utility/SessionManager.h"
 
 ARCN_GreenRoomModeBase::ARCN_GreenRoomModeBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	TargetQuat = FQuat(
-		FRotator(
-			FMath::FRandRange(-180.f, 180.f),
-			FMath::FRandRange(-180.f, 180.f),
-			FMath::FRandRange(-180.f, 180.f)));
-	RotationAnglePerSecond = 30.0f;
 }
 
 void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -65,33 +56,18 @@ void ARCN_GreenRoomModeBase::Tick(float DeltaSeconds)
 	{
 		if (const ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
 		{
+			FQuat TargetQuat = PlayerTargetQuatMap[PlayerController];
 			FQuat CurrentQuat = Player->GetRubikCube()->GetActorQuat();
-			FQuat DeltaQuat = TargetQuat * CurrentQuat.Inverse();
 
-			FVector Axis;
-			float AngleRad;
-			DeltaQuat.ToAxisAndAngle(Axis, AngleRad);
+			const float DiffAngle = FMath::RadiansToDegrees(CurrentQuat.AngularDistance(TargetQuat));
+			const float StepAngle = RotationAnglePerSecond * DeltaSeconds;
 
-			float AngleDeg = FMath::RadiansToDegrees(AngleRad);
-			
-			if (AngleDeg > 180.f)
-			{
-				AngleDeg = 360.f - AngleDeg;
-				Axis = -Axis;
-			}
+			FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, StepAngle / DiffAngle);
+			Player->GetRubikCube()->SetActorRotation(NewQuat);
 
-			if (AngleDeg < 0.01f)
+			if (DiffAngle < 1.0f)
 			{
-				TargetQuat = FQuat(FRotator(
-					FMath::FRandRange(-180.f, 180.f),
-					FMath::FRandRange(-180.f, 180.f),
-					FMath::FRandRange(-180.f, 180.f)));
-			}
-			else
-			{
-				float StepDeg = FMath::Min(RotationAnglePerSecond * DeltaSeconds, AngleDeg);
-				FQuat StepQuat = FQuat(Axis, FMath::DegreesToRadians(StepDeg));
-				Player->GetRubikCube()->AddActorLocalRotation(StepQuat);
+				PlayerTargetQuatMap[PlayerController] = FMath::VRand().ToOrientationQuat();
 			}
 		}
 	}
@@ -104,6 +80,7 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		UpdateDestroyCube(PlayerCubeMap[PlayerController]);
 		PlayerCubeMap.Remove(PlayerController);
 		PlayerReadyMap.Remove(PlayerController);
+		PlayerTargetQuatMap.Remove(PlayerController);
 	}
 	
 	// 호스트 마이그레이션 제작중
@@ -145,12 +122,7 @@ void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerContr
 	if (PlayerReadyMap.Num() > 1 && PlayerAllReadyCheck())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
-
-		if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetWorld()->GetGameInstance()))
-		{
-			GameInstance->SetMultiModeBasePlayerNum(GetWorld()->GetNumPlayerControllers());
-			GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
-		}
+		GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
 	}
 }
 
@@ -204,29 +176,8 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		for (const auto PlayerController : PlayerControllers)
-		{
-			
-		}
-	}), 3.0f, false);
-}
-
-void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostController)
-{
-	if (!NewHostController)
-	{
-		return;
-	}
-
-	RCN_LOG(LogTemp, Log, TEXT("새 호스트 후보 : %s"), *NewHostController->GetName())
-	
-	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
-	{
-		SessionManager->MigrateToHost(NewHostController);
-	}
+	PlayerTargetQuatMap.Emplace(NewPlayerController, FMath::VRand().ToOrientationQuat());
+	RotationAnglePerSecond = 60.0f;
 }
 
 bool ARCN_GreenRoomModeBase::PlayerAllReadyCheck()

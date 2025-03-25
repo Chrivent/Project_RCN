@@ -31,7 +31,6 @@ public:
 protected:
 	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
 	
-	void PromoteClientToHost(APlayerController* NewHostController);
 	bool PlayerAllReadyCheck();
 
 	UPROPERTY(VisibleAnywhere)
@@ -40,6 +39,9 @@ protected:
 	UPROPERTY(visibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, bool> PlayerReadyMap;
 
-	FQuat TargetQuat;
+	UPROPERTY(visibleAnywhere)
+	TMap<TObjectPtr<ARCN_PlayerController>, FQuat> PlayerTargetQuatMap;
+
+	UPROPERTY(visibleAnywhere)
 	float RotationAnglePerSecond;
 };

@@ -96,8 +96,8 @@ void ARCN_GameModeBase::Logout(AController* Exiting)
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
 	{
 		ReleasePlayerNumber(PlayerNumberMap[PlayerController]);
-		PlayerNumberMap.Remove(PlayerController);
 		PlayerControllers.Remove(PlayerController);
+		PlayerNumberMap.Remove(PlayerController);
 	}
 	
 	Super::Logout(Exiting);

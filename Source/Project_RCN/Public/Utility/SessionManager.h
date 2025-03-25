@@ -19,8 +19,6 @@ class PROJECT_RCN_API USessionManager : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
-	FORCEINLINE TSharedPtr<FOnlineSessionSearch> GetSessionSearch() const { return SessionSearch; }
-
 	FCreatedSessionDelegate CreatedSessionDelegate;
 	FFoundSessionsDelegate FoundSessionsDelegate;
 	FDestroyedSessionDelegate DestroyedSessionDelegate;
@@ -33,8 +31,6 @@ public:
 	void FindSessions();
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult) const;
 	void DestroySession(const APlayerController* PlayerController);
-
-	static void MigrateToHost(const APlayerController* NewHostController);
 
 protected:
 	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const;

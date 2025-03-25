@@ -559,7 +559,8 @@ void ARCN_RubikCube::ServerRPC_Scramble_Implementation()
 		return;
 	}
 	
-	ServerRPC_Spin(UCubeSolver::GenerateScrambleCommand());
+	MulticastRPC_Spin(UCubeSolver::GenerateScrambleCommand());
+	MulticastRPC_RenewalPattern(Facelets);
 
 	bIsScrambling = true;
 
@@ -580,12 +581,13 @@ void ARCN_RubikCube::ServerRPC_Solve_Implementation()
 	const FString Command =  UCubeSolver::SolveCube(Facelets, ErrorMessage);
 	if (ErrorMessage.StartsWith(TEXT("ERROR")))
 	{
-		RCN_LOG(LogRubikCube, Error, TEXT("%s"), *Command);
+		RCN_LOG(LogRubikCube, Error, TEXT("%s"), *ErrorMessage);
 	}
 	else
 	{
 		RCN_LOG(LogRubikCube, Log, TEXT("해법 커맨드 : %s"), *Command);
-		ServerRPC_Spin(Command);
+		MulticastRPC_Spin(Command);
+		MulticastRPC_RenewalPattern(Facelets);
 	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
