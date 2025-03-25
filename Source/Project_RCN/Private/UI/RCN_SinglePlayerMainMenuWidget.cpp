@@ -15,5 +15,5 @@ void URCN_SinglePlayerMainMenuWidget::NativeConstruct()
 
 void URCN_SinglePlayerMainMenuWidget::SinglePlayerStartButtonReleasedHandle()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName("SingleLevel"));
+	UGameplayStatics::OpenLevel(this, FName("SingleLevel"));
 }

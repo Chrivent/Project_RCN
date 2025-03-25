@@ -65,7 +65,7 @@ void ARCN_GreenRoomModeBase::Tick(float DeltaSeconds)
 			FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, StepAngle / DiffAngle);
 			Player->GetRubikCube()->SetActorRotation(NewQuat);
 
-			if (DiffAngle <= StepAngle)
+			if (DiffAngle < 1.0f)
 			{
 				PlayerTargetQuatMap[PlayerController] = FMath::VRand().ToOrientationQuat();
 			}

@@ -62,7 +62,7 @@ void ARCN_Player::BeginPlay()
 	{
 		EnableInput(PlayerController);
 	}
-
+	
 	SetControl();
 
 	ServerRPC_LoginComplete();
