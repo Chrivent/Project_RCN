@@ -7,9 +7,7 @@
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
-#include "Game/RCN_GameInstance.h"
 #include "Project_RCN/Project_RCN.h"
-#include "Project_RCN/Public/Utility/SessionManager.h"
 
 ARCN_GreenRoomModeBase::ARCN_GreenRoomModeBase()
 {
@@ -58,33 +56,18 @@ void ARCN_GreenRoomModeBase::Tick(float DeltaSeconds)
 	{
 		if (const ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
 		{
+			FQuat TargetQuat = PlayerTargetQuatMap[PlayerController];
 			FQuat CurrentQuat = Player->GetRubikCube()->GetActorQuat();
-			FQuat DeltaQuat = PlayerTargetQuatMap[PlayerController] * CurrentQuat.Inverse();
 
-			FVector Axis;
-			float RadianAngle;
-			DeltaQuat.ToAxisAndAngle(Axis, RadianAngle);
+			const float DiffAngle = FMath::RadiansToDegrees(CurrentQuat.AngularDistance(TargetQuat));
+			const float StepAngle = RotationAnglePerSecond * DeltaSeconds;
 
-			float Angle = FMath::RadiansToDegrees(RadianAngle);
-			
-			if (Angle > 180.f)
-			{
-				Angle = 360.f - Angle;
-				Axis = -Axis;
-			}
+			FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, StepAngle / DiffAngle);
+			Player->GetRubikCube()->SetActorRotation(NewQuat);
 
-			if (Angle < 0.01f || !Axis.IsNormalized())
+			if (DiffAngle <= StepAngle)
 			{
-				PlayerTargetQuatMap[PlayerController] = FQuat(FRotator(
-					FMath::FRandRange(-180.f, 180.f),
-					FMath::FRandRange(-180.f, 180.f),
-					FMath::FRandRange(-180.f, 180.f)));
-			}
-			else
-			{
-				float StepDeg = FMath::Min(RotationAnglePerSecond * DeltaSeconds, Angle);
-				FQuat StepQuat = FQuat(Axis, FMath::DegreesToRadians(StepDeg));
-				Player->GetRubikCube()->AddActorLocalRotation(StepQuat);
+				PlayerTargetQuatMap[PlayerController] = FMath::VRand().ToOrientationQuat();
 			}
 		}
 	}
@@ -198,11 +181,7 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
 
-	PlayerTargetQuatMap.Emplace(NewPlayerController, FQuat(
-		FRotator(
-			FMath::FRandRange(-180.f, 180.f),
-			FMath::FRandRange(-180.f, 180.f),
-			FMath::FRandRange(-180.f, 180.f))));
+	PlayerTargetQuatMap.Emplace(NewPlayerController, FMath::VRand().ToOrientationQuat());
 	RotationAnglePerSecond = 60.0f;
 }
 
