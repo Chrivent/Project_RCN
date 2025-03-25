@@ -14,13 +14,6 @@
 ARCN_GreenRoomModeBase::ARCN_GreenRoomModeBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	TargetQuat = FQuat(
-		FRotator(
-			FMath::FRandRange(-180.f, 180.f),
-			FMath::FRandRange(-180.f, 180.f),
-			FMath::FRandRange(-180.f, 180.f)));
-	RotationAnglePerSecond = 30.0f;
 }
 
 void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -66,30 +59,30 @@ void ARCN_GreenRoomModeBase::Tick(float DeltaSeconds)
 		if (const ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
 		{
 			FQuat CurrentQuat = Player->GetRubikCube()->GetActorQuat();
-			FQuat DeltaQuat = TargetQuat * CurrentQuat.Inverse();
+			FQuat DeltaQuat = PlayerTargetQuatMap[PlayerController] * CurrentQuat.Inverse();
 
 			FVector Axis;
-			float AngleRad;
-			DeltaQuat.ToAxisAndAngle(Axis, AngleRad);
+			float RadianAngle;
+			DeltaQuat.ToAxisAndAngle(Axis, RadianAngle);
 
-			float AngleDeg = FMath::RadiansToDegrees(AngleRad);
+			float Angle = FMath::RadiansToDegrees(RadianAngle);
 			
-			if (AngleDeg > 180.f)
+			if (Angle > 180.f)
 			{
-				AngleDeg = 360.f - AngleDeg;
+				Angle = 360.f - Angle;
 				Axis = -Axis;
 			}
 
-			if (AngleDeg < 0.01f)
+			if (Angle < 0.01f || !Axis.IsNormalized())
 			{
-				TargetQuat = FQuat(FRotator(
+				PlayerTargetQuatMap[PlayerController] = FQuat(FRotator(
 					FMath::FRandRange(-180.f, 180.f),
 					FMath::FRandRange(-180.f, 180.f),
 					FMath::FRandRange(-180.f, 180.f)));
 			}
 			else
 			{
-				float StepDeg = FMath::Min(RotationAnglePerSecond * DeltaSeconds, AngleDeg);
+				float StepDeg = FMath::Min(RotationAnglePerSecond * DeltaSeconds, Angle);
 				FQuat StepQuat = FQuat(Axis, FMath::DegreesToRadians(StepDeg));
 				Player->GetRubikCube()->AddActorLocalRotation(StepQuat);
 			}
@@ -101,7 +94,12 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
 	{
-		UpdateDestroyCube(PlayerCubeMap[PlayerController]);
+		if (!bIsTraveling)
+		{
+			UpdateDestroyCube(PlayerCubeMap[PlayerController]);
+		}
+
+		PlayerTargetQuatMap.Remove(PlayerController);
 		PlayerCubeMap.Remove(PlayerController);
 		PlayerReadyMap.Remove(PlayerController);
 	}
@@ -145,12 +143,8 @@ void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerContr
 	if (PlayerReadyMap.Num() > 1 && PlayerAllReadyCheck())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
-
-		if (URCN_GameInstance* GameInstance = Cast<URCN_GameInstance>(GetWorld()->GetGameInstance()))
-		{
-			GameInstance->SetMultiModeBasePlayerNum(GetWorld()->GetNumPlayerControllers());
-			GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
-		}
+		bIsTraveling = true;
+		GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
 	}
 }
 
@@ -204,14 +198,12 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateWeakLambda(this, [=, this]
-	{
-		for (const auto PlayerController : PlayerControllers)
-		{
-			
-		}
-	}), 3.0f, false);
+	PlayerTargetQuatMap.Emplace(NewPlayerController, FQuat(
+		FRotator(
+			FMath::FRandRange(-180.f, 180.f),
+			FMath::FRandRange(-180.f, 180.f),
+			FMath::FRandRange(-180.f, 180.f))));
+	RotationAnglePerSecond = 30.0f;
 }
 
 void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostController)
