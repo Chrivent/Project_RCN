@@ -42,6 +42,6 @@ protected:
 	UPROPERTY(visibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, FQuat> PlayerTargetQuatMap;
 
-	uint8 bIsTraveling : 1;
+	UPROPERTY(visibleAnywhere)
 	float RotationAnglePerSecond;
 };

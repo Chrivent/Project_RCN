@@ -77,11 +77,7 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(Exiting))
 	{
-		if (!bIsTraveling)
-		{
-			UpdateDestroyCube(PlayerCubeMap[PlayerController]);
-		}
-
+		UpdateDestroyCube(PlayerCubeMap[PlayerController]);
 		PlayerCubeMap.Remove(PlayerController);
 		PlayerReadyMap.Remove(PlayerController);
 		PlayerTargetQuatMap.Remove(PlayerController);
@@ -126,7 +122,6 @@ void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerContr
 	if (PlayerReadyMap.Num() > 1 && PlayerAllReadyCheck())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("ServerTravel : MultiLevel")));
-		bIsTraveling = true;
 		GetWorld()->ServerTravel(TEXT("/Game/Level/MultiLevel?listen"));
 	}
 }
