@@ -21,7 +21,6 @@ void URCN_MultiPlayerMainMenuWidget::NativeConstruct()
 	JoinConfirmButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerMainMenuWidget::JoinConfirmButtonReleasedHandle);
 	JoinCancelButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerMainMenuWidget::JoinCancelButtonReleasedHandle);
 	
-	
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
 		SessionManager->CreatedSessionDelegate.AddUObject(this, &URCN_MultiPlayerMainMenuWidget::CreatedSessionsHandle);

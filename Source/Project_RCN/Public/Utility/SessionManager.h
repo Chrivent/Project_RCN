@@ -19,8 +19,6 @@ class PROJECT_RCN_API USessionManager : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
-	FORCEINLINE TSharedPtr<FOnlineSessionSearch> GetSessionSearch() const { return SessionSearch; }
-
 	FCreatedSessionDelegate CreatedSessionDelegate;
 	FFoundSessionsDelegate FoundSessionsDelegate;
 	FDestroyedSessionDelegate DestroyedSessionDelegate;
