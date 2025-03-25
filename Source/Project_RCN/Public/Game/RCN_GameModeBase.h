@@ -51,10 +51,10 @@ protected:
 	TObjectPtr<URCN_GameModeBaseDataAsset> GameModeBaseDataAsset;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<ARCN_PlayerController>> PlayerControllers;
+	TArray<int32> AvailablePlayerNumbers;
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<int32> AvailablePlayerNumbers;
+	TArray<TObjectPtr<ARCN_PlayerController>> PlayerControllers;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, int32> PlayerNumberMap;

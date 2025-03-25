@@ -99,9 +99,9 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 			UpdateDestroyCube(PlayerCubeMap[PlayerController]);
 		}
 
-		PlayerTargetQuatMap.Remove(PlayerController);
 		PlayerCubeMap.Remove(PlayerController);
 		PlayerReadyMap.Remove(PlayerController);
+		PlayerTargetQuatMap.Remove(PlayerController);
 	}
 	
 	// 호스트 마이그레이션 제작중
@@ -203,22 +203,7 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 			FMath::FRandRange(-180.f, 180.f),
 			FMath::FRandRange(-180.f, 180.f),
 			FMath::FRandRange(-180.f, 180.f))));
-	RotationAnglePerSecond = 30.0f;
-}
-
-void ARCN_GreenRoomModeBase::PromoteClientToHost(APlayerController* NewHostController)
-{
-	if (!NewHostController)
-	{
-		return;
-	}
-
-	RCN_LOG(LogTemp, Log, TEXT("새 호스트 후보 : %s"), *NewHostController->GetName())
-	
-	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
-	{
-		SessionManager->MigrateToHost(NewHostController);
-	}
+	RotationAnglePerSecond = 60.0f;
 }
 
 bool ARCN_GreenRoomModeBase::PlayerAllReadyCheck()

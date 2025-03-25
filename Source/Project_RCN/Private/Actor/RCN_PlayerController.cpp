@@ -152,14 +152,6 @@ void ARCN_PlayerController::CreateSessionListButtonWidget(const TSharedPtr<FOnli
 	}
 }
 
-void ARCN_PlayerController::RequestReturnToMenu()
-{
-	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
-	{
-		SessionManager->DestroySession(this);
-	}
-}
-
 void ARCN_PlayerController::GreenRoomStartOrReady()
 {
 	if (HasAuthority())

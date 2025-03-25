@@ -104,16 +104,6 @@ void USessionManager::DestroySession(const APlayerController* PlayerController)
 	}
 }
 
-void USessionManager::MigrateToHost(const APlayerController* NewHostController)
-{
-	if (NewHostController)
-	{
-		return;
-	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("MigrateToHost New Host: %s"), *NewHostController->GetName()));
-}
-
 void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const
 {
 	if (bWasSuccessful)

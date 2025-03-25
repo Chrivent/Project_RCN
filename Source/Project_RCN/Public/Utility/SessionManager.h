@@ -32,8 +32,6 @@ public:
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult) const;
 	void DestroySession(const APlayerController* PlayerController);
 
-	static void MigrateToHost(const APlayerController* NewHostController);
-
 protected:
 	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const;
 	void OnFindSessionsCompleteHandle(const bool bWasSuccessful) const;

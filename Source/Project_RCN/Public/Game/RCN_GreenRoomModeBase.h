@@ -31,7 +31,6 @@ public:
 protected:
 	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController) override;
 	
-	void PromoteClientToHost(APlayerController* NewHostController);
 	bool PlayerAllReadyCheck();
 
 	UPROPERTY(VisibleAnywhere)

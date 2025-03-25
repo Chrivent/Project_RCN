@@ -22,9 +22,9 @@ void URCN_MultiPlayerGreenRoomWidget::NativeConstruct()
 
 void URCN_MultiPlayerGreenRoomWidget::BackButtonReleasedHandle()
 {
-	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
+	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
-		PlayerController->RequestReturnToMenu();
+		SessionManager->DestroySession(GetOwningPlayer());
 	}
 }
 

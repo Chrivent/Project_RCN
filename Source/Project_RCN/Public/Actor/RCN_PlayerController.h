@@ -54,7 +54,6 @@ public:
 	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);
-	void RequestReturnToMenu();
 	
 protected:
 	void UpdateMoveWidget(UWidget* Widget, FVector2D TargetTranslation);
