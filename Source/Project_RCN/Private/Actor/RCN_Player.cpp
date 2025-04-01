@@ -513,7 +513,8 @@ void ARCN_Player::ServerRPC_SetCubeLocation_Implementation(const FVector Locatio
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ARCN_Player::MulticastRPC_SetCubeLocation_Implementation(const FVector Location)
+void ARCN_Player::
+MulticastRPC_SetCubeLocation_Implementation(const FVector Location)
 {
 	//RCN_LOG(LogNetwork, Log, TEXT("%s"), TEXT("Begin"));
 

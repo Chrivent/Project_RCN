@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_GreenRoomReadyInfoWidget;
 class URCN_SessionListButtonWidget;
 class UWidget;
 class FOnlineSessionSearch;
@@ -54,6 +55,7 @@ public:
 	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);
+	void ChangeGreenRoomReadyInfo(const int32 PlayerIndex, const bool bIsReady);
 	
 protected:
 	void UpdateMoveWidget(UWidget* Widget, FVector2D TargetTranslation);
@@ -68,7 +70,7 @@ protected:
 	TObjectPtr<URCN_MainMenuWidget> MainMenuWidget;
 
 	// MultiPlayerGreenRoom UI Section
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MainMenu")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GreenRoom")
 	TObjectPtr<URCN_MultiPlayerGreenRoomWidget> MultiPlayerGreenRoomWidget;
 	
 	// Game UI Section
@@ -96,4 +98,7 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_ChangeGreenRoomReadyButton(const bool bIsReady);
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_ChangeGreenRoomReadyInfo(const int32 PlayerIndex, const bool bIsReady);
 };

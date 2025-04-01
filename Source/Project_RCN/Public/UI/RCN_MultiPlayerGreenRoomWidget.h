@@ -18,14 +18,17 @@ UCLASS()
 class PROJECT_RCN_API URCN_MultiPlayerGreenRoomWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
-public:
-	FORCEINLINE void SetStartOrReadyButtonText(const FString& InString) const { StartOrReadyButtonText->SetText(FText::FromString(InString)); }
-	FORCEINLINE void SetStartOrReadyButtonColor(const FLinearColor NewColor) const { StartOrReadyButtonText->SetColorAndOpacity(NewColor); }
 	
 protected:
 	virtual void NativeConstruct() override;
+	
+public:
+	FORCEINLINE void SetStartOrReadyButtonText(const FString& InString) const { StartOrReadyButtonText->SetText(FText::FromString(InString)); }
+	FORCEINLINE void SetStartOrReadyButtonColor(const FLinearColor NewColor) const { StartOrReadyButtonText->SetColorAndOpacity(NewColor); }
 
+	void ChangePlayerReadyText(const int32 PlayerIndex, const FString& ReadyText) const;
+	
+protected:
 	UFUNCTION()
 	void BackButtonReleasedHandle();
 
@@ -42,4 +45,16 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> StartOrReadyButtonText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Player1ReadyText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Player2ReadyText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Player3ReadyText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Player4ReadyText;
 };

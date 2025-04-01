@@ -13,7 +13,6 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Game/RCN_GreenRoomModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Net/UnrealNetwork.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_TimerWidget.h"
 #include "UI/RCN_MainMenuWidget.h"
@@ -21,7 +20,6 @@
 #include "UI/RCN_MultiPlayerMainMenuWidget.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_SessionListButtonWidget.h"
-#include "Utility/SessionManager.h"
 
 ARCN_PlayerController::ARCN_PlayerController()
 {
@@ -172,6 +170,11 @@ void ARCN_PlayerController::ChangeGreenRoomReadyButton(const bool bIsReady)
 	ClientRPC_ChangeGreenRoomReadyButton(bIsReady);
 }
 
+void ARCN_PlayerController::ChangeGreenRoomReadyInfo(const int32 PlayerIndex, const bool bIsReady)
+{
+	ClientRPC_ChangeGreenRoomReadyInfo(PlayerIndex, bIsReady);
+}
+
 void ARCN_PlayerController::UpdateMoveWidget(UWidget* Widget, const FVector2D TargetTranslation)
 {
 	const FVector2D CurrentTranslation = Widget->GetRenderTransform().Translation;
@@ -311,4 +314,10 @@ void ARCN_PlayerController::ClientRPC_ChangeGreenRoomReadyButton_Implementation(
 	MultiPlayerGreenRoomWidget->SetStartOrReadyButtonColor(bIsReady ? FLinearColor::Blue : FLinearColor::Black);
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ClientRPC_ChangeGreenRoomReadyInfo_Implementation(const int32 PlayerIndex, const bool bIsReady)
+{
+	const FString ReadyText = bIsReady ? TEXT("Ready") : TEXT("Not Ready");
+    	MultiPlayerGreenRoomWidget->ChangePlayerReadyText(PlayerIndex, ReadyText);
 }

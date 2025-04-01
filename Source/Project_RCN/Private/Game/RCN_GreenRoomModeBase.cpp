@@ -12,6 +12,8 @@
 ARCN_GreenRoomModeBase::ARCN_GreenRoomModeBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
+	RotationAnglePerSecond = 60.0f;
 }
 
 void ARCN_GreenRoomModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -134,6 +136,14 @@ void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerCon
 		PlayerReadyMap[PressedPlayerController] = false;
 		
 		PressedPlayerController->ChangeGreenRoomReadyButton(false);
+
+		for (auto& PlayerController : PlayerControllers)
+		{
+			if (IsValid(PlayerController))
+			{
+				PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
+			}
+		}
 	}
 	else
 	{
@@ -141,6 +151,14 @@ void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerCon
 		PlayerReadyMap[PressedPlayerController] = true;
 		
 		PressedPlayerController->ChangeGreenRoomReadyButton(true);
+
+		for (auto& PlayerController : PlayerControllers)
+        {
+        	if (IsValid(PlayerController))
+        	{
+				PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
+        	}
+        }
 	}
 }
 
@@ -177,7 +195,6 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
 
 	PlayerTargetQuatMap.Emplace(NewPlayerController, FMath::VRand().ToOrientationQuat());
-	RotationAnglePerSecond = 60.0f;
 }
 
 bool ARCN_GreenRoomModeBase::PlayerAllReadyCheck()

@@ -20,6 +20,39 @@ void URCN_MultiPlayerGreenRoomWidget::NativeConstruct()
 	}
 }
 
+void URCN_MultiPlayerGreenRoomWidget::ChangePlayerReadyText(const int32 PlayerIndex, const FString& ReadyText) const
+{
+	switch (PlayerIndex)
+	{
+	case 0:
+		if (IsValid(Player1ReadyText))
+		{
+			Player1ReadyText->SetText(FText::FromString(ReadyText));
+		}
+		break;
+	case 1:
+		if (IsValid(Player2ReadyText)) 
+		{ 
+			Player2ReadyText->SetText(FText::FromString(ReadyText));
+		}
+		break;
+	case 2:
+		if (IsValid(Player3ReadyText)) 
+		{ 
+			Player3ReadyText->SetText(FText::FromString(ReadyText));
+		}
+		break;
+	case 3:
+		if (IsValid(Player4ReadyText)) 
+		{ 
+			Player4ReadyText->SetText(FText::FromString(ReadyText));
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void URCN_MultiPlayerGreenRoomWidget::BackButtonReleasedHandle()
 {
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
