@@ -56,16 +56,16 @@ void ARCN_GreenRoomModeBase::Tick(float DeltaSeconds)
 	
 	for (const auto PlayerController : PlayerControllers)
 	{
-		if (const ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
+		if (ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
 		{
 			FQuat TargetQuat = PlayerTargetQuatMap[PlayerController];
-			FQuat CurrentQuat = Player->GetRubikCube()->GetActorQuat();
+			FQuat CurrentQuat = Player->GetCubeRotation().Quaternion();
 
 			const float DiffAngle = FMath::RadiansToDegrees(CurrentQuat.AngularDistance(TargetQuat));
 			const float StepAngle = RotationAnglePerSecond * DeltaSeconds;
 
 			FQuat NewQuat = FQuat::Slerp(CurrentQuat, TargetQuat, StepAngle / DiffAngle);
-			Player->GetRubikCube()->SetActorRotation(NewQuat);
+			Player->SetCubeRotation(NewQuat.Rotator());
 
 			if (DiffAngle < 1.0f)
 			{
@@ -130,19 +130,16 @@ void ARCN_GreenRoomModeBase::StartGame(ARCN_PlayerController* PressedPlayerContr
 
 void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerController)
 {
-	if (PlayerReadyMap[PressedPlayerController] == true)
+	if (PlayerReadyMap[PressedPlayerController])
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Not Read")));
 		PlayerReadyMap[PressedPlayerController] = false;
 		
 		PressedPlayerController->ChangeGreenRoomReadyButton(false);
 
-		for (auto& PlayerController : PlayerControllers)
+		for (const auto& PlayerController : PlayerControllers)
 		{
-			if (IsValid(PlayerController))
-			{
-				PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
-			}
+			PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
 		}
 	}
 	else
@@ -152,13 +149,10 @@ void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerCon
 		
 		PressedPlayerController->ChangeGreenRoomReadyButton(true);
 
-		for (auto& PlayerController : PlayerControllers)
-        {
-        	if (IsValid(PlayerController))
-        	{
-				PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
-        	}
-        }
+		for (const auto& PlayerController : PlayerControllers)
+		{
+			PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
+		}
 	}
 }
 
