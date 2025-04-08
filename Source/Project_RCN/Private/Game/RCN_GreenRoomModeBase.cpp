@@ -134,25 +134,18 @@ void ARCN_GreenRoomModeBase::PlayerReady(ARCN_PlayerController* PressedPlayerCon
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Not Read")));
 		PlayerReadyMap[PressedPlayerController] = false;
-		
-		PressedPlayerController->ChangeGreenRoomReadyButton(false);
-
-		for (const auto& PlayerController : PlayerControllers)
-		{
-			PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
-		}
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Ready")));
 		PlayerReadyMap[PressedPlayerController] = true;
-		
-		PressedPlayerController->ChangeGreenRoomReadyButton(true);
+	}
 
-		for (const auto& PlayerController : PlayerControllers)
-		{
-			PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
-		}
+	PressedPlayerController->ChangeGreenRoomReadyButton(PlayerReadyMap[PressedPlayerController]);
+
+	for (const auto& PlayerController : PlayerControllers)
+	{
+		PlayerController->ChangeGreenRoomReadyInfo(PlayerNumberMap[PressedPlayerController], PlayerReadyMap[PressedPlayerController]);
 	}
 }
 
