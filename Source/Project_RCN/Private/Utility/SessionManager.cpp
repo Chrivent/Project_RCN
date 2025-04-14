@@ -6,6 +6,7 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
+#include "Interfaces/OnlinePresenceInterface.h"
 
 void USessionManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -101,6 +102,50 @@ void USessionManager::DestroySession(const APlayerController* PlayerController)
 	else
 	{
 		ClientRPC_DestroySession();
+	}
+}
+
+void USessionManager::RequestReadSteamFriends() const
+{
+	if (const IOnlineSubsystem* OnlineSubsystem = Online::GetSubsystem(GetWorld()))
+	{
+		if (const IOnlineFriendsPtr FriendsInterface = OnlineSubsystem->GetFriendsInterface())
+		{
+			FriendsInterface->ReadFriendsList(0, TEXT("Default"),
+			FOnReadFriendsListComplete::CreateWeakLambda(this, [=, this]
+			(const int32 LocalUserNum, const bool bWasSuccessful, const FString& ListName, const FString& ErrorStr)
+			{
+				if (bWasSuccessful)
+				{
+					TArray<TSharedRef<FOnlineFriend>> OnlineFriends;
+					if (FriendsInterface->GetFriendsList(LocalUserNum, ListName, OnlineFriends))
+					{
+						if (OnlineFriends.Num() == 0)
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("✅ 친구 없음"));
+						}
+					}
+					else
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Failed to get friend list after ReadFriendsList success"));
+					}
+
+					ReadSteamFriendsDelegate.Broadcast(OnlineFriends);
+				}
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Failed to read Steam friends list: %s"), *ErrorStr));
+				}
+			}));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FriendsInterface not valid"));
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("OnlineSubsystem not found"));
 	}
 }
 

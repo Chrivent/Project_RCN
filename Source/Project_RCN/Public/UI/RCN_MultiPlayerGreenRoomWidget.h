@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OnlineSubsystemTypes.h"
 #include "Actor/RCN_PlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
@@ -34,14 +35,21 @@ protected:
 
 	UFUNCTION()
 	void StartOrReadyButtonReleasedHandle();
+
+	UFUNCTION()
+	void InviteButtonReleasedHandle();
 	
 	void DestroyedSessionsHandle() const;
+	void ReadSteamFriendsHandle(const TArray<TSharedRef<FOnlineFriend>>& OnlineFriends);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UButton> BackButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UButton> StartOrReadyButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UButton> InviteButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> StartOrReadyButtonText;

@@ -9,6 +9,7 @@
 DECLARE_MULTICAST_DELEGATE(FCreatedSessionDelegate)
 DECLARE_MULTICAST_DELEGATE_OneParam(FFoundSessionsDelegate, const TSharedPtr<FOnlineSessionSearch>&)
 DECLARE_MULTICAST_DELEGATE(FDestroyedSessionDelegate)
+DECLARE_MULTICAST_DELEGATE_OneParam(FReadSteamFriendsDelegate, const TArray<TSharedRef<FOnlineFriend>>&);
 
 /**
  * 
@@ -22,6 +23,7 @@ public:
 	FCreatedSessionDelegate CreatedSessionDelegate;
 	FFoundSessionsDelegate FoundSessionsDelegate;
 	FDestroyedSessionDelegate DestroyedSessionDelegate;
+	FReadSteamFriendsDelegate ReadSteamFriendsDelegate;
 
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -31,6 +33,7 @@ public:
 	void FindSessions();
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult) const;
 	void DestroySession(const APlayerController* PlayerController);
+	void RequestReadSteamFriends() const;
 
 protected:
 	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const;

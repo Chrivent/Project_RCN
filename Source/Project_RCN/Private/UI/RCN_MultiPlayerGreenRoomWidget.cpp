@@ -5,6 +5,7 @@
 
 #include "Actor/RCN_PlayerController.h"
 #include "Components/Button.h"
+#include "Interfaces/OnlinePresenceInterface.h"
 #include "Utility/SessionManager.h"
 
 void URCN_MultiPlayerGreenRoomWidget::NativeConstruct()
@@ -13,10 +14,12 @@ void URCN_MultiPlayerGreenRoomWidget::NativeConstruct()
 
 	BackButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerGreenRoomWidget::BackButtonReleasedHandle);
 	StartOrReadyButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerGreenRoomWidget::StartOrReadyButtonReleasedHandle);
+	InviteButton->OnReleased.AddDynamic(this, &URCN_MultiPlayerGreenRoomWidget::URCN_MultiPlayerGreenRoomWidget::InviteButtonReleasedHandle);
 	
 	if (USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
 	{
 		SessionManager->DestroyedSessionDelegate.AddUObject(this, &URCN_MultiPlayerGreenRoomWidget::DestroyedSessionsHandle);
+		SessionManager->ReadSteamFriendsDelegate.AddUObject(this, &URCN_MultiPlayerGreenRoomWidget::ReadSteamFriendsHandle);
 	}
 }
 
@@ -70,10 +73,31 @@ void URCN_MultiPlayerGreenRoomWidget::StartOrReadyButtonReleasedHandle()
 	}
 }
 
+void URCN_MultiPlayerGreenRoomWidget::InviteButtonReleasedHandle()
+{
+	if (const USessionManager* SessionManager = GetGameInstance()->GetSubsystem<USessionManager>())
+	{
+		SessionManager->RequestReadSteamFriends();
+	}
+}
+
 void URCN_MultiPlayerGreenRoomWidget::DestroyedSessionsHandle() const
 {
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
 	{
 		PlayerController->ClientTravel(TEXT("/Game/Level/MainMenuLevel"), TRAVEL_Absolute);
+	}
+}
+
+void URCN_MultiPlayerGreenRoomWidget::ReadSteamFriendsHandle(const TArray<TSharedRef<FOnlineFriend>>& OnlineFriends)
+{
+	for (const TSharedRef<FOnlineFriend>& Friend : OnlineFriends)
+	{
+		const FString DisplayName = Friend->GetDisplayName();
+		const FString RealName = Friend->GetRealName();
+		const FString Status = Friend->GetPresence().Status.StatusStr;
+
+		FString Msg = FString::Printf(TEXT("👤 %s (%s) - %s"), *DisplayName, *RealName, *Status);
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, Msg);
 	}
 }
