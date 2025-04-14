@@ -9,11 +9,13 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/ScrollBox.h"
 #include "Data/RCN_UIDataAsset.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Game/RCN_GreenRoomModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Project_RCN/Project_RCN.h"
+#include "UI/RCN_FriendEntryWidget.h"
 #include "UI/RCN_TimerWidget.h"
 #include "UI/RCN_MainMenuWidget.h"
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
@@ -147,6 +149,15 @@ void ARCN_PlayerController::CreateSessionListButtonWidget(const TSharedPtr<FOnli
 		}), i * 0.1f + 0.01f, false);
 
 		SessionListButtonWidgets.Emplace(SessionListButtonWidget);
+	}
+}
+
+void ARCN_PlayerController::CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedRef<FOnlineFriend>& OnlineFriend)
+{
+	if (URCN_FriendEntryWidget* FriendEntryWidget = CreateWidget<URCN_FriendEntryWidget>(this, UIDataAsset->FriendEntryWidgetClass))
+	{
+		FriendEntryWidget->Setup(OnlineFriend);
+		FriendsScrollBox->AddChild(FriendEntryWidget);
 	}
 }
 

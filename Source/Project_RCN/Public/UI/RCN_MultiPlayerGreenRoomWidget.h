@@ -9,8 +9,8 @@
 #include "Components/TextBlock.h"
 #include "RCN_MultiPlayerGreenRoomWidget.generated.h"
 
+class UScrollBox;
 class UTextBlock;
-
 class UButton;
 /**
  * 
@@ -65,4 +65,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> Player4ReadyText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UScrollBox> FriendsScrollBox;
 };

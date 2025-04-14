@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class FOnlineFriend;
+class UScrollBox;
 class URCN_GreenRoomReadyInfoWidget;
 class URCN_SessionListButtonWidget;
 class UWidget;
@@ -52,6 +54,7 @@ public:
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
+	void CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedRef<FOnlineFriend>& OnlineFriend);
 	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);

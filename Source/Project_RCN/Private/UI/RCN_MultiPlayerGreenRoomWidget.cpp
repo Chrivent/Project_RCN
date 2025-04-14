@@ -5,6 +5,7 @@
 
 #include "Actor/RCN_PlayerController.h"
 #include "Components/Button.h"
+#include "Components/ScrollBox.h"
 #include "Interfaces/OnlinePresenceInterface.h"
 #include "Utility/SessionManager.h"
 
@@ -99,5 +100,15 @@ void URCN_MultiPlayerGreenRoomWidget::ReadSteamFriendsHandle(const TArray<TShare
 
 		FString Msg = FString::Printf(TEXT("👤 %s (%s) - %s"), *DisplayName, *RealName, *Status);
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, Msg);
+	}
+
+	FriendsScrollBox->ClearChildren();
+
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
+	{
+		for (const TSharedRef<FOnlineFriend>& OnlineFriend : OnlineFriends)
+		{
+			PlayerController->CreateFriendEntryWidget(FriendsScrollBox, OnlineFriend);
+		}
 	}
 }
