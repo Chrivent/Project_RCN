@@ -54,7 +54,7 @@ public:
 	void CreateTimerWidget();
 	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
-	void CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedRef<FOnlineFriend>& OnlineFriend);
+	void CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedPtr<FOnlineFriend>& OnlineFriend);
 	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);

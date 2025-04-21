@@ -19,16 +19,16 @@ class PROJECT_RCN_API URCN_FriendEntryWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	void SetOnlineFriend(const TSharedPtr<FOnlineFriend>& InOnlineFriend);
+
+	UFUNCTION()
+	void InviteButtonReleasedHandle();
+
+	TSharedPtr<FOnlineFriend> OnlineFriend;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> NicknameText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UButton> InviteButton;
-
-	void Setup(const TSharedRef<FOnlineFriend>& OnlineFriend);
-	
-	FUniqueNetIdRepl FriendId;
-
-	UFUNCTION()
-	void InviteButtonReleasedHandle();
 };

@@ -152,11 +152,11 @@ void ARCN_PlayerController::CreateSessionListButtonWidget(const TSharedPtr<FOnli
 	}
 }
 
-void ARCN_PlayerController::CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedRef<FOnlineFriend>& OnlineFriend)
+void ARCN_PlayerController::CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedPtr<FOnlineFriend>& OnlineFriend)
 {
 	if (URCN_FriendEntryWidget* FriendEntryWidget = CreateWidget<URCN_FriendEntryWidget>(this, UIDataAsset->FriendEntryWidgetClass))
 	{
-		FriendEntryWidget->Setup(OnlineFriend);
+		FriendEntryWidget->SetOnlineFriend(OnlineFriend);
 		FriendsScrollBox->AddChild(FriendEntryWidget);
 	}
 }

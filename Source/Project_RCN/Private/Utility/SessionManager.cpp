@@ -149,6 +149,24 @@ void USessionManager::RequestReadSteamFriends() const
 	}
 }
 
+void USessionManager::SendInviteSteamFriend(const TSharedPtr<FOnlineFriend>& OnlineFriend) const
+{
+	if (!SessionInterface.IsValid())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("SessionInterface is invalid")));
+		return;
+	}
+	
+	//if (SessionInterface.Pin()->SendSessionInviteToFriend(0, NAME_GameSession, *OnlineFriend->GetUserId()))
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Sent invite to %s"), *OnlineFriend->GetDisplayName()));
+	}
+	//else
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Failed to send invite"));
+	}
+}
+
 void USessionManager::OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const
 {
 	if (bWasSuccessful)

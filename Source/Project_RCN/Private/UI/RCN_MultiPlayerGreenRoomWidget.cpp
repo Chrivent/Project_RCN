@@ -96,9 +96,8 @@ void URCN_MultiPlayerGreenRoomWidget::ReadSteamFriendsHandle(const TArray<TShare
 	{
 		const FString DisplayName = Friend->GetDisplayName();
 		const FString RealName = Friend->GetRealName();
-		const FString Status = Friend->GetPresence().Status.StatusStr;
 
-		FString Msg = FString::Printf(TEXT("👤 %s (%s) - %s"), *DisplayName, *RealName, *Status);
+		FString Msg = FString::Printf(TEXT("%s (%s)"), *DisplayName, *RealName);
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, Msg);
 	}
 
@@ -106,7 +105,7 @@ void URCN_MultiPlayerGreenRoomWidget::ReadSteamFriendsHandle(const TArray<TShare
 
 	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetOwningPlayer()))
 	{
-		for (const TSharedRef<FOnlineFriend>& OnlineFriend : OnlineFriends)
+		for (const auto OnlineFriend : OnlineFriends)
 		{
 			PlayerController->CreateFriendEntryWidget(FriendsScrollBox, OnlineFriend);
 		}

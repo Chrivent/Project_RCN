@@ -34,6 +34,7 @@ public:
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult) const;
 	void DestroySession(const APlayerController* PlayerController);
 	void RequestReadSteamFriends() const;
+	void SendInviteSteamFriend(const TSharedPtr<FOnlineFriend>& OnlineFriend) const;
 
 protected:
 	void OnCreateSessionCompleteHandle(const FName SessionName, const bool bWasSuccessful) const;
