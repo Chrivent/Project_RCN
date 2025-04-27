@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_NicknameWidget;
 class FOnlineFriend;
 class UScrollBox;
 class URCN_GreenRoomReadyInfoWidget;
@@ -55,6 +56,7 @@ public:
 	void CreateOtherPlayerViewWidget(ARCN_Player* OtherPlayer);
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
 	void CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedPtr<FOnlineFriend>& OnlineFriend);
+	void CreateNicknameWidget(ARCN_Player* OtherPlayer);
 	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);
@@ -85,6 +87,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category="GameUI")
 	TArray<TObjectPtr<URCN_SessionListButtonWidget>> SessionListButtonWidgets;
+
+	UPROPERTY(VisibleAnywhere, Category="GameUI")
+	TArray<TObjectPtr<URCN_NicknameWidget>> NicknameWidgets;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
@@ -104,4 +109,7 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_ChangeGreenRoomReadyInfo(const int32 PlayerIndex, const bool bIsReady);
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_CreateNicknameWidget(ARCN_Player* OtherPlayer);
 };

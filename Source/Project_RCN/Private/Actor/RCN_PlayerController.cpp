@@ -13,6 +13,7 @@
 #include "Data/RCN_UIDataAsset.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Game/RCN_GreenRoomModeBase.h"
+#include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_FriendEntryWidget.h"
@@ -20,6 +21,7 @@
 #include "UI/RCN_MainMenuWidget.h"
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
 #include "UI/RCN_MultiPlayerMainMenuWidget.h"
+#include "UI/RCN_NicknameWidget.h"
 #include "UI/RCN_OtherPlayerViewWidget.h"
 #include "UI/RCN_SessionListButtonWidget.h"
 
@@ -161,6 +163,11 @@ void ARCN_PlayerController::CreateFriendEntryWidget(UScrollBox* FriendsScrollBox
 	}
 }
 
+void ARCN_PlayerController::CreateNicknameWidget(ARCN_Player* OtherPlayer)
+{
+	ClientRPC_CreateNicknameWidget(OtherPlayer);
+}
+
 void ARCN_PlayerController::GreenRoomStartOrReady()
 {
 	if (HasAuthority())
@@ -279,7 +286,7 @@ void ARCN_PlayerController::ClientRPC_CreateOtherPlayerViewWidget_Implementation
 
 	CurrentTranslation.X -= UIDataAsset->CubeOtherPlayerViewWidgetWidthMoveDistance;
 	UpdateMoveWidget(OtherPlayerViewWidget, CurrentTranslation);
-	OtherPlayerViewWidgets.Add(OtherPlayerViewWidget);
+	OtherPlayerViewWidgets.Emplace(OtherPlayerViewWidget);
 
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
@@ -331,4 +338,23 @@ void ARCN_PlayerController::ClientRPC_ChangeGreenRoomReadyInfo_Implementation(co
 {
 	const FString ReadyText = bIsReady ? TEXT("Ready") : TEXT("Not Ready");
 	MultiPlayerGreenRoomWidget->ChangePlayerReadyText(PlayerIndex, ReadyText);
+}
+
+void ARCN_PlayerController::ClientRPC_CreateNicknameWidget_Implementation(ARCN_Player* OtherPlayer)
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	RCN_LOG(LogPlayer, Warning, TEXT("%s"), *PlayerState->GetPlayerName());
+		
+	URCN_NicknameWidget* OtherNicknameWidget = CreateWidget<URCN_NicknameWidget>(this, UIDataAsset->NicknameWidgetClass);
+	OtherNicknameWidget->AddToViewport();
+	OtherNicknameWidget->SetNicknameText(OtherPlayer->GetPlayerState()->GetPlayerName());
+
+	FVector2D CurrentTranslation = OtherNicknameWidget->GetRenderTransform().Translation;
+	CurrentTranslation.X += 400.0f * NicknameWidgets.Num();
+	UpdateMoveWidget(OtherNicknameWidget, CurrentTranslation);
+
+	NicknameWidgets.Emplace(OtherNicknameWidget);
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

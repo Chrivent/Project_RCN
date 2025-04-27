@@ -6,6 +6,12 @@
 #include "Engine/DataAsset.h"
 #include "RCN_UIDataAsset.generated.h"
 
+class URCN_MainMenuWidget;
+class URCN_MultiPlayerGreenRoomWidget;
+class URCN_TimerWidget;
+class URCN_OtherPlayerViewWidget;
+class URCN_SessionListButtonWidget;
+class URCN_NicknameWidget;
 class URCN_FriendEntryWidget;
 class URCN_SettingWidget;
 class URCN_SinglePlayerMainMenuWidget;
@@ -45,6 +51,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	TSubclassOf<URCN_FriendEntryWidget> FriendEntryWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Game UI")
+	TSubclassOf<URCN_NicknameWidget> NicknameWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Game UI")
 	float WidgetMoveSpeed;

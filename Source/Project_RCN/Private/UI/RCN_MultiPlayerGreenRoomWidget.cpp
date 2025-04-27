@@ -90,7 +90,7 @@ void URCN_MultiPlayerGreenRoomWidget::DestroyedSessionsHandle() const
 	}
 }
 
-void URCN_MultiPlayerGreenRoomWidget::ReadSteamFriendsHandle(const TArray<TSharedRef<FOnlineFriend>>& OnlineFriends)
+void URCN_MultiPlayerGreenRoomWidget::ReadSteamFriendsHandle(const TArray<TSharedRef<FOnlineFriend>>& OnlineFriends) const
 {
 	for (const TSharedRef<FOnlineFriend>& Friend : OnlineFriends)
 	{

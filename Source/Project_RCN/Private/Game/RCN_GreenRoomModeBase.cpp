@@ -179,6 +179,20 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 		}
 	}
 
+	if (GetWorld()->GetNumPlayerControllers() == PlayerControllers.Num())
+	{
+		for (const auto PlayerController1 : PlayerControllers)
+		{
+			for (const auto PlayerController2 : PlayerControllers)
+			{
+				if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController2->GetPawn()))
+				{
+					PlayerController1->CreateNicknameWidget(OtherPlayer);
+				}
+			}
+		}
+	}
+
 	NewPlayerController->CreateMultiPlayerGreenRoomWidget();
 
 	PlayerTargetQuatMap.Emplace(NewPlayerController, FMath::VRand().ToOrientationQuat());

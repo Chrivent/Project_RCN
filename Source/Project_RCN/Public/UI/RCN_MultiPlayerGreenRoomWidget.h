@@ -40,7 +40,7 @@ protected:
 	void InviteButtonReleasedHandle();
 	
 	void DestroyedSessionsHandle() const;
-	void ReadSteamFriendsHandle(const TArray<TSharedRef<FOnlineFriend>>& OnlineFriends);
+	void ReadSteamFriendsHandle(const TArray<TSharedRef<FOnlineFriend>>& OnlineFriends) const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UButton> BackButton;
