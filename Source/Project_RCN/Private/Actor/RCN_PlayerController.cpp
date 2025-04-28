@@ -168,6 +168,11 @@ void ARCN_PlayerController::CreateNicknameWidget(ARCN_Player* OtherPlayer)
 	ClientRPC_CreateNicknameWidget(OtherPlayer);
 }
 
+void ARCN_PlayerController::RemoveInvalidNicknameWidget()
+{
+	ClientRPC_RemoveInvalidNicknameWidget();
+}
+
 void ARCN_PlayerController::GreenRoomStartOrReady()
 {
 	if (HasAuthority())
@@ -248,6 +253,14 @@ void ARCN_PlayerController::ClientRPC_CreateTimerWidget_Implementation()
 void ARCN_PlayerController::ClientRPC_CreateOtherPlayerViewWidget_Implementation(ARCN_Player* OtherPlayer)
 {
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	for (const auto OtherPlayerViewWidget : OtherPlayerViewWidgets)
+	{
+		if (OtherPlayerViewWidget->GetPlayer() == OtherPlayer)
+		{
+			return;
+		}
+	}
 	
 	URCN_OtherPlayerViewWidget* OtherPlayerViewWidget = CreateWidget<URCN_OtherPlayerViewWidget>(this, UIDataAsset->OtherPlayerViewWidgetClass);
 	if (!IsValid(OtherPlayerViewWidget))
@@ -257,6 +270,7 @@ void ARCN_PlayerController::ClientRPC_CreateOtherPlayerViewWidget_Implementation
 	}
 
 	OtherPlayerViewWidget->AddToViewport();
+	OtherPlayerViewWidget->SetPlayer(OtherPlayer);
 
 	USceneCaptureComponent2D* SceneCaptureComponent = NewObject<USceneCaptureComponent2D>(this);
 	SceneCaptureComponent->AttachToComponent(OtherPlayer->GetSpringArmComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, USpringArmComponent::SocketName);
@@ -344,17 +358,41 @@ void ARCN_PlayerController::ClientRPC_CreateNicknameWidget_Implementation(ARCN_P
 {
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
 
-	RCN_LOG(LogPlayer, Warning, TEXT("%s"), *PlayerState->GetPlayerName());
+	for (const auto NicknameWidget : NicknameWidgets)
+	{
+		if (NicknameWidget->GetPlayer() == OtherPlayer)
+		{
+			return;
+		}
+	}
 		
 	URCN_NicknameWidget* OtherNicknameWidget = CreateWidget<URCN_NicknameWidget>(this, UIDataAsset->NicknameWidgetClass);
 	OtherNicknameWidget->AddToViewport();
 	OtherNicknameWidget->SetNicknameText(OtherPlayer->GetPlayerState()->GetPlayerName());
+	OtherNicknameWidget->SetPlayer(OtherPlayer);
 
 	FVector2D CurrentTranslation = OtherNicknameWidget->GetRenderTransform().Translation;
 	CurrentTranslation.X += 400.0f * NicknameWidgets.Num();
 	UpdateMoveWidget(OtherNicknameWidget, CurrentTranslation);
 
 	NicknameWidgets.Emplace(OtherNicknameWidget);
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ClientRPC_RemoveInvalidNicknameWidget_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	for (const auto NicknameWidget : NicknameWidgets)
+	{
+		if (!IsValid(NicknameWidget->GetPlayer()->Controller))
+		{
+			NicknameWidget->RemoveFromParent();
+			NicknameWidgets.Remove(NicknameWidget);
+			break;
+		}
+	}
 
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

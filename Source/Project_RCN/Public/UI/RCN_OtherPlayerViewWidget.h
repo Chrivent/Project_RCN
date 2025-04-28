@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RCN_OtherPlayerViewWidget.generated.h"
 
+class ARCN_Player;
 class UImage;
 /**
  * 
@@ -16,6 +17,9 @@ class PROJECT_RCN_API URCN_OtherPlayerViewWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	FORCEINLINE void SetPlayer(ARCN_Player* InPlayer) { Player = InPlayer; }
+	FORCEINLINE ARCN_Player* GetPlayer() const { return Player; }
+	
 	void SetOtherPlayerView(UTextureRenderTarget2D* RenderTarget, float OpacitySpeed);
 	
 protected:
@@ -24,6 +28,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UImage> OtherPlayerView;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UMaterialInterface* RenderTargetMaterial;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<ARCN_Player> Player;
 };

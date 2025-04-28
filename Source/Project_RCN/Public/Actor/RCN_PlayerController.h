@@ -57,6 +57,7 @@ public:
 	void CreateSessionListButtonWidget(const TSharedPtr<FOnlineSessionSearch>& SessionSearch);
 	void CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedPtr<FOnlineFriend>& OnlineFriend);
 	void CreateNicknameWidget(ARCN_Player* OtherPlayer);
+	void RemoveInvalidNicknameWidget();
 	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);
@@ -112,4 +113,7 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateNicknameWidget(ARCN_Player* OtherPlayer);
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_RemoveInvalidNicknameWidget();
 };

@@ -60,18 +60,15 @@ void ARCN_MultiModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControlle
 	
 	NewPlayerController->CreateTimerWidget();
 	
-	if (GetWorld()->GetNumPlayerControllers() == PlayerControllers.Num())
+	for (const auto PlayerController1 : PlayerControllers)
 	{
-		for (const auto PlayerController1 : PlayerControllers)
+		for (const auto PlayerController2 : PlayerControllers)
 		{
-			for (const auto PlayerController2 : PlayerControllers)
+			if (PlayerController1 != PlayerController2)
 			{
-				if (PlayerController1 != PlayerController2)
+				if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController2->GetPawn()))
 				{
-					if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController2->GetPawn()))
-					{
-						PlayerController1->CreateOtherPlayerViewWidget(OtherPlayer);
-					}
+					PlayerController1->CreateOtherPlayerViewWidget(OtherPlayer);
 				}
 			}
 		}

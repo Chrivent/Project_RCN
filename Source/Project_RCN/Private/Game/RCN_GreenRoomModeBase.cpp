@@ -8,6 +8,7 @@
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
+#include "UI/RCN_NicknameWidget.h"
 
 ARCN_GreenRoomModeBase::ARCN_GreenRoomModeBase()
 {
@@ -83,34 +84,12 @@ void ARCN_GreenRoomModeBase::Logout(AController* Exiting)
 		PlayerCubeMap.Remove(PlayerController);
 		PlayerReadyMap.Remove(PlayerController);
 		PlayerTargetQuatMap.Remove(PlayerController);
+
+		for (const auto ExistingPlayerController : PlayerControllers)
+		{
+			ExistingPlayerController->RemoveInvalidNicknameWidget();
+		}
 	}
-	
-	// 호스트 마이그레이션 제작중
-	/*if (Exiting->IsLocalController() && Exiting->HasAuthority())
-	{
-		RCN_LOG(LogTemp, Log, TEXT("호스트가 나가므로 호스트 마이그레이션을 실시합니다."))
-
-		TArray<APlayerController*> RemainingControllers;
-		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			APlayerController* PlayerController = Iterator->Get();
-
-			if (PlayerController && PlayerController != Exiting)
-			{
-				RemainingControllers.Add(PlayerController);
-			}
-		}
-
-		if (RemainingControllers.Num() > 0)
-		{
-			APlayerController* NetHost = RemainingControllers[0];
-			PromoteClientToHost(NetHost);
-		}
-		else
-		{
-			RCN_LOG(LogTemp, Log, TEXT("남은 플레이어가 없어서 호스트 마이그레이션 불가능"));
-		}
-	}*/
 	
 	RCN_LOG(LogTemp, Log, TEXT("Logout"))
 	
@@ -179,16 +158,13 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 		}
 	}
 
-	if (GetWorld()->GetNumPlayerControllers() == PlayerControllers.Num())
+	for (const auto PlayerController1 : PlayerControllers)
 	{
-		for (const auto PlayerController1 : PlayerControllers)
+		for (const auto PlayerController2 : PlayerControllers)
 		{
-			for (const auto PlayerController2 : PlayerControllers)
+			if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController2->GetPawn()))
 			{
-				if (ARCN_Player* OtherPlayer = Cast<ARCN_Player>(PlayerController2->GetPawn()))
-				{
-					PlayerController1->CreateNicknameWidget(OtherPlayer);
-				}
+				PlayerController1->CreateNicknameWidget(OtherPlayer);
 			}
 		}
 	}
