@@ -350,8 +350,12 @@ void ARCN_PlayerController::ClientRPC_ChangeGreenRoomReadyButton_Implementation(
 
 void ARCN_PlayerController::ClientRPC_ChangeGreenRoomReadyInfo_Implementation(const int32 PlayerIndex, const bool bIsReady)
 {
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+	
 	const FString ReadyText = bIsReady ? TEXT("Ready") : TEXT("Not Ready");
 	MultiPlayerGreenRoomWidget->ChangePlayerReadyText(PlayerIndex, ReadyText);
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ARCN_PlayerController::ClientRPC_CreateNicknameWidget_Implementation(ARCN_Player* OtherPlayer)
