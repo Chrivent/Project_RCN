@@ -167,4 +167,8 @@ protected:
 
 	UPROPERTY(ReplicatedUsing=OnRep_Facelets)
 	FString Facelets;
+
+	//----------------------
+
+	void LargestConnectedStickerGroup();
 };

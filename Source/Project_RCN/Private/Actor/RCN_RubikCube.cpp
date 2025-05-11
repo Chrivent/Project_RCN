@@ -265,6 +265,8 @@ void ARCN_RubikCube::TurnNext()
 				}
 				bIsSolved = false;
 			}
+
+			LargestConnectedStickerGroup();
 		}
 		
 		return;
@@ -607,4 +609,99 @@ void ARCN_RubikCube::MulticastRPC_RenewalPattern_Implementation(const FString& N
 	}
 
 	RCN_LOG(LogRubikCube, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_RubikCube::LargestConnectedStickerGroup()
+{
+	TMap<FVector, bool> VisitedPositions;
+	for (auto FaceletOrderPosition : FaceletOrderPositions)
+	{
+		VisitedPositions.Emplace(FaceletOrderPosition, false);
+	}
+
+	TArray Offsets = {
+		FVector(1, 0, 0), FVector(-1, 0, 0),
+		FVector(0, 1, 0), FVector(0, -1, 0),
+		FVector(0, 0, 1), FVector(0, 0, -1)
+	};
+
+	TMap<UMaterialInterface*, int32> MaxGroupSizeMap;
+	int32 MaxGroupSize = 0;
+	TArray<FVector> LargestGroupPositions;
+	for (auto StartPosition : FaceletOrderPositions)
+	{
+		if (VisitedPositions[StartPosition])
+		{
+			continue;
+		}
+		
+		TQueue<FVector> QueuePositions;
+		QueuePositions.Enqueue(StartPosition);
+		VisitedPositions[StartPosition] = true;
+
+		int32 CurrentGroupSize = 1;
+		TArray<FVector> CurrentGroupPositions;
+		CurrentGroupPositions.Add(StartPosition);
+		while (!QueuePositions.IsEmpty())
+		{
+			FVector CurrentPosition;
+			QueuePositions.Dequeue(CurrentPosition);
+
+			const UStaticMeshComponent* CurrentMeshComponent = StickerPositions.FindKey(CurrentPosition)->Get();
+			UE_LOG(LogTemp, Log, TEXT("%s %s"), *CurrentPosition.ToString(), *CurrentMeshComponent->GetMaterial(0)->GetName());
+
+			for (auto Offset : Offsets)
+			{
+				FVector NextPosition = CurrentPosition + Offset;
+				if (VisitedPositions.Contains(NextPosition) && !VisitedPositions[NextPosition])
+				{
+					const UStaticMeshComponent* NextMeshComponent = StickerPositions.FindKey(NextPosition)->Get();
+					if (NextMeshComponent->GetMaterial(0) == CurrentMeshComponent->GetMaterial(0))
+					{
+						QueuePositions.Enqueue(NextPosition);
+						VisitedPositions[NextPosition] = true;
+						CurrentGroupSize++;
+						CurrentGroupPositions.Add(NextPosition);
+					}
+				}
+			}
+		}
+
+		const UStaticMeshComponent* StartMeshComponent = StickerPositions.FindKey(StartPosition)->Get();
+		if (!MaxGroupSizeMap.Contains(StartMeshComponent->GetMaterial(0)) || MaxGroupSizeMap[StartMeshComponent->GetMaterial(0)] < CurrentGroupSize)
+		{
+			MaxGroupSizeMap.FindOrAdd(StartMeshComponent->GetMaterial(0)) = CurrentGroupSize;
+		}
+
+		if (CurrentGroupSize > MaxGroupSize)
+		{
+			MaxGroupSize = CurrentGroupSize;
+			LargestGroupPositions = CurrentGroupPositions;
+		}
+		else if (CurrentGroupSize == MaxGroupSize)
+		{
+			LargestGroupPositions.Append(CurrentGroupPositions);
+		}
+		
+		UE_LOG(LogTemp, Log, TEXT("현재 그룹 크기: %d"), CurrentGroupSize);
+		UE_LOG(LogTemp, Log, TEXT("------------------"));
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("=== 가장 넓게 연결된 색상 그룹 ==="));
+	TArray<UMaterialInterface*> LargestMaterials;
+	for (auto EachMaxGroupSize : MaxGroupSizeMap)
+	{
+		if (EachMaxGroupSize.Value == MaxGroupSize)
+		{
+			LargestMaterials.Add(EachMaxGroupSize.Key);
+			UE_LOG(LogTemp, Log, TEXT("색상: %s, 크기: %d"), *EachMaxGroupSize.Key->GetName(), EachMaxGroupSize.Value);
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("=== 가장 넓은 연결 영역의 스티커 위치들 ==="));
+	for (auto LargestGroupPosition : LargestGroupPositions)
+	{
+		const UStaticMeshComponent* Mesh = StickerPositions.FindKey(LargestGroupPosition)->Get();
+		UE_LOG(LogTemp, Log, TEXT("위치: %s, 색상: %s"), *LargestGroupPosition.ToString(), *Mesh->GetMaterial(0)->GetName());
+	}
 }
