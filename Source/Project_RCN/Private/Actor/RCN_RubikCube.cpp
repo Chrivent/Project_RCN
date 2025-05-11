@@ -701,7 +701,7 @@ void ARCN_RubikCube::LargestConnectedStickerGroup()
 	UE_LOG(LogTemp, Log, TEXT("=== 가장 넓은 연결 영역의 스티커 위치들 ==="));
 	for (auto LargestGroupPosition : LargestGroupPositions)
 	{
-		const UStaticMeshComponent* Mesh = StickerPositions.FindKey(LargestGroupPosition)->Get();
-		UE_LOG(LogTemp, Log, TEXT("위치: %s, 색상: %s"), *LargestGroupPosition.ToString(), *Mesh->GetMaterial(0)->GetName());
+		UStaticMeshComponent* LargestGroupMeshComponent = StickerPositions.FindKey(LargestGroupPosition)->Get();
+		UE_LOG(LogTemp, Log, TEXT("위치: %s, 색상: %s"), *LargestGroupPosition.ToString(), *LargestGroupMeshComponent->GetMaterial(0)->GetName());
 	}
 }
