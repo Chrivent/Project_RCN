@@ -3,12 +3,34 @@
 
 #include "UI/RCN_TimerWidget.h"
 
+#include "Actor/RCN_Player.h"
+#include "Actor/RCN_PlayerController.h"
+#include "Actor/RCN_RubikCube.h"
+#include "Components/Button.h"
 #include "Components/TextBlock.h"
 
 void URCN_TimerWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
+	ScrambleButton->OnReleased.AddDynamic(this, &URCN_TimerWidget::ScrambleButtonReleasedHandle);
+	SolveButton->OnReleased.AddDynamic(this, &URCN_TimerWidget::SolveButtonReleasedHandle);
+}
+
+void URCN_TimerWidget::ScrambleButtonReleasedHandle()
+{
+	if (const ARCN_Player* Player = Cast<ARCN_Player>(GetOwningPlayerPawn()))
+	{
+		Player->GetRubikCube()->Scramble();
+	}
+}
+
+void URCN_TimerWidget::SolveButtonReleasedHandle()
+{
+	if (const ARCN_Player* Player = Cast<ARCN_Player>(GetOwningPlayerPawn()))
+	{
+		Player->GetRubikCube()->Solve();
+	}
 }
 
 void URCN_TimerWidget::StartTimer()

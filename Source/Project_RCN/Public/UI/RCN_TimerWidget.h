@@ -8,7 +8,7 @@
 
 class UImage;
 class UTextBlock;
-class ARCN_RubikCube;
+class UButton;
 /**
  * 
  */
@@ -20,6 +20,12 @@ class PROJECT_RCN_API URCN_TimerWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
+	UFUNCTION()
+	void ScrambleButtonReleasedHandle();
+
+	UFUNCTION()
+	void SolveButtonReleasedHandle();
+
 public:
 	void StartTimer();
 	void StopTimer();
@@ -29,6 +35,12 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> TxtPlayTime;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> ScrambleButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> SolveButton;
 	
 	UPROPERTY()
 	float Time;

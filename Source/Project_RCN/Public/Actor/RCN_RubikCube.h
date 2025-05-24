@@ -103,6 +103,7 @@ protected:
 	void ReleasePieces(const FSignInfo& SignInfo);
 	void ChangeFacelets(const FString& NewFacelets);
 	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);
+	void LargestConnectedStickerGroup();
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_RubikCubeDataAsset> RubikCubeDataAsset;
@@ -167,8 +168,4 @@ protected:
 
 	UPROPERTY(ReplicatedUsing=OnRep_Facelets)
 	FString Facelets;
-
-	//----------------------
-
-	void LargestConnectedStickerGroup();
 };
