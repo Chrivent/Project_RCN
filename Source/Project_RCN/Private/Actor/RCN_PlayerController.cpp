@@ -17,6 +17,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Project_RCN/Project_RCN.h"
 #include "UI/RCN_FriendEntryWidget.h"
+#include "UI/RCN_ItemWidget.h"
 #include "UI/RCN_TimerWidget.h"
 #include "UI/RCN_MainMenuWidget.h"
 #include "UI/RCN_MultiPlayerGreenRoomWidget.h"
@@ -171,6 +172,16 @@ void ARCN_PlayerController::CreateNicknameWidget(ARCN_Player* OtherPlayer)
 void ARCN_PlayerController::RemoveInvalidNicknameWidget()
 {
 	ClientRPC_RemoveInvalidNicknameWidget();
+}
+
+void ARCN_PlayerController::CreateItemWidget()
+{
+	ClientRPC_CreateItemWidget();
+}
+
+void ARCN_PlayerController::RemoveItemWidget()
+{
+	ClientRPC_RemoveItemWidget();
 }
 
 void ARCN_PlayerController::GreenRoomStartOrReady()
@@ -397,6 +408,26 @@ void ARCN_PlayerController::ClientRPC_RemoveInvalidNicknameWidget_Implementation
 			break;
 		}
 	}
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ClientRPC_CreateItemWidget_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	URCN_ItemWidget* NewItemWidget = CreateWidget<URCN_ItemWidget>(this, UIDataAsset->ItemWidgetClass);
+	NewItemWidget->AddToViewport();
+	ItemWidget = NewItemWidget;
+
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_PlayerController::ClientRPC_RemoveItemWidget_Implementation()
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	ItemWidget->RemoveFromParent();
 
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

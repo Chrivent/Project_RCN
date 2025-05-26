@@ -30,7 +30,7 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 
 	GameStateClass = ARCN_GameState::StaticClass();
 
-	AvailablePlayerNumbers = { 1, 2, 3, 4 };
+	AvailablePlayerNumbers = { 0, 1, 2, 3 };
 }
 
 void ARCN_GameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)

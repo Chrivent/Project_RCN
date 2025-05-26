@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCN_PlayerController.generated.h"
 
+class URCN_ItemWidget;
 class URCN_NicknameWidget;
 class FOnlineFriend;
 class UScrollBox;
@@ -58,6 +59,8 @@ public:
 	void CreateFriendEntryWidget(UScrollBox* FriendsScrollBox, const TSharedPtr<FOnlineFriend>& OnlineFriend);
 	void CreateNicknameWidget(ARCN_Player* OtherPlayer);
 	void RemoveInvalidNicknameWidget();
+	void CreateItemWidget();
+	void RemoveItemWidget();
 	
 	void GreenRoomStartOrReady();
 	void ChangeGreenRoomReadyButton(const bool bIsReady);
@@ -91,6 +94,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category="GameUI")
 	TArray<TObjectPtr<URCN_NicknameWidget>> NicknameWidgets;
+
+	UPROPERTY(VisibleAnywhere, Category="GameUI")
+	TObjectPtr<URCN_ItemWidget> ItemWidget;
 	
 	// 네트워크 로직
 	UFUNCTION(Client, Reliable)
@@ -116,4 +122,10 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_RemoveInvalidNicknameWidget();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_CreateItemWidget();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_RemoveItemWidget();
 };
