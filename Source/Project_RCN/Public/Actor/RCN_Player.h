@@ -61,7 +61,7 @@ protected:
 	void SpinInput(const FInputActionValue& Value);
 
 	FVector GetClosestSpinDirection(const FVector& SelectedButtonPosition, const FVector& Direction) const;
-	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection) const;
+	void SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection);
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_PlayerDataAsset> PlayerDataAsset;
@@ -114,6 +114,9 @@ protected:
 
 	UFUNCTION(Server, Unreliable)
 	void ServerRPC_RenewalCube();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SpinCube(const FString& Command);
 
 	UPROPERTY(Replicated)
 	TObjectPtr<ARCN_RubikCube> RubikCube;

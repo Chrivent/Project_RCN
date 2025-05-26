@@ -414,7 +414,7 @@ FVector ARCN_Player::GetClosestSpinDirection(const FVector& SelectedButtonPositi
 	return SpinDirection;
 }
 
-void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection) const
+void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector& SpinDirection)
 {
 	const FVector NormalVector = FVector(
 			FMath::Abs(SelectedButtonPosition.X) == 2 ? SelectedButtonPosition.X / 2.0f : 0,
@@ -470,7 +470,8 @@ void ARCN_Player::SpinCube(const FVector& SelectedButtonPosition, const FVector&
 		}
 	}
 	
-	RubikCube->Spin(Command);
+	//RubikCube->Spin(Command);
+	ServerRPC_SpinCube(Command);
 }
 
 void ARCN_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -556,6 +557,21 @@ void ARCN_Player::ServerRPC_RenewalCube_Implementation()
 	Rotator.Yaw = YawComponent->GetRelativeRotation().Yaw;
 	
 	MulticastRPC_SetCubeRotation(Rotator, true);
+	
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ARCN_Player::ServerRPC_SpinCube_Implementation(const FString& Command)
+{
+	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("Begin"));
+
+	if (ARCN_PlayerController* PlayerController = Cast<ARCN_PlayerController>(GetController()))
+	{
+		if (ARCN_GameModeBase* GameModeBase = Cast<ARCN_GameModeBase>(GetWorld()->GetAuthGameMode()))
+		{
+			GameModeBase->SpinCube(PlayerController, Command);
+		}
+	}
 	
 	RCN_LOG(LogPlayer, Log, TEXT("%s"), TEXT("End"));
 }

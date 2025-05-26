@@ -3,6 +3,7 @@
 
 #include "Game/RCN_GameModeBase.h"
 
+#include "Actor/RCN_Player.h"
 #include "Actor/RCN_PlayerController.h"
 #include "Actor/RCN_RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
@@ -28,6 +29,8 @@ ARCN_GameModeBase::ARCN_GameModeBase()
 	PlayerControllerClass = GameModeBaseDataAsset->PlayerControllerClass;
 
 	GameStateClass = ARCN_GameState::StaticClass();
+
+	AvailablePlayerNumbers = { 1, 2, 3, 4 };
 }
 
 void ARCN_GameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
@@ -109,6 +112,14 @@ void ARCN_GameModeBase::LoginComplete(ARCN_PlayerController* NewPlayerController
 
 	PlayerControllers.Emplace(NewPlayerController);
 	PlayerNumberMap.Emplace(NewPlayerController, GetAvailablePlayerNumber());
+}
+
+void ARCN_GameModeBase::SpinCube(ARCN_PlayerController* PlayerController, const FString& Command)
+{
+	if (const ARCN_Player* Player = Cast<ARCN_Player>(PlayerController->GetPawn()))
+	{
+		Player->GetRubikCube()->Spin(Command);
+	}
 }
 
 int32 ARCN_GameModeBase::GetAvailablePlayerNumber()

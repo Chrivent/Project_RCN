@@ -40,6 +40,7 @@ protected:
 
 public:
 	virtual void LoginComplete(ARCN_PlayerController* NewPlayerController);
+	virtual void SpinCube(ARCN_PlayerController* PlayerController, const FString& Command);
 	
 protected:
 	int32 GetAvailablePlayerNumber();
