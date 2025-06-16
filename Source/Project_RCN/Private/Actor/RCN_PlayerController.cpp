@@ -5,7 +5,7 @@
 
 #include "OnlineSessionSettings.h"
 #include "Actor/RCN_Player.h"
-#include "Actor/RCN_RubikCube.h"
+#include "RubikCube.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Components/SceneCaptureComponent2D.h"

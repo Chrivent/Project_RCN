@@ -6,7 +6,7 @@
 #include "Game/RCN_GameModeBase.h"
 #include "RCN_GreenRoomModeBase.generated.h"
 
-class ARCN_RubikCube;
+class ARubikCube;
 class ARCN_PlayerController;
 /**
  * 
@@ -34,7 +34,7 @@ protected:
 	bool PlayerAllReadyCheck();
 
 	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARCN_RubikCube>> PlayerCubeMap;
+	TMap<TObjectPtr<ARCN_PlayerController>, TObjectPtr<ARubikCube>> PlayerCubeMap;
 
 	UPROPERTY(visibleAnywhere)
 	TMap<TObjectPtr<ARCN_PlayerController>, bool> PlayerReadyMap;

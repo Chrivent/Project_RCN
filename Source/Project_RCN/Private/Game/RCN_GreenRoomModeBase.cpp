@@ -5,10 +5,9 @@
 
 #include "Actor/RCN_Player.h"
 #include "Actor/RCN_PlayerController.h"
-#include "Actor/RCN_RubikCube.h"
+#include "RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
-#include "UI/RCN_NicknameWidget.h"
 
 ARCN_GreenRoomModeBase::ARCN_GreenRoomModeBase()
 {
@@ -132,7 +131,7 @@ void ARCN_GreenRoomModeBase::LoginComplete(ARCN_PlayerController* NewPlayerContr
 {
 	Super::LoginComplete(NewPlayerController);
 
-	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	if (ARubikCube* RubikCube = Cast<ARubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		RubikCube->SetOwner(NewPlayerController->GetPawn());
 		RubikCube->SetActorScale3D(FVector::ZeroVector);

@@ -1,10 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RCN_RubikCube.generated.h"
+#include "RubikCube.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogRubikCube, Log, All);
 
@@ -13,7 +11,6 @@ struct FInputActionValue;
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
-class URCN_RubikCubeDataAsset;
 
 DECLARE_MULTICAST_DELEGATE(FFinishScramble)
 DECLARE_MULTICAST_DELEGATE(FFinishSolve)
@@ -68,23 +65,16 @@ struct FSignInfo
 };
 
 UCLASS()
-class PROJECT_RCN_API ARCN_RubikCube : public AActor
+class CUBESOLVER_API ARubikCube : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
-	ARCN_RubikCube();
+	ARubikCube();
 
 	FORCEINLINE bool IsSolved() const { return bIsSolved; }
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	void Spin(const FString& Command);
 	void Scramble();
@@ -95,18 +85,43 @@ public:
 	FFinishSolve FinishSolveDelegate;
 
 protected:
-	void CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const float PieceSize, const FVector& Position, const EStickerType StickerType);
+	void CreateStickerAndButton(UStaticMeshComponent* PieceMeshComponent, const FVector& Position, const EStickerType StickerType);
 	void TurnNext();
 	void TurnCore(const FSignInfo& SignInfo);
-	void UpdateTurnCore(const FSignInfo& SignInfo, const FQuat& TargetQuat);
 	void GrabPieces(const FSignInfo& SignInfo);
 	void ReleasePieces(const FSignInfo& SignInfo);
 	void ChangeFacelets(const FString& NewFacelets);
 	static FMatrix GetRotationMatrix(const FSignInfo& SignInfo);
-	void LargestConnectedStickerGroup();
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UStaticMesh> PieceMesh;
+
+	UPROPERTY(EditDefaultsOnly)
+	float PieceDistance;
+
+	UPROPERTY(EditDefaultsOnly)
+	float PieceSize;
+
+	UPROPERTY(EditDefaultsOnly)
+	float TurnSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UStaticMesh> StickerMesh;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<EStickerType, TObjectPtr<UMaterial>> StickerMaterials;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StickerDistance;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StickerSize;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ButtonSize;
 	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<URCN_RubikCubeDataAsset> RubikCubeDataAsset;
+	UPROPERTY(EditDefaultsOnly)
+	float ButtonThickness;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultComponent;
@@ -141,6 +156,10 @@ protected:
 	static const TArray<FSignInfo> SignInfos;
 	static const TArray<FVector> FaceletOrderPositions;
 	TQueue<FSignInfo> SignQueue;
+
+	bool bIsUpdatingTurnCore = false;
+	FSignInfo CurrentSignInfo;
+	FQuat CurrentTargetQuat;
 
 	// 네트워크 로직
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

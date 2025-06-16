@@ -2,6 +2,8 @@
 
 
 #include "Game/RCN_GameState.h"
+
+#include "Actor/RCN_Player.h"
 #include "Project_RCN/Project_RCN.h"
 
 void ARCN_GameState::HandleBeginPlay()

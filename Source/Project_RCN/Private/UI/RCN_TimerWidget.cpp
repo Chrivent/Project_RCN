@@ -4,8 +4,7 @@
 #include "UI/RCN_TimerWidget.h"
 
 #include "Actor/RCN_Player.h"
-#include "Actor/RCN_PlayerController.h"
-#include "Actor/RCN_RubikCube.h"
+#include "RubikCube.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 

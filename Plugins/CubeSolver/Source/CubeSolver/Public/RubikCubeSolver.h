@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CubeSolver.generated.h"
+#include "RubikCubeSolver.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogCubeSolver, Log, All)
+DECLARE_LOG_CATEGORY_EXTERN(LogRubikCubeSolver, Log, All)
 
 /**
  * The names of the facelet positions of the cube
@@ -36,17 +36,17 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCubeSolver, Log, All)
  * L5, L6, L7, L8, L9, B1, B2, B3, B4, B5, B6, B7, B8, B9 of the enum constants.
  */
 UCLASS()
-class UCubeSolver : public UObject
+class CUBESOLVER_API URubikCubeSolver : public UObject
 {
     GENERATED_BODY()
 
 public:
-    /**
-     * Computes the solver string for a given cube.
-     * 
-     * @param Facelets
-     * The cube definition string
-     *
+	/**
+	 * Computes the solver string for a given cube.
+	 * 
+	 * @param Facelets
+	 * The cube definition string
+	 *
 	 * @param ErrorMessage
 	 * If an error occurs, this will be populated with a human-readable explanation.<br>
 	 * Error 1: There is not exactly one facelet of each colour<br>

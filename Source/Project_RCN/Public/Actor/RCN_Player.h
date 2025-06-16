@@ -9,7 +9,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogPlayer, Log, All);
 
 class UBoxComponent;
-class ARCN_RubikCube;
+class ARubikCube;
 class URCN_PlayerDataAsset;
 class USpringArmComponent;
 class UCameraComponent;
@@ -25,7 +25,7 @@ public:
 	// Sets default values for this pawn's properties
 	ARCN_Player();
 	
-	FORCEINLINE ARCN_RubikCube* GetRubikCube() const { return RubikCube; }
+	FORCEINLINE ARubikCube* GetRubikCube() const { return RubikCube; }
 	FORCEINLINE USpringArmComponent* GetSpringArmComponent() const { return SpringArmComponent; }
 
 protected:
@@ -42,7 +42,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	void SetRubikCube(ARCN_RubikCube* InRubikCube);
+	void SetRubikCube(ARubikCube* InRubikCube);
 	void SetCubeLocation(const FVector& Location);
 	void SetCubeRotation(const FRotator& Rotation);
 	void RenewalCube();
@@ -119,6 +119,6 @@ protected:
 	void ServerRPC_SpinCube(const FString& Command);
 
 	UPROPERTY(Replicated)
-	TObjectPtr<ARCN_RubikCube> RubikCube;
+	TObjectPtr<ARubikCube> RubikCube;
 };
 

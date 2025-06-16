@@ -5,7 +5,7 @@
 
 #include "Actor/RCN_Player.h"
 #include "Actor/RCN_PlayerController.h"
-#include "Actor/RCN_RubikCube.h"
+#include "RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "Project_RCN/Project_RCN.h"
 #include "Game/RCN_GameState.h"
@@ -140,7 +140,7 @@ void ARCN_GameModeBase::ReleasePlayerNumber(int32 PlayerNumber)
 	AvailablePlayerNumbers.Sort();
 }
 
-void ARCN_GameModeBase::UpdateAppearCube(ARCN_RubikCube* RubikCube)
+void ARCN_GameModeBase::UpdateAppearCube(ARubikCube* RubikCube)
 {
 	const FVector CurrentScale = RubikCube->GetActorScale3D();
 	const FVector NewScale = FMath::Lerp(CurrentScale, FVector::OneVector, GameModeBaseDataAsset->CubeAppearSpeed);
@@ -158,7 +158,7 @@ void ARCN_GameModeBase::UpdateAppearCube(ARCN_RubikCube* RubikCube)
 	}));
 }
 
-void ARCN_GameModeBase::UpdateDestroyCube(ARCN_RubikCube* RubikCube)
+void ARCN_GameModeBase::UpdateDestroyCube(ARubikCube* RubikCube)
 {
 	const FVector CurrentCubeScale = RubikCube->GetActorScale3D();
 	const FVector NewCubeScale  = FMath::Lerp(CurrentCubeScale, FVector::ZeroVector, GameModeBaseDataAsset->CubeDestroySpeed);

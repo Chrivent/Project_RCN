@@ -1,6 +1,6 @@
-#include "Project_RCN/Public/Utility/CubeSolver.h"
+#include "RubikCubeSolver.h"
 
-DEFINE_LOG_CATEGORY(LogCubeSolver)
+DEFINE_LOG_CATEGORY(LogRubikCubeSolver)
 
 #define CORNER_COUNT 8
 #define EDGE_COUNT 12
@@ -895,11 +895,11 @@ bool CheckCachedTable(const FString& Name, void* Ptr, const int32 Length, const 
         }
         else
         {
-            UE_LOG(LogCubeSolver, Error, TEXT("Failed to read file: %s"), *FilePath);
+            UE_LOG(LogRubikCubeSolver, Error, TEXT("Failed to read file: %s"), *FilePath);
         }
         return true;
     }
-    UE_LOG(LogCubeSolver, Warning, TEXT("Cache table %s was not found. Recalculating."), *FilePath);
+    UE_LOG(LogRubikCubeSolver, Warning, TEXT("Cache table %s was not found. Recalculating."), *FilePath);
     return false;
 }
 
@@ -914,16 +914,16 @@ void DumpToFile(void* Ptr, const int32 Length, const FString& Name, const FStrin
 
         if (FFileHelper::SaveArrayToFile(FileData, *FilePath))
         {
-            UE_LOG(LogCubeSolver, Log, TEXT("Successfully wrote cache table: %s"), *FilePath);
+            UE_LOG(LogRubikCubeSolver, Log, TEXT("Successfully wrote cache table: %s"), *FilePath);
         }
         else
         {
-            UE_LOG(LogCubeSolver, Error, TEXT("Failed to write cache table: %s"), *FilePath);
+            UE_LOG(LogRubikCubeSolver, Error, TEXT("Failed to write cache table: %s"), *FilePath);
         }
     }
     else
     {
-        UE_LOG(LogCubeSolver, Error, TEXT("Cannot create cache tables directory: %s"), *CacheDir);
+        UE_LOG(LogRubikCubeSolver, Error, TEXT("Cannot create cache tables directory: %s"), *CacheDir);
     }
 }
 
@@ -1262,7 +1262,7 @@ int32 TotalDepth(FSearch& Search, const int32 DepthPhase1, const int32 MaxDepth)
     return DepthPhase1 + DepthPhase2;
 }
 
-FString UCubeSolver::SolveCube(FString Facelets, FString& ErrorMessage, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
+FString URubikCubeSolver::SolveCube(FString Facelets, FString& ErrorMessage, const int32 MaxDepth, const double TimeOut, const FString& CacheDir)
 {
     FSearch Search;
 
@@ -1426,7 +1426,7 @@ const TArray<FString> SignArray = {
     "U", "U'", "U2"
 };
 
-FString UCubeSolver::GenerateScrambleCommand(const int32 ScrambleCount)
+FString URubikCubeSolver::GenerateScrambleCommand(const int32 ScrambleCount)
 {
     FString Command;
     FString LastSign = TEXT(" ");
@@ -1447,7 +1447,7 @@ FString UCubeSolver::GenerateScrambleCommand(const int32 ScrambleCount)
     return Command;
 }
 
-bool UCubeSolver::CheckSolved(const FString& Facelets, FString& ErrorMessage)
+bool URubikCubeSolver::CheckSolved(const FString& Facelets, FString& ErrorMessage)
 {
     if (Facelets.Len() < 54)
     {

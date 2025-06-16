@@ -6,7 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Actor/RCN_PlayerController.h"
-#include "Actor/RCN_RubikCube.h"
+#include "RubikCube.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Data/RCN_PlayerDataAsset.h"
@@ -152,7 +152,7 @@ void ARCN_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(PlayerDataAsset->SpinInputRightAction, ETriggerEvent::Triggered, this, &ARCN_Player::SpinInput);
 }
 
-void ARCN_Player::SetRubikCube(ARCN_RubikCube* InRubikCube)
+void ARCN_Player::SetRubikCube(ARubikCube* InRubikCube)
 {
 	RubikCube = InRubikCube;
 	RubikCube->AttachToComponent(YawComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);

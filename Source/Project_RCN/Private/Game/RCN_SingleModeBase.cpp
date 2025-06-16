@@ -5,7 +5,7 @@
 
 #include "Actor/RCN_Player.h"
 #include "Actor/RCN_PlayerController.h"
-#include "Actor/RCN_RubikCube.h"
+#include "RubikCube.h"
 #include "Data/RCN_GameModeBaseDataAsset.h"
 #include "UI/RCN_TimerWidget.h"
 
@@ -13,7 +13,7 @@ void ARCN_SingleModeBase::LoginComplete(ARCN_PlayerController* NewPlayerControll
 {
 	Super::LoginComplete(NewPlayerController);
 
-	if (ARCN_RubikCube* RubikCube = Cast<ARCN_RubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
+	if (ARubikCube* RubikCube = Cast<ARubikCube>(GetWorld()->SpawnActor(GameModeBaseDataAsset->RubikCubeClass)))
 	{
 		RubikCube->SetOwner(NewPlayerController->GetPawn());
 		RubikCube->SetActorScale3D(FVector::ZeroVector);

@@ -8,7 +8,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogGameModeBase, Log, All);
 
-class ARCN_RubikCube;
+class ARubikCube;
 class ARCN_PlayerController;
 class URCN_UIDataAsset;
 class URCN_GameModeBaseDataAsset;
@@ -45,8 +45,8 @@ public:
 protected:
 	int32 GetAvailablePlayerNumber();
 	void ReleasePlayerNumber(int32 PlayerNumber);
-	void UpdateAppearCube(ARCN_RubikCube* RubikCube);
-	void UpdateDestroyCube(ARCN_RubikCube* RubikCube);
+	void UpdateAppearCube(ARubikCube* RubikCube);
+	void UpdateDestroyCube(ARubikCube* RubikCube);
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URCN_GameModeBaseDataAsset> GameModeBaseDataAsset;

@@ -8,7 +8,19 @@ public class Project_RCN : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UMG", "SlateCore", "InputCore", "EnhancedInput", "OnlineSubsystem", "OnlineSubsystemSteam" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"UMG",
+			"SlateCore",
+			"InputCore",
+			"EnhancedInput",
+			"OnlineSubsystem",
+			"OnlineSubsystemSteam",
+			"CubeSolver"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

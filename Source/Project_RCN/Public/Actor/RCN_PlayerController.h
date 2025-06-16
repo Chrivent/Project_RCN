@@ -15,7 +15,7 @@ class URCN_SessionListButtonWidget;
 class UWidget;
 class FOnlineSessionSearch;
 class UListView;
-class ARCN_RubikCube;
+class ARubikCube;
 class URCN_MultiPlayerGreenRoomWidget;
 class UImage;
 class URCN_MainMenuWidget;
